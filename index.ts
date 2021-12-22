@@ -1,1 +1,3 @@
-export * from './src';
+import { main } from './src';
+
+main();

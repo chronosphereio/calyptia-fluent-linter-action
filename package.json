@@ -1,31 +1,26 @@
 {
-  "name": "ts-node-template",
-  "repository": "git@github.com:gagoar/codeowners-generator.git",
-  "license": "MIT",
-  "version": "0.0.0",
-  "description": "ts node template description",
-  "main": "dist/index.js",
-  "types": "types/index.d.ts",
-  "bin": {
-    "ts-node-template-ci": "cli/index.js"
+  "name": "fluent-bit-linter",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com:calyptia/fluent-bit-linter.git"
   },
+  "license": "Apache-2.0",
+  "version": "0.0.9",
+  "description": "Linter action for Fluent-bit configuration",
+  "main": "dist/index.js",
   "scripts": {
     "precommit": "lint-staged",
     "test": "jest",
     "build": "esbuild --bundle ./index.ts --platform=node --target=node12 --main-fields=main --outdir=dist",
-    "build-cli": "esbuild --bundle ./src/bin/cli.ts --platform=node --target=node12 --main-fields=main  --outdir=cli",
-    "lint": "eslint src/* --ext .ts",
-    "build-types": "tsc --emitDeclarationOnly --outDir types",
-    "version": "auto-changelog -p && git add CHANGELOG.md",
-    "release": "npm run build && npm run build-cli && npm publish"
+    "lint": "eslint src/* --ext .ts"
   },
   "engines": {
-    "node": ">10.0.0"
+    "node": ">12.0.0"
   },
   "keywords": [
-    "cli",
-    "template",
-    "node"
+    "linter",
+    "action",
+    "fluent-bit"
   ],
   "husky": {
     "hooks": {
@@ -103,21 +98,22 @@
   },
   "author": "Gago <xeroice@gmail.com>",
   "dependencies": {
-    "commander": "7.0.0",
-    "cosmiconfig": "7.0.1",
-    "debug": "4.3.3",
-    "ora": "5.4.1"
+    "@actions/core": "^1.6.0",
+    "@actions/glob": "^0.2.0",
+    "@calyptia/fluent-bit-config-parser": "^1.0.0",
+    "axios": "^0.24.0",
+    "got": "^12.0.0",
+    "node-fetch": "^2.6.6"
   },
   "devDependencies": {
     "@types/debug": "4.1.7",
     "@types/jest": "26.0.24",
     "@types/node": "16.11.12",
+    "@types/node-fetch": "^3.0.3",
     "@typescript-eslint/eslint-plugin": "4.33.0",
     "@typescript-eslint/parser": "4.33.0",
     "ajv-keywords": "5.1.0",
     "auto-changelog": "2.3.0",
-    "bufferutil": "4.0.5",
-    "canvas": "2.6.1",
     "esbuild": "0.14.2",
     "eslint": "7.32.0",
     "eslint-config-prettier": "7.2.0",
@@ -126,13 +122,16 @@
     "jest-mock-process": "1.4.1",
     "lint-staged": "10.5.4",
     "prettier": "2.5.1",
-    "prettier-eslint": "13.0.0",
-    "prettier-eslint-cli": "5.0.1",
+    "prettier-eslint": "^8.2.2",
+    "prettier-eslint-cli": "^4.2.1",
     "pretty-quick": "3.1.2",
     "ts-jest": "26.5.6",
     "ts-node": "9.1.1",
     "tslib": "2.3.1",
-    "typescript": "4.5.2",
-    "utf-8-validate": "5.0.4"
-  }
+    "typescript": "4.5.2"
+  },
+  "bugs": {
+    "url": "https://github.com/calyptia/fluent-bit-linter/issues"
+  },
+  "homepage": "https://github.com/calyptia/fluent-bit-linter#readme"
 }
