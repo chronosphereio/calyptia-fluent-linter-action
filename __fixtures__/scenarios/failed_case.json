@@ -1,0 +1,13 @@
+{
+  "errors": {
+    "runtime": [],
+    "input": {
+      "john": ["cannot initialize input plugin: john"],
+      "syslog": ["Unknown syslog mode abc"]
+    },
+    "output": {},
+    "filter": {
+      "parser": ["missing 'key_name'"]
+    }
+  }
+}

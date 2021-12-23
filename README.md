@@ -1,33 +1,24 @@
 <p align="center">
-  <h3 align="center">Template for typescript applications</h3>
+  <h3 align="center">Fluent Linter Action</h3>
 
   <p align="center">
      ⚙ Template repository for typescript applications meant to run in node ⚙
     <br />
-    <a href="https://github.com/gagoar/ts-node-template#table-of-contents"><strong>Explore the docs »</strong></a>
+    <a href="https://github.com/gagoar/calyptia/fluent-linter-action#table-of-contents"><strong>Explore the docs »</strong></a>
     <br />
-    <a href="https://github.com/gagoar/ts-node-template/issues">Report Bug</a>
+    <a href="https://github.com/gagoar/calyptia/fluent-linter-action/issues">Report Bug</a>
     ·
-    <a href="https://github.com/gagoar/ts-node-template/issues">Request Feature</a>
+    <a href="https://github.com/gagoar/calyptia/fluent-linter-action/issues">Request Feature</a>
   </p>
 </p>
 
 ## Table of Contents
 
-- [Built With](#built-with)
 - [Getting Started](#getting-started)
 - [Contributing](#contributing)
 - [License](#license)
 
 <!-- CONTRIBUTING -->
-
-### Built With
-
-- [ncc](https://github.com/vercel/ncc/)
-- [jest](https://github.com/facebook/jest)
-- [ora](https://github.com/sindresorhus/ora)
-- [commander](https://github.com/tj/commander.js/)
-- [cosmiconfig](https://github.com/davidtheclark/cosmiconfig)
 
 ## Contributing
 

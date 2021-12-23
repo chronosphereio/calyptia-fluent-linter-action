@@ -1,6 +1,9 @@
 {
   "include": ["src", "test", "index.ts"],
   "compilerOptions": {
+    "paths": {
+      "*": ["@types/*"]
+    },
     "target": "es2017",
     "module": "es6",
     "lib": ["dom", "esnext"],
