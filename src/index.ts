@@ -4,7 +4,7 @@ import { readContent } from './utils/readContent';
 import { FluentBitSchema } from '@calyptia/fluent-bit-config-parser';
 import fetch from 'node-fetch';
 import { CALYPTIA_API_ENDPOINT, CALYPTIA_API_VALIDATION_PATH } from './utils/constants';
-import { operations } from '../api';
+import { FieldErrors, normalizeErrors } from './utils/normalizeErrors';
 export enum ExtraOptions {
   HTTP_TIMEOUT = 'HTTP_TIMEOUT',
   MAX_RETRIES = 'MAX_RETRIES',
@@ -17,9 +17,7 @@ export enum InputValues {
   GITHUB_TOKEN = 'GITHUB_TOKEN',
 }
 
-type r200 = operations['agentConfigValidation']['responses']['200']['content']['application/json'];
-
-type r401 = operations['agentConfigValidation']['responses']['401']['content']['application/json'];
+type ValidationResponse = { errors: FieldErrors };
 
 const getActionInput = () => {
   return Object.keys(InputValues).reduce((memo, prop) => {
@@ -34,7 +32,7 @@ export const main = async () => {
 
     const globber = await glob.create(input.CONFIG_LOCATION_GLOB, { matchDirectories: false });
 
-    const annotations = [] as AnnotationProperties[];
+    let annotations = [] as AnnotationProperties[];
 
     for await (const filePath of globber.globGenerator()) {
       debug(`evaluating file ${filePath}`);
@@ -55,17 +53,21 @@ export const main = async () => {
           const config = new FluentBitSchema(content);
 
           const response = (await fetch(URL, {
-            method: 'post',
-            body: JSON.stringify(config),
+            method: 'POST',
+            body: JSON.stringify(config.schema),
             headers,
           })) as Response;
 
+          const data = (await response.json()) as unknown as ValidationResponse;
           if (response.status === 200) {
-            const data = response.json() as unknown as r200;
             debug(`[${filePath}]: ${JSON.stringify(data)}`);
+
+            const errors = normalizeErrors(filePath, data.errors);
+            if (errors.length) {
+              annotations = [...annotations, ...errors];
+            }
           } else {
-            const data = response.json() as unknown as r401;
-            annotations.push({ file: filePath, title: data.error });
+            setFailed(`The request failed:  ${JSON.stringify(data)}`);
           }
         } catch (e) {
           setFailed(`something went very wrong ${JSON.stringify((e as Error).message)}`);

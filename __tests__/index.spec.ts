@@ -1,7 +1,7 @@
 import { main, InputValues } from '../src';
 import { setFailed, getInput, setOutput, error } from '../__mocks__/@actions/core';
 
-describe('invoke-aws-lambda', () => {
+describe('fluent-bit-linter', () => {
   const mockedInput = {
     [InputValues.GITHUB_TOKEN]: 'GITHUB_TOKEN',
     [InputValues.CALYPTIA_API_KEY]:
@@ -23,8 +23,40 @@ describe('invoke-aws-lambda', () => {
 
   it('runs when provided the correct input', async () => {
     await main();
-    expect(setFailed).not.toHaveBeenCalled();
-    expect(error).not.toHaveBeenCalled();
+    expect(setFailed).toHaveBeenCalled();
+    expect(error).toMatchInlineSnapshot(`
+      [MockFunction] {
+        "calls": Array [
+          Array [
+            [Error: Linting Error],
+            Object {
+              "file": "/Users/gago/base/fluent-bit-linter/__fixtures__/invalid1.conf",
+              "message": "[john]: cannot initialize input plugin: john
+      [syslog]: Unknown syslog mode abc",
+              "title": "input",
+            },
+          ],
+          Array [
+            [Error: Linting Error],
+            Object {
+              "file": "/Users/gago/base/fluent-bit-linter/__fixtures__/invalid1.conf",
+              "message": "[parser]: missing 'key_name'",
+              "title": "filter",
+            },
+          ],
+        ],
+        "results": Array [
+          Object {
+            "type": "return",
+            "value": undefined,
+          },
+          Object {
+            "type": "return",
+            "value": undefined,
+          },
+        ],
+      }
+    `);
     expect(setOutput.mock.calls).toMatchInlineSnapshot('Array []');
-  });
+  }, 5000000000);
 });
