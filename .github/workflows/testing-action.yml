@@ -1,12 +1,12 @@
 on: pull_request
 
 jobs:
-  test-action:
+  testAction:
     name: Fluent linter action test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
-      - id: Running Linter
+      - id: running_linter
         uses: calyptia/fluent-linter-action@main
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
