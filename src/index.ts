@@ -73,7 +73,7 @@ export const main = async (): Promise<void> => {
 
     if (annotations.length) {
       for (const annotation of annotations) {
-        error(annotation.message, annotation);
+        error(annotation.group, annotation);
       }
 
       setFailed('We found errors in your configurations');
