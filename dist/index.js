@@ -15285,10 +15285,13 @@ function normalizeErrors(filePath, _a) {
   var _b = _a,
     { runtime } = _b,
     errors = __objRest(_b, ['runtime']);
-  const annotations = Object.entries(errors).reduce((memo, [group, issues]) => {
+  const annotations = Object.entries(errors).reduce((memo, [command, issues]) => {
     if (Object.keys(issues).length) {
-      const errGroup = Object.entries(issues).map(([group2, problems]) => `[${group2}]: ${problems.join(',')}`);
-      return [...memo, { file: filePath, title: `${errGroup.join('\n')}`, group }];
+      const errGroup = Object.entries(issues).map(([group, problems]) => `[${group}]: ${problems.join('\n')}`);
+      return [
+        ...memo,
+        { file: filePath, problems: `${errGroup.join('\n')}`, title: `Problems found in command ${command}` },
+      ];
     }
     return memo;
   }, []);
@@ -15348,7 +15351,7 @@ var main = async () => {
     }
     if (annotations.length) {
       for (const annotation of annotations) {
-        (0, import_core.error)(annotation.group, annotation);
+        (0, import_core.error)(annotation.problems, annotation);
       }
       (0, import_core.setFailed)('We found errors in your configurations');
     }
