@@ -1,10 +1,10 @@
-import { getInput, setFailed, debug, error, type AnnotationProperties } from '@actions/core';
+import { getInput, setFailed, debug, error } from '@actions/core';
 import * as glob from '@actions/glob';
 import { readContent } from './utils/readContent';
 import { FluentBitSchema } from '@calyptia/fluent-bit-config-parser';
 import fetch from 'node-fetch';
 import { CALYPTIA_API_ENDPOINT, CALYPTIA_API_VALIDATION_PATH } from './utils/constants';
-import { FieldErrors, normalizeErrors } from './utils/normalizeErrors';
+import { Annotation, FieldErrors, normalizeErrors } from './utils/normalizeErrors';
 export enum InputValues {
   CONFIG_LOCATION_GLOB = 'CONFIG_LOCATION_GLOB',
   CALYPTIA_API_KEY = 'CALYPTIA_API_KEY',
@@ -26,7 +26,7 @@ export const main = async (): Promise<void> => {
 
     const globber = await glob.create(input.CONFIG_LOCATION_GLOB, { matchDirectories: false });
 
-    let annotations = [] as AnnotationProperties[];
+    let annotations = [] as Annotation[];
 
     for await (const filePath of globber.globGenerator()) {
       debug(`evaluating file ${filePath}`);
@@ -73,7 +73,7 @@ export const main = async (): Promise<void> => {
 
     if (annotations.length) {
       for (const annotation of annotations) {
-        error(new Error('Linting Error'), annotation);
+        error(annotation.message, annotation);
       }
 
       setFailed('We found errors in your configurations');

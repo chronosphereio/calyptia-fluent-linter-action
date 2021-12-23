@@ -15348,7 +15348,7 @@ var main = async () => {
     }
     if (annotations.length) {
       for (const annotation of annotations) {
-        (0, import_core.error)(new Error('Linting Error'), annotation);
+        (0, import_core.error)(annotation.message, annotation);
       }
       (0, import_core.setFailed)('We found errors in your configurations');
     }
