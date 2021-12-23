@@ -1,4 +1,4 @@
-name: 'fluent-bit-linter'
+name: 'fluent-linter-action'
 description: 'Linter action for Fluent-bit configuration'
 branding:
   icon: check

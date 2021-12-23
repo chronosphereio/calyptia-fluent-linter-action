@@ -1,11 +1,12 @@
 import { main, InputValues } from '../src';
 import { setFailed, getInput, setOutput, error } from '../__mocks__/@actions/core';
-
-describe('fluent-bit-linter', () => {
+import nock from 'nock';
+import failCase from '../__fixtures__/scenarios/failed_case.json';
+import { CALYPTIA_API_ENDPOINT, CALYPTIA_API_VALIDATION_PATH } from '../src/utils/constants';
+describe('fluent-linter-action', () => {
   const mockedInput = {
     [InputValues.GITHUB_TOKEN]: 'GITHUB_TOKEN',
-    [InputValues.CALYPTIA_API_KEY]:
-      'eyJUb2tlbklEIjoiMzBiOTkxYTAtYjQ0My00ZTUwLWEwZGUtNDAwYThlMmEyNmVkIiwiUHJvamVjdElEIjoiN2JhZThmNTEtNGQwYi00ODY4LTllMmQtYWQzNWEzZTRlYTliIn0.7sSHp_u4Bz5r38CBavTmFmMrc2WL4gPcv4ta2EEiMUDcCe3_F2mR59DgnkdCqNH-',
+    [InputValues.CALYPTIA_API_KEY]: 'API_TOKEN',
     [InputValues.CONFIG_LOCATION_GLOB]: '__fixtures__/*.conf',
   };
 
@@ -22,6 +23,11 @@ describe('fluent-bit-linter', () => {
   });
 
   it('runs when provided the correct input', async () => {
+    const client = nock(CALYPTIA_API_ENDPOINT)
+      ['post']('/' + CALYPTIA_API_VALIDATION_PATH)
+      .reply(200, JSON.stringify({ config: {} }));
+    client['post']('/' + CALYPTIA_API_VALIDATION_PATH).reply(200, failCase);
+
     await main();
     expect(setFailed).toHaveBeenCalled();
     expect(error).toMatchInlineSnapshot(`
@@ -30,7 +36,7 @@ describe('fluent-bit-linter', () => {
           Array [
             [Error: Linting Error],
             Object {
-              "file": "/Users/gago/base/fluent-bit-linter/__fixtures__/invalid1.conf",
+              "file": "<PROJECT_ROOT>/__fixtures__/invalid1.conf",
               "message": "[john]: cannot initialize input plugin: john
       [syslog]: Unknown syslog mode abc",
               "title": "input",
@@ -39,7 +45,7 @@ describe('fluent-bit-linter', () => {
           Array [
             [Error: Linting Error],
             Object {
-              "file": "/Users/gago/base/fluent-bit-linter/__fixtures__/invalid1.conf",
+              "file": "<PROJECT_ROOT>/__fixtures__/invalid1.conf",
               "message": "[parser]: missing 'key_name'",
               "title": "filter",
             },
@@ -57,6 +63,6 @@ describe('fluent-bit-linter', () => {
         ],
       }
     `);
-    expect(setOutput.mock.calls).toMatchInlineSnapshot('Array []');
+    expect(client.isDone()).toBe(true);
   }, 5000000000);
 });

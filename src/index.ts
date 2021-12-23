@@ -26,7 +26,7 @@ const getActionInput = () => {
   }, {} as Record<keyof typeof InputValues, string>);
 };
 
-export const main = async () => {
+export const main = async (): Promise<void> => {
   try {
     const input = getActionInput();
 
@@ -59,11 +59,13 @@ export const main = async () => {
           })) as Response;
 
           const data = (await response.json()) as unknown as ValidationResponse;
+
           if (response.status === 200) {
             debug(`[${filePath}]: ${JSON.stringify(data)}`);
 
             const errors = normalizeErrors(filePath, data.errors);
             if (errors.length) {
+              debug(`${filePath}, Found errors: ${JSON.stringify(errors, null, 2)}`);
               annotations = [...annotations, ...errors];
             }
           } else {

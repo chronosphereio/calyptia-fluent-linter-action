@@ -10,6 +10,7 @@ module.exports = {
   transform: {
     '^.+\\.tsx?$': 'ts-jest',
   },
+  snapshotSerializers: ['jest-serializer-path'],
   preset: 'ts-jest',
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
   testURL: 'http://localhost',
