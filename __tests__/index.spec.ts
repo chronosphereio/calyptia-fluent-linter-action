@@ -34,20 +34,21 @@ describe('fluent-linter-action', () => {
       [MockFunction] {
         "calls": Array [
           Array [
-            [Error: Linting Error],
+            "[john]: cannot initialize input plugin: john
+      [syslog]: Unknown syslog mode abc",
             Object {
               "file": "<PROJECT_ROOT>/__fixtures__/invalid1.conf",
-              "message": "[john]: cannot initialize input plugin: john
+              "problems": "[john]: cannot initialize input plugin: john
       [syslog]: Unknown syslog mode abc",
-              "title": "input",
+              "title": "Problems found in command input",
             },
           ],
           Array [
-            [Error: Linting Error],
+            "[parser]: missing 'key_name'",
             Object {
               "file": "<PROJECT_ROOT>/__fixtures__/invalid1.conf",
-              "message": "[parser]: missing 'key_name'",
-              "title": "filter",
+              "problems": "[parser]: missing 'key_name'",
+              "title": "Problems found in command filter",
             },
           ],
         ],
