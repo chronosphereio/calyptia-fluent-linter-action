@@ -5,12 +5,6 @@ import { FluentBitSchema } from '@calyptia/fluent-bit-config-parser';
 import fetch from 'node-fetch';
 import { CALYPTIA_API_ENDPOINT, CALYPTIA_API_VALIDATION_PATH } from './utils/constants';
 import { FieldErrors, normalizeErrors } from './utils/normalizeErrors';
-export enum ExtraOptions {
-  HTTP_TIMEOUT = 'HTTP_TIMEOUT',
-  MAX_RETRIES = 'MAX_RETRIES',
-  SUCCEED_ON_FUNCTION_FAILURE = 'SUCCEED_ON_FUNCTION_FAILURE',
-}
-
 export enum InputValues {
   CONFIG_LOCATION_GLOB = 'CONFIG_LOCATION_GLOB',
   CALYPTIA_API_KEY = 'CALYPTIA_API_KEY',
