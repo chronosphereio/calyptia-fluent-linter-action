@@ -11,7 +11,7 @@
   "scripts": {
     "precommit": "lint-staged",
     "test": "jest",
-    "build": "esbuild --bundle ./index.ts --platform=node --target=node12 --main-fields=main --outdir=dist",
+    "build": "esbuild --bundle ./index.ts --platform=node --target=node12 --main-fields=main --outdir=dist && pretty-quick dist/index.js",
     "lint": "eslint src/* --ext .ts"
   },
   "engines": {
@@ -33,7 +33,8 @@
     ],
     "*.ts": [
       "eslint --fix",
-      "bash -c \"npm run build\""
+      "bash -c \"npm run build\"",
+      "pretty-quick dist/index.js"
     ]
   },
   "prettier": {
