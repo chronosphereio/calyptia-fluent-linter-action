@@ -65,5 +65,5 @@ describe('fluent-linter-action', () => {
       }
     `);
     expect(client.isDone()).toBe(true);
-  }, 5000000000);
+  });
 });
