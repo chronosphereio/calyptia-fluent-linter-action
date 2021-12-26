@@ -34,7 +34,8 @@
     "*.ts": [
       "eslint --fix",
       "bash -c \"npm run build\"",
-      "pretty-quick dist/index.js"
+      "pretty-quick dist/index.js",
+      "git add ."
     ]
   },
   "prettier": {
