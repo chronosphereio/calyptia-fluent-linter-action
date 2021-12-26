@@ -1,10 +1,11 @@
-import { getInput, setFailed, debug, error } from '@actions/core';
+import { getInput, setFailed, debug } from '@actions/core';
 import * as glob from '@actions/glob';
 import { readContent } from './utils/readContent';
 import { FluentBitSchema } from '@calyptia/fluent-bit-config-parser';
 import fetch from 'node-fetch';
 import { CALYPTIA_API_ENDPOINT, CALYPTIA_API_VALIDATION_PATH } from './utils/constants';
 import { Annotation, FieldErrors, normalizeErrors } from './utils/normalizeErrors';
+import { formatErrorsPerFile } from './formatErrorsPerFile';
 export enum InputValues {
   CONFIG_LOCATION_GLOB = 'CONFIG_LOCATION_GLOB',
   CALYPTIA_API_KEY = 'CALYPTIA_API_KEY',
@@ -58,6 +59,7 @@ export const main = async (): Promise<void> => {
             debug(`[${filePath}]: ${JSON.stringify(data)}`);
 
             const errors = normalizeErrors(filePath, data.errors);
+
             if (errors.length) {
               debug(`${filePath}, Found errors: ${JSON.stringify(errors, null, 2)}`);
               annotations = [...annotations, ...errors];
@@ -72,10 +74,10 @@ export const main = async (): Promise<void> => {
     }
 
     if (annotations.length) {
+      console.log('::add-matcher::problem-matcher.json');
       for (const annotation of annotations) {
-        error(annotation.problems, annotation);
+        console.log(annotation.filePath, formatErrorsPerFile(annotation));
       }
-
       setFailed('We found errors in your configurations');
     }
   } catch (error) {

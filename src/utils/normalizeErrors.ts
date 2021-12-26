@@ -1,16 +1,13 @@
-import type { AnnotationProperties } from '@actions/core';
 export type FieldErrors = Record<string, Record<string, string[]>>;
 
-export type Annotation = AnnotationProperties & { problems: string };
+type ErrorGroup = [group: string, reasons: string[]];
+export type Annotation = { filePath: string; errorGroups: ErrorGroup[]; section: string };
 export function normalizeErrors(filePath: string, { runtime, ...errors }: FieldErrors): Annotation[] {
   const annotations = Object.entries(errors).reduce((memo, [command, issues]) => {
     if (Object.keys(issues).length) {
-      const errGroup = Object.entries(issues).map(([group, problems]) => `[${group}]: ${problems.join('\n')}`);
+      const errorGroups = Object.entries(issues);
 
-      return [
-        ...memo,
-        { file: filePath, problems: `${errGroup.join('\n')}`, title: `Problems found in command ${command}` },
-      ];
+      return [...memo, { filePath, section: command, errorGroups }];
     }
 
     return memo;

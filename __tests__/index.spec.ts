@@ -1,9 +1,11 @@
 import { main, InputValues } from '../src';
-import { setFailed, getInput, setOutput, error } from '../__mocks__/@actions/core';
+import { setFailed, getInput, setOutput } from '../__mocks__/@actions/core';
 import nock from 'nock';
 import failCase from '../__fixtures__/scenarios/failed_case.json';
 import { CALYPTIA_API_ENDPOINT, CALYPTIA_API_VALIDATION_PATH } from '../src/utils/constants';
+import { mockConsole, unMockConsole } from './helpers';
 describe('fluent-linter-action', () => {
+  let consoleLogMock: jest.Mock;
   const mockedInput = {
     [InputValues.GITHUB_TOKEN]: 'GITHUB_TOKEN',
     [InputValues.CALYPTIA_API_KEY]: 'API_TOKEN',
@@ -14,6 +16,12 @@ describe('fluent-linter-action', () => {
     getInput.mockImplementation((key: Partial<InputValues>) => {
       return mockedInput[key];
     });
+
+    consoleLogMock = mockConsole('log');
+  });
+
+  afterAll(() => {
+    unMockConsole('log');
   });
 
   afterEach(() => {
@@ -30,39 +38,23 @@ describe('fluent-linter-action', () => {
 
     await main();
     expect(setFailed).toHaveBeenCalled();
-    expect(error).toMatchInlineSnapshot(`
-      [MockFunction] {
-        "calls": Array [
-          Array [
-            "[john]: cannot initialize input plugin: john
-      [syslog]: Unknown syslog mode abc",
-            Object {
-              "file": "<PROJECT_ROOT>/__fixtures__/invalid1.conf",
-              "problems": "[john]: cannot initialize input plugin: john
-      [syslog]: Unknown syslog mode abc",
-              "title": "Problems found in command input",
-            },
-          ],
-          Array [
-            "[parser]: missing 'key_name'",
-            Object {
-              "file": "<PROJECT_ROOT>/__fixtures__/invalid1.conf",
-              "problems": "[parser]: missing 'key_name'",
-              "title": "Problems found in command filter",
-            },
-          ],
+    expect(consoleLogMock.mock.calls).toMatchInlineSnapshot(`
+      Array [
+        Array [
+          "::add-matcher::problem-matcher.json",
         ],
-        "results": Array [
-          Object {
-            "type": "return",
-            "value": undefined,
-          },
-          Object {
-            "type": "return",
-            "value": undefined,
-          },
+        Array [
+          "<PROJECT_ROOT>/__fixtures__/invalid1.conf",
+          "0:0 error john   cannot initialize input plugin: john 
+      0:0 error syslog Unknown syslog mode abc              
+      ",
         ],
-      }
+        Array [
+          "<PROJECT_ROOT>/__fixtures__/invalid1.conf",
+          "0:0 error parser missing 'key_name' 
+      ",
+        ],
+      ]
     `);
     expect(client.isDone()).toBe(true);
   });
