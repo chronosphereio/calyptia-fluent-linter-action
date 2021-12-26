@@ -20189,8 +20189,9 @@ var NO_STYLES_IN_TABLE = {
 };
 
 // src/utils/normalizeErrors.ts
+var import_path = __toModule(require('path'));
 function relativeFilePath(filePath) {
-  return filePath.replace(process.env.GITHUB_WORKSPACE, '');
+  return filePath.replace((0, import_path.join)(process.env.GITHUB_WORKSPACE, '/'), '');
 }
 function normalizeErrors(filePath, _a) {
   var _b = _a,
