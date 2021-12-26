@@ -4,7 +4,7 @@
       "owner": "fluent-linter",
       "pattern": [
         {
-          "regexp": "^(\\w*):\\s*(\\d+):(\\d+)\\s+(error|warning|info)\\s+(\\w+)\\s+(.*)$",
+          "regexp": "(.+\\/[^\\/]+):\\s(\\d+):(\\d+)\\s+(error|warning|info)\\s+(\\w+)\\s+(.*)$",
           "file": 1,
           "line": 2,
           "column": 3,
