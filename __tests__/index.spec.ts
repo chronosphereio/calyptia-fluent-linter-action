@@ -46,7 +46,7 @@ describe('fluent-linter-action', () => {
           "::add-matcher::problem-matcher.json",
         ],
         Array [
-          "<PROJECT_ROOT>/__fixtures__/invalid1.conf:",
+          "<PROJECT_ROOT>/__fixtures__/invalid.conf:",
           "
       ",
           "0:0 error john   cannot initialize input plugin: john 
@@ -54,7 +54,7 @@ describe('fluent-linter-action', () => {
       ",
         ],
         Array [
-          "<PROJECT_ROOT>/__fixtures__/invalid1.conf:",
+          "<PROJECT_ROOT>/__fixtures__/invalid.conf:",
           "
       ",
           "0:0 error parser missing 'key_name' 
