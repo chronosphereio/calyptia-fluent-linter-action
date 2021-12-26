@@ -46,12 +46,9 @@ describe('fluent-linter-action', () => {
           "::add-matcher::.github/problem-matcher.json",
         ],
         Array [
-          "<PROJECT_ROOT>/__fixtures__/invalid.conf:",
-          "
-      ",
-          "0:0 error john   cannot initialize input plugin: john 
-      0:0 error syslog Unknown syslog mode abc              
-      0:0 error parser missing 'key_name'                   
+          "<PROJECT_ROOT>/__fixtures__/invalid.conf: 0:0 error john   cannot initialize input plugin: john 
+      <PROJECT_ROOT>/__fixtures__/invalid.conf: 0:0 error syslog Unknown syslog mode abc              
+      <PROJECT_ROOT>/__fixtures__/invalid.conf: 0:0 error parser missing 'key_name'                   
       ",
         ],
       ]

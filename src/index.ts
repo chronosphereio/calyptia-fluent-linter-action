@@ -82,7 +82,7 @@ export const main = async (): Promise<void> => {
         return memo;
       }, {} as Record<string, unknown[]>);
       for (const file in groupedByFile) {
-        console.log(`${file}:`, '\n', formatErrorsPerFile(groupedByFile[file] as Annotation['errorGroups']));
+        console.log(formatErrorsPerFile(file, groupedByFile[file] as Annotation['errorGroups']));
       }
       setFailed('We found errors in your configurations. Please check the errors above');
     }

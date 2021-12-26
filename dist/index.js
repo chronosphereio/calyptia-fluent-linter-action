@@ -20212,11 +20212,11 @@ function normalizeErrors(filePath, _a) {
 var import_table2 = __toModule(require_src());
 var DEFAULT_LINE_AND_COLUMN = '0:0';
 var ISSUE_LEVEL = 'error';
-function formatErrorsPerFile(errorGroups) {
+function formatErrorsPerFile(filePath, errorGroups) {
   const data = [];
   for (const [group, errors] of errorGroups) {
     for (const reason of errors) {
-      data.push([DEFAULT_LINE_AND_COLUMN, ISSUE_LEVEL, group, reason]);
+      data.push([`${filePath}:`, DEFAULT_LINE_AND_COLUMN, ISSUE_LEVEL, group, reason]);
     }
   }
   return (0, import_table2.table)(data, NO_STYLES_IN_TABLE);
@@ -20280,7 +20280,7 @@ var main = async () => {
         return memo;
       }, {});
       for (const file in groupedByFile) {
-        console.log(`${file}:`, '\n', formatErrorsPerFile(groupedByFile[file]));
+        console.log(formatErrorsPerFile(file, groupedByFile[file]));
       }
       (0, import_core.setFailed)('We found errors in your configurations. Please check the errors above');
     }
