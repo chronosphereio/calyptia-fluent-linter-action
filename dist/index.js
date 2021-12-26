@@ -20189,6 +20189,9 @@ var NO_STYLES_IN_TABLE = {
 };
 
 // src/utils/normalizeErrors.ts
+function relativeFilePath(filePath) {
+  return filePath.replace(process.env.GITHUB_WORKSPACE, '');
+}
 function normalizeErrors(filePath, _a) {
   var _b = _a,
     { runtime } = _b,
@@ -20196,7 +20199,7 @@ function normalizeErrors(filePath, _a) {
   const annotations = Object.entries(errors).reduce((memo, [command, issues]) => {
     if (Object.keys(issues).length) {
       const errorGroups = Object.entries(issues);
-      return [...memo, { filePath, section: command, errorGroups }];
+      return [...memo, { filePath: relativeFilePath(filePath), section: command, errorGroups }];
     }
     return memo;
   }, []);
@@ -20271,9 +20274,8 @@ var main = async () => {
     if (annotations.length) {
       console.log('::add-matcher::problem-matcher.json');
       for (const annotation of annotations) {
-        console.log(annotation.filePath, '\n', formatErrorsPerFile(annotation));
+        console.log(`${annotation.filePath}:`, '\n', formatErrorsPerFile(annotation));
       }
-      (0, import_core.setFailed)('We found errors in your configurations');
     }
   } catch (error) {
     (0, import_core.setFailed)(JSON.stringify(error));

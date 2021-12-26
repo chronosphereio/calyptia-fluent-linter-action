@@ -12,6 +12,8 @@ describe('fluent-linter-action', () => {
     [InputValues.CONFIG_LOCATION_GLOB]: '__fixtures__/*.conf',
   };
 
+  process.env.GITHUB_WORKSPACE = __dirname;
+  console.log(process.env.GITHUB_WORKSPACE);
   beforeAll(() => {
     getInput.mockImplementation((key: Partial<InputValues>) => {
       return mockedInput[key];
@@ -44,13 +46,17 @@ describe('fluent-linter-action', () => {
           "::add-matcher::problem-matcher.json",
         ],
         Array [
-          "<PROJECT_ROOT>/__fixtures__/invalid1.conf",
+          "<PROJECT_ROOT>/__fixtures__/invalid1.conf:",
+          "
+      ",
           "0:0 error john   cannot initialize input plugin: john 
       0:0 error syslog Unknown syslog mode abc              
       ",
         ],
         Array [
-          "<PROJECT_ROOT>/__fixtures__/invalid1.conf",
+          "<PROJECT_ROOT>/__fixtures__/invalid1.conf:",
+          "
+      ",
           "0:0 error parser missing 'key_name' 
       ",
         ],
