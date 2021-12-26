@@ -4,7 +4,7 @@ import { NO_STYLES_IN_TABLE } from './utils/constants';
 
 const DEFAULT_LINE_AND_COLUMN = '0:0';
 const ISSUE_LEVEL = 'error';
-export function formatErrorsPerFile({ errorGroups }: Annotation) {
+export function formatErrorsPerFile(errorGroups: Annotation['errorGroups']): string {
   const data = [] as string[][];
 
   for (const [group, errors] of errorGroups) {

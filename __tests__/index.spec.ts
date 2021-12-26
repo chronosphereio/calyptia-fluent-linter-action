@@ -43,7 +43,7 @@ describe('fluent-linter-action', () => {
     expect(consoleLogMock.mock.calls).toMatchInlineSnapshot(`
       Array [
         Array [
-          "::add-matcher::problem-matcher.json",
+          "::add-matcher::.github/problem-matcher.json",
         ],
         Array [
           "<PROJECT_ROOT>/__fixtures__/invalid.conf:",
@@ -51,13 +51,7 @@ describe('fluent-linter-action', () => {
       ",
           "0:0 error john   cannot initialize input plugin: john 
       0:0 error syslog Unknown syslog mode abc              
-      ",
-        ],
-        Array [
-          "<PROJECT_ROOT>/__fixtures__/invalid.conf:",
-          "
-      ",
-          "0:0 error parser missing 'key_name' 
+      0:0 error parser missing 'key_name'                   
       ",
         ],
       ]

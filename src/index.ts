@@ -3,7 +3,7 @@ import * as glob from '@actions/glob';
 import { readContent } from './utils/readContent';
 import { FluentBitSchema } from '@calyptia/fluent-bit-config-parser';
 import fetch from 'node-fetch';
-import { CALYPTIA_API_ENDPOINT, CALYPTIA_API_VALIDATION_PATH } from './utils/constants';
+import { CALYPTIA_API_ENDPOINT, CALYPTIA_API_VALIDATION_PATH, PROBLEM_MATCHER_FILE_LOCATION } from './utils/constants';
 import { Annotation, FieldErrors, normalizeErrors } from './utils/normalizeErrors';
 import { formatErrorsPerFile } from './formatErrorsPerFile';
 export enum InputValues {
@@ -74,12 +74,15 @@ export const main = async (): Promise<void> => {
     }
 
     if (annotations.length) {
-      console.log('::add-matcher::.github/problem-matcher.json');
+      console.log(`::add-matcher::${PROBLEM_MATCHER_FILE_LOCATION}`);
 
-      // console.log('::add-matcher::problem-matcher.json');
+      const groupedByFile = annotations.reduce((memo, { filePath, errorGroups }) => {
+        memo[filePath] = memo[filePath] ? [...memo[filePath], ...errorGroups] : errorGroups;
 
-      for (const annotation of annotations) {
-        console.log(`${annotation.filePath}:`, '\n', formatErrorsPerFile(annotation));
+        return memo;
+      }, {} as Record<string, unknown[]>);
+      for (const file in groupedByFile) {
+        console.log(`${file}:`, '\n', formatErrorsPerFile(groupedByFile[file] as Annotation['errorGroups']));
       }
       setFailed('We found errors in your configurations. Please check the errors above');
     }

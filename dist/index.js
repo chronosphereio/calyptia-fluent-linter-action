@@ -20179,6 +20179,7 @@ var import_node_fetch = __toModule(require_lib2());
 var import_table = __toModule(require_src());
 var CALYPTIA_API_ENDPOINT = 'https://cloud-api.calyptia.com';
 var CALYPTIA_API_VALIDATION_PATH = 'v1/config_validate/fluentbit';
+var PROBLEM_MATCHER_FILE_LOCATION = '.github/problem-matcher.json';
 var NO_STYLES_IN_TABLE = {
   border: (0, import_table.getBorderCharacters)('void'),
   columnDefault: {
@@ -20211,7 +20212,7 @@ function normalizeErrors(filePath, _a) {
 var import_table2 = __toModule(require_src());
 var DEFAULT_LINE_AND_COLUMN = '0:0';
 var ISSUE_LEVEL = 'error';
-function formatErrorsPerFile({ errorGroups }) {
+function formatErrorsPerFile(errorGroups) {
   const data = [];
   for (const [group, errors] of errorGroups) {
     for (const reason of errors) {
@@ -20273,9 +20274,13 @@ var main = async () => {
       }
     }
     if (annotations.length) {
-      console.log('::add-matcher::.github/problem-matcher.json');
-      for (const annotation of annotations) {
-        console.log(`${annotation.filePath}:`, '\n', formatErrorsPerFile(annotation));
+      console.log(`::add-matcher::${PROBLEM_MATCHER_FILE_LOCATION}`);
+      const groupedByFile = annotations.reduce((memo, { filePath, errorGroups }) => {
+        memo[filePath] = memo[filePath] ? [...memo[filePath], ...errorGroups] : errorGroups;
+        return memo;
+      }, {});
+      for (const file in groupedByFile) {
+        console.log(`${file}:`, '\n', formatErrorsPerFile(groupedByFile[file]));
       }
       (0, import_core.setFailed)('We found errors in your configurations. Please check the errors above');
     }
