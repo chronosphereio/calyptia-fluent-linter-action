@@ -1,4 +1,5 @@
 import { getInput, setFailed, debug } from '@actions/core';
+import { issueCommand } from '@actions/core/lib/command';
 import * as glob from '@actions/glob';
 import { readContent } from './utils/readContent';
 import { FluentBitSchema } from '@calyptia/fluent-bit-config-parser';
@@ -6,6 +7,7 @@ import fetch from 'node-fetch';
 import { CALYPTIA_API_ENDPOINT, CALYPTIA_API_VALIDATION_PATH } from './utils/constants';
 import { Annotation, FieldErrors, normalizeErrors } from './utils/normalizeErrors';
 import { formatErrorsPerFile } from './formatErrorsPerFile';
+import problemMatcher from '../problem-matcher.json';
 export enum InputValues {
   CONFIG_LOCATION_GLOB = 'CONFIG_LOCATION_GLOB',
   CALYPTIA_API_KEY = 'CALYPTIA_API_KEY',
@@ -74,11 +76,22 @@ export const main = async (): Promise<void> => {
     }
 
     if (annotations.length) {
-      console.log('::add-matcher::problem-matcher.json');
+      issueCommand('add-matcher', {}, problemMatcher);
+
+      // console.log('::add-matcher::problem-matcher.json');
+
       for (const annotation of annotations) {
         console.log(`${annotation.filePath}:`, '\n', formatErrorsPerFile(annotation));
       }
       setFailed('We found errors in your configurations. Please check the errors above');
+
+      issueCommand(
+        'remove-matcher',
+        {
+          owner: problemMatcher.owner,
+        },
+        ''
+      );
     }
   } catch (error) {
     setFailed(JSON.stringify(error));

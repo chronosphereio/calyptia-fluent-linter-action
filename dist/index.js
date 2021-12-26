@@ -138,13 +138,13 @@ var require_command = __commonJS({
     exports2.issue = exports2.issueCommand = void 0;
     var os = __importStar(require('os'));
     var utils_1 = require_utils();
-    function issueCommand(command, properties, message) {
+    function issueCommand2(command, properties, message) {
       const cmd = new Command(command, properties, message);
       process.stdout.write(cmd.toString() + os.EOL);
     }
-    exports2.issueCommand = issueCommand;
+    exports2.issueCommand = issueCommand2;
     function issue(name, message = '') {
-      issueCommand(name, {}, message);
+      issueCommand2(name, {}, message);
     }
     exports2.issue = issue;
     var CMD_STRING = '::';
@@ -240,7 +240,7 @@ var require_file_command = __commonJS({
     var fs2 = __importStar(require('fs'));
     var os = __importStar(require('os'));
     var utils_1 = require_utils();
-    function issueCommand(command, message) {
+    function issueCommand2(command, message) {
       const filePath = process.env[`GITHUB_${command}`];
       if (!filePath) {
         throw new Error(`Unable to find environment variable for file command ${command}`);
@@ -252,7 +252,7 @@ var require_file_command = __commonJS({
         encoding: 'utf8',
       });
     }
-    exports2.issueCommand = issueCommand;
+    exports2.issueCommand = issueCommand2;
   },
 });
 
@@ -20160,6 +20160,7 @@ var require_src = __commonJS({
 
 // src/index.ts
 var import_core = __toModule(require_core());
+var import_command = __toModule(require_command());
 var glob = __toModule(require_glob());
 
 // src/utils/readContent.ts
@@ -20221,6 +20222,31 @@ function formatErrorsPerFile({ errorGroups }) {
   return (0, import_table2.table)(data, NO_STYLES_IN_TABLE);
 }
 
+// problem-matcher.json
+var problemMatcher = [
+  {
+    owner: 'eslint-stylish',
+    pattern: [
+      {
+        regexp: '^([^\\s].*)$',
+        file: 1,
+      },
+      {
+        regexp: '^\\s+(\\d+):(\\d+)\\s+(error|warning|info)\\s+(.*)\\s\\s+(.*)$',
+        line: 1,
+        column: 2,
+        severity: 3,
+        message: 4,
+        code: 5,
+        loop: true,
+      },
+    ],
+  },
+];
+var problem_matcher_default = {
+  problemMatcher,
+};
+
 // src/index.ts
 var InputValues = /* @__PURE__ */ ((InputValues2) => {
   InputValues2['CONFIG_LOCATION_GLOB'] = 'CONFIG_LOCATION_GLOB';
@@ -20273,11 +20299,18 @@ var main = async () => {
       }
     }
     if (annotations.length) {
-      console.log('::add-matcher::problem-matcher.json');
+      (0, import_command.issueCommand)('add-matcher', {}, problem_matcher_default);
       for (const annotation of annotations) {
         console.log(`${annotation.filePath}:`, '\n', formatErrorsPerFile(annotation));
       }
       (0, import_core.setFailed)('We found errors in your configurations. Please check the errors above');
+      (0, import_command.issueCommand)(
+        'remove-matcher',
+        {
+          owner: problem_matcher_default.owner,
+        },
+        ''
+      );
     }
   } catch (error) {
     (0, import_core.setFailed)(JSON.stringify(error));
