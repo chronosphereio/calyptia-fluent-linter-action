@@ -20277,6 +20277,7 @@ var main = async () => {
       for (const annotation of annotations) {
         console.log(`${annotation.filePath}:`, '\n', formatErrorsPerFile(annotation));
       }
+      (0, import_core.setFailed)('We found errors in your configurations. Please check the errors above');
     }
   } catch (error) {
     (0, import_core.setFailed)(JSON.stringify(error));

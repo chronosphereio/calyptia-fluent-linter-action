@@ -78,7 +78,7 @@ export const main = async (): Promise<void> => {
       for (const annotation of annotations) {
         console.log(`${annotation.filePath}:`, '\n', formatErrorsPerFile(annotation));
       }
-      // setFailed('We found errors in your configurations');
+      setFailed('We found errors in your configurations. Please check the errors above');
     }
   } catch (error) {
     setFailed(JSON.stringify(error));
