@@ -20273,7 +20273,7 @@ var main = async () => {
       }
     }
     if (annotations.length) {
-      console.log(`::add-matcher::${__dirname}/.github/problem-matcher.json`);
+      console.log('::add-matcher::.github/problem-matcher.json');
       for (const annotation of annotations) {
         console.log(`${annotation.filePath}:`, '\n', formatErrorsPerFile(annotation));
       }

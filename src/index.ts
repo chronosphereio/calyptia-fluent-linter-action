@@ -74,7 +74,7 @@ export const main = async (): Promise<void> => {
     }
 
     if (annotations.length) {
-      console.log(`::add-matcher::${__dirname}/.github/problem-matcher.json`);
+      console.log('::add-matcher::.github/problem-matcher.json');
 
       // console.log('::add-matcher::problem-matcher.json');
 
