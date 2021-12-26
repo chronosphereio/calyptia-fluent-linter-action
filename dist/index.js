@@ -20271,7 +20271,7 @@ var main = async () => {
     if (annotations.length) {
       console.log('::add-matcher::problem-matcher.json');
       for (const annotation of annotations) {
-        console.log(annotation.filePath, formatErrorsPerFile(annotation));
+        console.log(annotation.filePath, '\n', formatErrorsPerFile(annotation));
       }
       (0, import_core.setFailed)('We found errors in your configurations');
     }

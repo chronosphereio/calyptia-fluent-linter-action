@@ -76,7 +76,7 @@ export const main = async (): Promise<void> => {
     if (annotations.length) {
       console.log('::add-matcher::problem-matcher.json');
       for (const annotation of annotations) {
-        console.log(annotation.filePath, formatErrorsPerFile(annotation));
+        console.log(annotation.filePath, '\n', formatErrorsPerFile(annotation));
       }
       setFailed('We found errors in your configurations');
     }
