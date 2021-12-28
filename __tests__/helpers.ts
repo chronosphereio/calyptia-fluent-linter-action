@@ -1,3 +1,5 @@
+import { AGENT_TYPE, CALYPTIA_API_VALIDATION_PATH } from '../src/utils/constants';
+
 type Response = (...args: unknown[]) => unknown;
 
 const ORIGINALS = {
@@ -17,4 +19,8 @@ export const mockConsole = (method: METHODS): jest.Mock => {
 };
 export const unMockConsole = (method: METHODS): void => {
   global.console[method] = ORIGINALS[method];
+};
+
+export const urlByAgentType = (agentType: keyof typeof AGENT_TYPE): string => {
+  return [CALYPTIA_API_VALIDATION_PATH, AGENT_TYPE[agentType]].join('/');
 };

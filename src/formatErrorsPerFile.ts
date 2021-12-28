@@ -1,4 +1,4 @@
-import { Annotation } from './utils/normalizeErrors';
+import type { Annotation } from './utils/normalizeErrors';
 import { table } from 'table';
 import { NO_STYLES_IN_TABLE } from './utils/constants';
 

@@ -2,11 +2,12 @@
   "include": ["src", "__tests__", "index.ts"],
   "compilerOptions": {
     "paths": {
-      "*": ["@types/*"]
+        "*": ["@types/*"]
     },
     "target": "es2017",
     "module": "es6",
     "lib": ["dom", "esnext"],
+    "importsNotUsedAsValues": "error",
     "emitDecoratorMetadata": true,
     "importHelpers": true,
     "declaration": true,
