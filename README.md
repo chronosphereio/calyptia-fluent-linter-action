@@ -1,16 +1,24 @@
 <p align="center">
-  <h3 align="center">Fluent Linter Action</h3>
-
-  <p align="center">
-     ⚙ Template repository for typescript applications meant to run in node ⚙
-    <br />
-    <a href="https://github.com/gagoar/calyptia/fluent-linter-action#table-of-contents"><strong>Explore the docs »</strong></a>
-    <br />
-    <a href="https://github.com/gagoar/calyptia/fluent-linter-action/issues">Report Bug</a>
-    ·
-    <a href="https://github.com/gagoar/calyptia/fluent-linter-action/issues">Request Feature</a>
-  </p>
+    <a href="https://github.com/marketplace/actions/use-herald-action">
+      <img src="https://img.shields.io/badge/Marketplace-v2-undefined.svg?logo=github&logoColor=white&style=flat" alt="GitHub Marketplace" />
+    </a>
+    <a href="https://github.com/calyptia/fluent-linter-action/actions">
+      <img src="https://github.com/gagoar/use-herald-action/workflows/validation%20on%20Master/badge.svg" alt="Workflow" />
+    </a>
+    <a href="https://codecov.io/gh/calyptia/fluent-linter-action">
+      <img src="https://codecov.io/gh/calyptia/fluent-linter-action/branch/main/graph/badge.svg?token=48gHuQl8zV" alt="codecov" />
+    </a>
+    <a href="https://github.com/calyptia/fluent-linter-action/LICENSE">
+      <img src="https://img.shields.io/npm/l/calyptia/fluent-linter-action.svg?style=flat-square" alt="Apache-2.0" />
+    </a>
 </p>
+
+<p align="center">
+  <a href="https://github.com/calyptia/fluent-linter-action">
+    <img src="logo.png" alt="Logo" width="128" height="128">
+  </a>
+
+  </p>
 
 ## Table of Contents
 
