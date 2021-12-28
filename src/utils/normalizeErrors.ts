@@ -1,15 +1,28 @@
-import type { AnnotationProperties } from '@actions/core';
-export type FieldErrors = Record<string, Record<string, string[]>>;
-export function normalizeErrors(filePath: string, { runtime, ...errors }: FieldErrors): AnnotationProperties[] {
-  const annotations = Object.entries(errors).reduce((memo, [title, issues]) => {
-    if (Object.keys(issues).length) {
-      const errGroup = Object.entries(issues).map(([group, problems]) => `[${group}]: ${problems.join(',')}`);
+import { join } from 'path';
 
-      return [...memo, { file: filePath, message: `${errGroup.join('\n')}`, title }];
+export type FieldErrors = Record<string, Record<string, string[]>>;
+type ErrorGroup = [group: string, reasons: string[]];
+export type Annotation = { filePath: string; errorGroups: ErrorGroup[]; section: string };
+
+declare let process: {
+  env: {
+    GITHUB_WORKSPACE: string;
+  };
+};
+
+function relativeFilePath(filePath: string): string {
+  return filePath.replace(join(process.env.GITHUB_WORKSPACE, '/'), '');
+}
+export function normalizeErrors(filePath: string, { runtime, ...errors }: FieldErrors): Annotation[] {
+  const annotations = Object.entries(errors).reduce((memo, [command, issues]) => {
+    if (Object.keys(issues).length) {
+      const errorGroups = Object.entries(issues);
+
+      return [...memo, { filePath: relativeFilePath(filePath), section: command, errorGroups }];
     }
 
     return memo;
-  }, [] as AnnotationProperties[]);
+  }, [] as Annotation[]);
 
   return annotations;
 }

@@ -1,68 +1,150 @@
 import { main, InputValues } from '../src';
-import { setFailed, getInput, setOutput, error } from '../__mocks__/@actions/core';
+import { setFailed, getInput, setOutput } from '../__mocks__/@actions/core';
 import nock from 'nock';
 import failCase from '../__fixtures__/scenarios/failed_case.json';
 import { CALYPTIA_API_ENDPOINT, CALYPTIA_API_VALIDATION_PATH } from '../src/utils/constants';
+import { mockConsole, unMockConsole } from './helpers';
+import { problemMatcher } from '../.github/problem-matcher.json';
+import { join } from 'path';
 describe('fluent-linter-action', () => {
+  let consoleLogMock: jest.Mock;
   const mockedInput = {
-    [InputValues.GITHUB_TOKEN]: 'GITHUB_TOKEN',
     [InputValues.CALYPTIA_API_KEY]: 'API_TOKEN',
     [InputValues.CONFIG_LOCATION_GLOB]: '__fixtures__/*.conf',
   };
 
+  process.env.GITHUB_WORKSPACE = __dirname;
   beforeAll(() => {
     getInput.mockImplementation((key: Partial<InputValues>) => {
       return mockedInput[key];
     });
+
+    consoleLogMock = mockConsole('log');
+  });
+
+  afterAll(() => {
+    unMockConsole('log');
   });
 
   afterEach(() => {
     getInput.mockClear();
     setFailed.mockClear();
     setOutput.mockClear();
+    consoleLogMock.mockClear();
   });
 
-  it('runs when provided the correct input', async () => {
-    const client = nock(CALYPTIA_API_ENDPOINT)
-      ['post']('/' + CALYPTIA_API_VALIDATION_PATH)
-      .reply(200, JSON.stringify({ config: {} }));
+  it('Reports no issues when configuration has no errors', async () => {
+    mockedInput.CONFIG_LOCATION_GLOB = '__fixtures__/basic.conf';
+    const client = nock(CALYPTIA_API_ENDPOINT);
+    client['post']('/' + CALYPTIA_API_VALIDATION_PATH).reply(200, { config: {} });
+
+    await main();
+
+    expect(setFailed).not.toHaveBeenCalled();
+    expect(consoleLogMock.mock.calls).toMatchInlineSnapshot('Array []');
+  });
+  it('Reports errors correctly matching problemMatcher', async () => {
+    mockedInput.CONFIG_LOCATION_GLOB = '__fixtures__/invalid.conf';
+    const client = nock(CALYPTIA_API_ENDPOINT);
     client['post']('/' + CALYPTIA_API_VALIDATION_PATH).reply(200, failCase);
 
     await main();
-    expect(setFailed).toHaveBeenCalled();
-    expect(error).toMatchInlineSnapshot(`
-      [MockFunction] {
-        "calls": Array [
-          Array [
-            [Error: Linting Error],
-            Object {
-              "file": "<PROJECT_ROOT>/__fixtures__/invalid1.conf",
-              "message": "[john]: cannot initialize input plugin: john
-      [syslog]: Unknown syslog mode abc",
-              "title": "input",
-            },
-          ],
-          Array [
-            [Error: Linting Error],
-            Object {
-              "file": "<PROJECT_ROOT>/__fixtures__/invalid1.conf",
-              "message": "[parser]: missing 'key_name'",
-              "title": "filter",
-            },
-          ],
+    expect(setFailed.mock.calls).toMatchInlineSnapshot(`
+      Array [
+        Array [
+          "We found errors in your configurations. Please check your logs",
         ],
-        "results": Array [
-          Object {
-            "type": "return",
-            "value": undefined,
-          },
-          Object {
-            "type": "return",
-            "value": undefined,
-          },
-        ],
-      }
+      ]
     `);
+    expect(consoleLogMock.mock.calls).toMatchInlineSnapshot(`
+      Array [
+        Array [
+          "::add-matcher::.github/problem-matcher.json",
+        ],
+        Array [
+          "<PROJECT_ROOT>/__fixtures__/invalid.conf: 0:0 error john   cannot initialize input plugin: john 
+      <PROJECT_ROOT>/__fixtures__/invalid.conf: 0:0 error syslog Unknown syslog mode abc              
+      <PROJECT_ROOT>/__fixtures__/invalid.conf: 0:0 error parser missing 'key_name'                   
+      ",
+        ],
+      ]
+    `);
+    const [
+      {
+        pattern: [{ regexp }],
+      },
+    ] = problemMatcher;
+
+    const [issues] = consoleLogMock.mock.calls[1] as string[];
+
+    const errors = issues.split('\n');
+
+    errors.pop(); // We end up with a last line jump for format that we don't want in the loop.
+
+    for (const error of errors) {
+      const issue = error.match(new RegExp(regexp));
+
+      if (issue) {
+        const [, file, line, column, severity, , message] = issue;
+
+        expect({
+          file,
+          line,
+          column,
+          severity,
+          message,
+        }).toMatchSnapshot(file.replace(join(__dirname, '../'), ''));
+      }
+    }
+
     expect(client.isDone()).toBe(true);
-  }, 5000000000);
+  });
+
+  it('Reports errors when request fails', async () => {
+    mockedInput.CONFIG_LOCATION_GLOB = '__fixtures__/basic.conf';
+    const client = nock(CALYPTIA_API_ENDPOINT);
+
+    client['post']('/' + CALYPTIA_API_VALIDATION_PATH).replyWithError(new Error('Server Error'));
+
+    await main();
+
+    expect(setFailed.mock.calls).toMatchInlineSnapshot(`
+      Array [
+        Array [
+          "something went very wrong \\"request to https://cloud-api.calyptia.com/v1/config_validate/fluentbit failed, reason: Server Error\\"",
+        ],
+      ]
+    `);
+    expect(consoleLogMock.mock.calls).toMatchInlineSnapshot('Array []');
+
+    expect(client.isDone()).toBe(true);
+  });
+
+  it('Reports errors when request fails with other than 500', async () => {
+    mockedInput.CONFIG_LOCATION_GLOB = '__fixtures__/basic.conf';
+    const client = nock(CALYPTIA_API_ENDPOINT);
+    client['post']('/' + CALYPTIA_API_VALIDATION_PATH).reply(401, new Error('Auth Error'));
+
+    await main();
+
+    expect(setFailed.mock.calls).toMatchInlineSnapshot(`
+      Array [
+        Array [
+          "The request failed:  status: 401, data: {}",
+        ],
+      ]
+    `);
+    expect(consoleLogMock.mock.calls).toMatchInlineSnapshot('Array []');
+
+    expect(client.isDone()).toBe(true);
+  });
+
+  it('does not report if configuration is not fluent-bit/fluent-d', async () => {
+    mockedInput.CONFIG_LOCATION_GLOB = '__fixtures__/nginx.conf';
+
+    await main();
+
+    expect(setFailed).not.toHaveBeenCalled();
+    expect(consoleLogMock.mock.calls).toMatchInlineSnapshot('Array []');
+  });
 });
