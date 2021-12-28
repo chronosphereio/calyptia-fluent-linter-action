@@ -22,72 +22,68 @@ const getActionInput = () => {
 };
 
 export const main = async (): Promise<void> => {
-  try {
-    const input = getActionInput();
+  const input = getActionInput();
 
-    const globber = await glob.create(input.CONFIG_LOCATION_GLOB, { matchDirectories: false });
+  const globber = await glob.create(input.CONFIG_LOCATION_GLOB, { matchDirectories: false });
 
-    let annotations = [] as Annotation[];
+  let annotations = [] as Annotation[];
 
-    for await (const filePath of globber.globGenerator()) {
-      debug(`evaluating file ${filePath}`);
+  for await (const filePath of globber.globGenerator()) {
+    debug(`evaluating file ${filePath}`);
 
-      const content = await readContent(filePath);
+    const content = await readContent(filePath);
 
-      if (FluentBitSchema.isFluentBitConfiguration(content)) {
-        debug(`File ${filePath} seems to be fluent-bit config, validating...`);
+    if (FluentBitSchema.isFluentBitConfiguration(content)) {
+      debug(`File ${filePath} seems to be fluent-bit config, validating...`);
 
-        const URL = `${CALYPTIA_API_ENDPOINT}/${CALYPTIA_API_VALIDATION_PATH}`;
+      const URL = `${CALYPTIA_API_ENDPOINT}/${CALYPTIA_API_VALIDATION_PATH}`;
 
-        const headers = {
-          'Content-Type': 'application/json',
-          'x-project-token': input.CALYPTIA_API_KEY,
-        };
+      const headers = {
+        'Content-Type': 'application/json',
+        'x-project-token': input.CALYPTIA_API_KEY,
+      };
 
-        try {
-          const config = new FluentBitSchema(content);
-          const response = (await fetch(URL, {
-            method: 'POST',
-            body: JSON.stringify(config.schema),
-            headers,
-          })) as Response;
+      try {
+        const config = new FluentBitSchema(content);
+        const response = (await fetch(URL, {
+          method: 'POST',
+          body: JSON.stringify(config.schema),
+          headers,
+        })) as Response;
 
-          const data = (await response.json()) as unknown as ValidationResponse;
+        const data = (await response.json()) as unknown as ValidationResponse;
 
-          if (response.status === 200) {
-            debug(`[${filePath}]: ${JSON.stringify(data)}`);
+        if (response.status === 200) {
+          debug(`[${filePath}]: ${JSON.stringify(data)}`);
 
-            if (data.errors) {
-              const errors = normalizeErrors(filePath, data.errors);
+          if (data.errors) {
+            const errors = normalizeErrors(filePath, data.errors);
 
-              if (errors.length) {
-                debug(`${filePath}, Found errors: ${JSON.stringify(errors, null, 2)}`);
-                annotations = [...annotations, ...errors];
-              }
+            if (errors.length) {
+              debug(`${filePath}, Found errors: ${JSON.stringify(errors, null, 2)}`);
+              annotations = [...annotations, ...errors];
             }
-          } else {
-            setFailed(`The request failed:  status: ${response.status}, data: ${JSON.stringify(data)}`);
           }
-        } catch (e) {
-          setFailed(`something went very wrong ${JSON.stringify((e as Error).message)}`);
+        } else {
+          setFailed(`The request failed:  status: ${response.status}, data: ${JSON.stringify(data)}`);
         }
+      } catch (e) {
+        setFailed(`something went very wrong ${JSON.stringify((e as Error).message)}`);
       }
     }
+  }
 
-    if (annotations.length) {
-      console.log(`::add-matcher::${PROBLEM_MATCHER_FILE_LOCATION}`);
+  if (annotations.length) {
+    console.log(`::add-matcher::${PROBLEM_MATCHER_FILE_LOCATION}`);
 
-      const groupedByFile = annotations.reduce((memo, { filePath, errorGroups }) => {
-        memo[filePath] = memo[filePath] ? [...memo[filePath], ...errorGroups] : errorGroups;
+    const groupedByFile = annotations.reduce((memo, { filePath, errorGroups }) => {
+      memo[filePath] = memo[filePath] ? [...memo[filePath], ...errorGroups] : errorGroups;
 
-        return memo;
-      }, {} as Record<string, unknown[]>);
-      for (const file in groupedByFile) {
-        console.log(formatErrorsPerFile(file, groupedByFile[file] as Annotation['errorGroups']));
-      }
-      setFailed('We found errors in your configurations. Please check your logs');
+      return memo;
+    }, {} as Record<string, unknown[]>);
+    for (const file in groupedByFile) {
+      console.log(formatErrorsPerFile(file, groupedByFile[file] as Annotation['errorGroups']));
     }
-  } catch (error) {
-    setFailed(JSON.stringify(error));
+    setFailed('We found errors in your configurations. Please check your logs');
   }
 };

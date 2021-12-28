@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`fluent-linter-action runs when provided the correct input: 1 correct, 1 with errors, the last one fails with server error: /Users/gago/base/fluent-linter-action/__fixtures__/invalid.conf: 0:0 error john   cannot initialize input plugin: john  1`] = `
+exports[`fluent-linter-action Reports errors correctly matching problemMatcher: /Users/gago/base/fluent-linter-action/__fixtures__/invalid.conf: 0:0 error john   cannot initialize input plugin: john  1`] = `
 Object {
   "column": "0",
   "file": "<PROJECT_ROOT>/__fixtures__/invalid.conf",
@@ -10,7 +10,7 @@ Object {
 }
 `;
 
-exports[`fluent-linter-action runs when provided the correct input: 1 correct, 1 with errors, the last one fails with server error: /Users/gago/base/fluent-linter-action/__fixtures__/invalid.conf: 0:0 error parser missing 'key_name'                    1`] = `
+exports[`fluent-linter-action Reports errors correctly matching problemMatcher: /Users/gago/base/fluent-linter-action/__fixtures__/invalid.conf: 0:0 error parser missing 'key_name'                    1`] = `
 Object {
   "column": "0",
   "file": "<PROJECT_ROOT>/__fixtures__/invalid.conf",
@@ -20,7 +20,7 @@ Object {
 }
 `;
 
-exports[`fluent-linter-action runs when provided the correct input: 1 correct, 1 with errors, the last one fails with server error: /Users/gago/base/fluent-linter-action/__fixtures__/invalid.conf: 0:0 error syslog Unknown syslog mode abc               1`] = `
+exports[`fluent-linter-action Reports errors correctly matching problemMatcher: /Users/gago/base/fluent-linter-action/__fixtures__/invalid.conf: 0:0 error syslog Unknown syslog mode abc               1`] = `
 Object {
   "column": "0",
   "file": "<PROJECT_ROOT>/__fixtures__/invalid.conf",

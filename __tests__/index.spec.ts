@@ -33,21 +33,19 @@ describe('fluent-linter-action', () => {
     consoleLogMock.mockClear();
   });
 
-  it('runs when provided the correct input: 1 correct, 1 with errors, the last one fails with server error', async () => {
-    const client = nock(CALYPTIA_API_ENDPOINT)
-      ['post']('/' + CALYPTIA_API_VALIDATION_PATH)
-      .reply(200, JSON.stringify({ config: {} }));
+  it('Reports errors correctly matching problemMatcher', async () => {
+    mockedInput.CONFIG_LOCATION_GLOB = '__fixtures__/invalid.conf';
+    const client = nock(CALYPTIA_API_ENDPOINT);
+    // ['post']('/' + CALYPTIA_API_VALIDATION_PATH)
+    //   .reply(200, JSON.stringify({ config: {} }));
     client['post']('/' + CALYPTIA_API_VALIDATION_PATH).reply(200, failCase);
 
-    client['post']('/' + CALYPTIA_API_VALIDATION_PATH).replyWithError(new Error('Server Error'));
+    // client['post']('/' + CALYPTIA_API_VALIDATION_PATH).replyWithError(new Error('Server Error'));
 
     await main();
     // expect(setFailed).toHaveBeenCalled();
     expect(setFailed.mock.calls).toMatchInlineSnapshot(`
       Array [
-        Array [
-          "something went very wrong \\"request to https://cloud-api.calyptia.com/v1/config_validate/fluentbit failed, reason: Server Error\\"",
-        ],
         Array [
           "We found errors in your configurations. Please check your logs",
         ],
@@ -93,6 +91,48 @@ describe('fluent-linter-action', () => {
         }).toMatchSnapshot(`${error}`);
       }
     }
+
+    expect(client.isDone()).toBe(true);
+  });
+
+  it('Reports errors when request fails', async () => {
+    mockedInput.CONFIG_LOCATION_GLOB = '__fixtures__/basic.conf';
+    const client = nock(CALYPTIA_API_ENDPOINT);
+    // ['post']('/' + CALYPTIA_API_VALIDATION_PATH)
+    //   .reply(200, JSON.stringify({ config: {} }));
+    // client['post']('/' + CALYPTIA_API_VALIDATION_PATH).reply(200, failCase);
+
+    client['post']('/' + CALYPTIA_API_VALIDATION_PATH).replyWithError(new Error('Server Error'));
+
+    await main();
+
+    expect(setFailed.mock.calls).toMatchInlineSnapshot(`
+      Array [
+        Array [
+          "something went very wrong \\"request to https://cloud-api.calyptia.com/v1/config_validate/fluentbit failed, reason: Server Error\\"",
+        ],
+      ]
+    `);
+    expect(consoleLogMock.mock.calls).toMatchInlineSnapshot('Array []');
+
+    expect(client.isDone()).toBe(true);
+  });
+
+  it('Reports errors when request fails with other than 500', async () => {
+    mockedInput.CONFIG_LOCATION_GLOB = '__fixtures__/basic.conf';
+    const client = nock(CALYPTIA_API_ENDPOINT);
+    client['post']('/' + CALYPTIA_API_VALIDATION_PATH).reply(401, new Error('Auth Error'));
+
+    await main();
+
+    expect(setFailed.mock.calls).toMatchInlineSnapshot(`
+      Array [
+        Array [
+          "The request failed:  status: 401, data: {}",
+        ],
+      ]
+    `);
+    expect(consoleLogMock.mock.calls).toMatchInlineSnapshot('Array []');
 
     expect(client.isDone()).toBe(true);
   });

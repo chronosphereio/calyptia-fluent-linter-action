@@ -20236,60 +20236,54 @@ var getActionInput = () => {
   }, {});
 };
 var main = async () => {
-  try {
-    const input = getActionInput();
-    const globber = await glob.create(input.CONFIG_LOCATION_GLOB, { matchDirectories: false });
-    let annotations = [];
-    for await (const filePath of globber.globGenerator()) {
-      (0, import_core.debug)(`evaluating file ${filePath}`);
-      const content = await readContent(filePath);
-      if (import_fluent_bit_config_parser.FluentBitSchema.isFluentBitConfiguration(content)) {
-        (0, import_core.debug)(`File ${filePath} seems to be fluent-bit config, validating...`);
-        const URL2 = `${CALYPTIA_API_ENDPOINT}/${CALYPTIA_API_VALIDATION_PATH}`;
-        const headers = {
-          'Content-Type': 'application/json',
-          'x-project-token': input.CALYPTIA_API_KEY,
-        };
-        try {
-          const config = new import_fluent_bit_config_parser.FluentBitSchema(content);
-          const response = await (0, import_node_fetch.default)(URL2, {
-            method: 'POST',
-            body: JSON.stringify(config.schema),
-            headers,
-          });
-          const data = await response.json();
-          if (response.status === 200) {
-            (0, import_core.debug)(`[${filePath}]: ${JSON.stringify(data)}`);
-            if (data.errors) {
-              const errors = normalizeErrors(filePath, data.errors);
-              if (errors.length) {
-                (0, import_core.debug)(`${filePath}, Found errors: ${JSON.stringify(errors, null, 2)}`);
-                annotations = [...annotations, ...errors];
-              }
+  const input = getActionInput();
+  const globber = await glob.create(input.CONFIG_LOCATION_GLOB, { matchDirectories: false });
+  let annotations = [];
+  for await (const filePath of globber.globGenerator()) {
+    (0, import_core.debug)(`evaluating file ${filePath}`);
+    const content = await readContent(filePath);
+    if (import_fluent_bit_config_parser.FluentBitSchema.isFluentBitConfiguration(content)) {
+      (0, import_core.debug)(`File ${filePath} seems to be fluent-bit config, validating...`);
+      const URL2 = `${CALYPTIA_API_ENDPOINT}/${CALYPTIA_API_VALIDATION_PATH}`;
+      const headers = {
+        'Content-Type': 'application/json',
+        'x-project-token': input.CALYPTIA_API_KEY,
+      };
+      try {
+        const config = new import_fluent_bit_config_parser.FluentBitSchema(content);
+        const response = await (0, import_node_fetch.default)(URL2, {
+          method: 'POST',
+          body: JSON.stringify(config.schema),
+          headers,
+        });
+        const data = await response.json();
+        if (response.status === 200) {
+          (0, import_core.debug)(`[${filePath}]: ${JSON.stringify(data)}`);
+          if (data.errors) {
+            const errors = normalizeErrors(filePath, data.errors);
+            if (errors.length) {
+              (0, import_core.debug)(`${filePath}, Found errors: ${JSON.stringify(errors, null, 2)}`);
+              annotations = [...annotations, ...errors];
             }
-          } else {
-            (0, import_core.setFailed)(
-              `The request failed:  status: ${response.status}, data: ${JSON.stringify(data)}`
-            );
           }
-        } catch (e) {
-          (0, import_core.setFailed)(`something went very wrong ${JSON.stringify(e.message)}`);
+        } else {
+          (0, import_core.setFailed)(`The request failed:  status: ${response.status}, data: ${JSON.stringify(data)}`);
         }
+      } catch (e) {
+        (0, import_core.setFailed)(`something went very wrong ${JSON.stringify(e.message)}`);
       }
     }
-    if (annotations.length) {
-      console.log(`::add-matcher::${PROBLEM_MATCHER_FILE_LOCATION}`);
-      const groupedByFile = annotations.reduce((memo, { filePath, errorGroups }) => {
-        memo[filePath] = memo[filePath] ? [...memo[filePath], ...errorGroups] : errorGroups;
-        return memo;
-      }, {});
-      for (const file in groupedByFile) {
-        console.log(formatErrorsPerFile(file, groupedByFile[file]));
-      }
-      (0, import_core.setFailed)('We found errors in your configurations. Please check your logs');
+  }
+  if (annotations.length) {
+    console.log(`::add-matcher::${PROBLEM_MATCHER_FILE_LOCATION}`);
+    const groupedByFile = annotations.reduce((memo, { filePath, errorGroups }) => {
+      memo[filePath] = memo[filePath] ? [...memo[filePath], ...errorGroups] : errorGroups;
+      return memo;
+    }, {});
+    for (const file in groupedByFile) {
+      console.log(formatErrorsPerFile(file, groupedByFile[file]));
     }
-  } catch (error) {
-    (0, import_core.setFailed)(JSON.stringify(error));
+    (0, import_core.setFailed)('We found errors in your configurations. Please check your logs');
   }
 };
 
