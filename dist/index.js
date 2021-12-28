@@ -20260,13 +20260,17 @@ var main = async () => {
           const data = await response.json();
           if (response.status === 200) {
             (0, import_core.debug)(`[${filePath}]: ${JSON.stringify(data)}`);
-            const errors = normalizeErrors(filePath, data.errors);
-            if (errors.length) {
-              (0, import_core.debug)(`${filePath}, Found errors: ${JSON.stringify(errors, null, 2)}`);
-              annotations = [...annotations, ...errors];
+            if (data.errors) {
+              const errors = normalizeErrors(filePath, data.errors);
+              if (errors.length) {
+                (0, import_core.debug)(`${filePath}, Found errors: ${JSON.stringify(errors, null, 2)}`);
+                annotations = [...annotations, ...errors];
+              }
             }
           } else {
-            (0, import_core.setFailed)(`The request failed:  ${JSON.stringify(data)}`);
+            (0, import_core.setFailed)(
+              `The request failed:  status: ${response.status}, data: ${JSON.stringify(data)}`
+            );
           }
         } catch (e) {
           (0, import_core.setFailed)(`something went very wrong ${JSON.stringify(e.message)}`);
@@ -20282,7 +20286,7 @@ var main = async () => {
       for (const file in groupedByFile) {
         console.log(formatErrorsPerFile(file, groupedByFile[file]));
       }
-      (0, import_core.setFailed)('We found errors in your configurations. Please check the errors above');
+      (0, import_core.setFailed)('We found errors in your configurations. Please check your logs');
     }
   } catch (error) {
     (0, import_core.setFailed)(JSON.stringify(error));

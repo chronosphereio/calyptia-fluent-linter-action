@@ -12,7 +12,7 @@ export enum InputValues {
   GITHUB_TOKEN = 'GITHUB_TOKEN',
 }
 
-type ValidationResponse = { errors: FieldErrors };
+type ValidationResponse = { errors?: FieldErrors };
 
 const getActionInput = () => {
   return Object.keys(InputValues).reduce((memo, prop) => {
@@ -46,7 +46,6 @@ export const main = async (): Promise<void> => {
 
         try {
           const config = new FluentBitSchema(content);
-
           const response = (await fetch(URL, {
             method: 'POST',
             body: JSON.stringify(config.schema),
@@ -58,14 +57,16 @@ export const main = async (): Promise<void> => {
           if (response.status === 200) {
             debug(`[${filePath}]: ${JSON.stringify(data)}`);
 
-            const errors = normalizeErrors(filePath, data.errors);
+            if (data.errors) {
+              const errors = normalizeErrors(filePath, data.errors);
 
-            if (errors.length) {
-              debug(`${filePath}, Found errors: ${JSON.stringify(errors, null, 2)}`);
-              annotations = [...annotations, ...errors];
+              if (errors.length) {
+                debug(`${filePath}, Found errors: ${JSON.stringify(errors, null, 2)}`);
+                annotations = [...annotations, ...errors];
+              }
             }
           } else {
-            setFailed(`The request failed:  ${JSON.stringify(data)}`);
+            setFailed(`The request failed:  status: ${response.status}, data: ${JSON.stringify(data)}`);
           }
         } catch (e) {
           setFailed(`something went very wrong ${JSON.stringify((e as Error).message)}`);
@@ -84,7 +85,7 @@ export const main = async (): Promise<void> => {
       for (const file in groupedByFile) {
         console.log(formatErrorsPerFile(file, groupedByFile[file] as Annotation['errorGroups']));
       }
-      setFailed('We found errors in your configurations. Please check the errors above');
+      setFailed('We found errors in your configurations. Please check your logs');
     }
   } catch (error) {
     setFailed(JSON.stringify(error));

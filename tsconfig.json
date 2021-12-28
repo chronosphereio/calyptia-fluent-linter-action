@@ -1,5 +1,5 @@
 {
-  "include": ["src", "test", "index.ts"],
+  "include": ["src", "__tests__", "index.ts"],
   "compilerOptions": {
     "paths": {
       "*": ["@types/*"]
