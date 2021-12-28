@@ -8,7 +8,6 @@ import { problemMatcher } from '../.github/problem-matcher.json';
 describe('fluent-linter-action', () => {
   let consoleLogMock: jest.Mock;
   const mockedInput = {
-    [InputValues.GITHUB_TOKEN]: 'GITHUB_TOKEN',
     [InputValues.CALYPTIA_API_KEY]: 'API_TOKEN',
     [InputValues.CONFIG_LOCATION_GLOB]: '__fixtures__/*.conf',
   };
@@ -33,17 +32,22 @@ describe('fluent-linter-action', () => {
     consoleLogMock.mockClear();
   });
 
+  it('Reports no issues when configuration has no errors', async () => {
+    mockedInput.CONFIG_LOCATION_GLOB = '__fixtures__/basic.conf';
+    const client = nock(CALYPTIA_API_ENDPOINT);
+    client['post']('/' + CALYPTIA_API_VALIDATION_PATH).reply(200, { config: {} });
+
+    await main();
+
+    expect(setFailed).not.toHaveBeenCalled();
+    expect(consoleLogMock.mock.calls).toMatchInlineSnapshot('Array []');
+  });
   it('Reports errors correctly matching problemMatcher', async () => {
     mockedInput.CONFIG_LOCATION_GLOB = '__fixtures__/invalid.conf';
     const client = nock(CALYPTIA_API_ENDPOINT);
-    // ['post']('/' + CALYPTIA_API_VALIDATION_PATH)
-    //   .reply(200, JSON.stringify({ config: {} }));
     client['post']('/' + CALYPTIA_API_VALIDATION_PATH).reply(200, failCase);
 
-    // client['post']('/' + CALYPTIA_API_VALIDATION_PATH).replyWithError(new Error('Server Error'));
-
     await main();
-    // expect(setFailed).toHaveBeenCalled();
     expect(setFailed.mock.calls).toMatchInlineSnapshot(`
       Array [
         Array [
@@ -98,9 +102,6 @@ describe('fluent-linter-action', () => {
   it('Reports errors when request fails', async () => {
     mockedInput.CONFIG_LOCATION_GLOB = '__fixtures__/basic.conf';
     const client = nock(CALYPTIA_API_ENDPOINT);
-    // ['post']('/' + CALYPTIA_API_VALIDATION_PATH)
-    //   .reply(200, JSON.stringify({ config: {} }));
-    // client['post']('/' + CALYPTIA_API_VALIDATION_PATH).reply(200, failCase);
 
     client['post']('/' + CALYPTIA_API_VALIDATION_PATH).replyWithError(new Error('Server Error'));
 
@@ -135,5 +136,14 @@ describe('fluent-linter-action', () => {
     expect(consoleLogMock.mock.calls).toMatchInlineSnapshot('Array []');
 
     expect(client.isDone()).toBe(true);
+  });
+
+  it('does not report if configuration is not fluent-bit/fluent-d', async () => {
+    mockedInput.CONFIG_LOCATION_GLOB = '__fixtures__/nginx.conf';
+
+    await main();
+
+    expect(setFailed).not.toHaveBeenCalled();
+    expect(consoleLogMock.mock.calls).toMatchInlineSnapshot('Array []');
   });
 });

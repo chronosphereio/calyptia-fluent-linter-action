@@ -10,9 +10,6 @@ inputs:
   CONFIG_LOCATION_GLOB:
     description: 'Glob pattern for Fluent-bit location'
     required: true
-  GITHUB_TOKEN:
-    description: 'Github token, typically available under ${secrets.GITHUB_TOKEN}'
-    required: true
 runs:
   using: 'node12'
   main: 'dist/index.js'

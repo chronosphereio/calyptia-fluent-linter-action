@@ -9,7 +9,6 @@ import { formatErrorsPerFile } from './formatErrorsPerFile';
 export enum InputValues {
   CONFIG_LOCATION_GLOB = 'CONFIG_LOCATION_GLOB',
   CALYPTIA_API_KEY = 'CALYPTIA_API_KEY',
-  GITHUB_TOKEN = 'GITHUB_TOKEN',
 }
 
 type ValidationResponse = { errors?: FieldErrors };
@@ -17,7 +16,7 @@ type ValidationResponse = { errors?: FieldErrors };
 const getActionInput = () => {
   return Object.keys(InputValues).reduce((memo, prop) => {
     const value = getInput(prop);
-    return value ? { ...memo, [prop]: value } : memo;
+    return { ...memo, [prop]: value };
   }, {} as Record<keyof typeof InputValues, string>);
 };
 
@@ -59,10 +58,8 @@ export const main = async (): Promise<void> => {
           if (data.errors) {
             const errors = normalizeErrors(filePath, data.errors);
 
-            if (errors.length) {
-              debug(`${filePath}, Found errors: ${JSON.stringify(errors, null, 2)}`);
-              annotations = [...annotations, ...errors];
-            }
+            debug(`${filePath}, Found errors: ${JSON.stringify(errors, null, 2)}`);
+            annotations = [...annotations, ...errors];
           }
         } else {
           setFailed(`The request failed:  status: ${response.status}, data: ${JSON.stringify(data)}`);

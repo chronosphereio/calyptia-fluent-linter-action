@@ -20226,13 +20226,12 @@ function formatErrorsPerFile(filePath, errorGroups) {
 var InputValues = /* @__PURE__ */ ((InputValues2) => {
   InputValues2['CONFIG_LOCATION_GLOB'] = 'CONFIG_LOCATION_GLOB';
   InputValues2['CALYPTIA_API_KEY'] = 'CALYPTIA_API_KEY';
-  InputValues2['GITHUB_TOKEN'] = 'GITHUB_TOKEN';
   return InputValues2;
 })(InputValues || {});
 var getActionInput = () => {
   return Object.keys(InputValues).reduce((memo, prop) => {
     const value = (0, import_core.getInput)(prop);
-    return value ? __spreadProps(__spreadValues({}, memo), { [prop]: value }) : memo;
+    return __spreadProps(__spreadValues({}, memo), { [prop]: value });
   }, {});
 };
 var main = async () => {
@@ -20261,10 +20260,8 @@ var main = async () => {
           (0, import_core.debug)(`[${filePath}]: ${JSON.stringify(data)}`);
           if (data.errors) {
             const errors = normalizeErrors(filePath, data.errors);
-            if (errors.length) {
-              (0, import_core.debug)(`${filePath}, Found errors: ${JSON.stringify(errors, null, 2)}`);
-              annotations = [...annotations, ...errors];
-            }
+            (0, import_core.debug)(`${filePath}, Found errors: ${JSON.stringify(errors, null, 2)}`);
+            annotations = [...annotations, ...errors];
           }
         } else {
           (0, import_core.setFailed)(`The request failed:  status: ${response.status}, data: ${JSON.stringify(data)}`);
