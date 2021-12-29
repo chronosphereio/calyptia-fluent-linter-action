@@ -20,7 +20,7 @@
 
   </p>
 
-# Table of Contents
+## Table of Contents
 
 - [Getting Started](#getting-started)
 - [Installation](#installation)
@@ -43,11 +43,11 @@ Follow the following steps to make the workflow is correctly set up in your repo
 
 the first step is to actually create the workflow in your repository. There are many way we can achieve this, but we have opted for the plug-n-play approach:
 
-0. Go to the repository you wish to add the fluent-linter-action workflow
-1. Under the tab "Actions" look for a button called _New workflow_
-2. Under choose workflow, you will find a box, please type "fluent-linter"
-3. You will find Fluent-linter-action by Calyptia, look for a button called "configure"
-4. Make sure to change `CONFIG_LOCATION_GLOB` to a [glob](<https://en.wikipedia.org/wiki/Glob_(programming)>) that points your fluent-d and fluent-bit configuration within the repository
+0. Go to the repository you wish to add the fluent-linter-action workflow.
+1. Under the tab _Actions_ look for a button called _New workflow_.
+2. Under _Choose workflow_, you will find a text box, please type "fluent-linter".
+3. You will find Fluent-linter-action by Calyptia, look for a button called "Configure".
+4. Make sure to change `CONFIG_LOCATION_GLOB` to a [glob](<https://en.wikipedia.org/wiki/Glob_(programming)>) that points to your fluent-d and/or fluent-bit configuration within the repository.
 
 If everything goes well, you will have an editor that will let you change anything on the workflow before committing. Keep in mind that the version could be changed to a specific version instead of `main` (current version `v0.0.10`).
 
@@ -57,13 +57,13 @@ _Make sure to commit the workflow to your repository._
 
 ## Get Calyptia API Key
 
-In order to get the full linting capabilities from this action, you will need to get a Calyptia token. The token is easy to get, just head over [Calyptia Cloud](https://cloud.calyptia.com/) and login (you can use your github account). On the Left panel you can find Account > settings > Generate API key. Give it a distinct name for safe keeping (ex: linter). please copy this token for the next step.
+In order to get the full linting capabilities from this action, you will need to get a Calyptia token. The token is easy to get, just head over to [Calyptia Cloud](https://cloud.calyptia.com/) and login (you can use your github account). On the Left panel you can find _Account > settings > Generate API key_. Give it a distinct name for safe keeping (for instance you could name it _linter_). please copy this token.
 
 ## Configure secret in your repository
 
-The last step will make use of the API key we generated in Calyptia Cloud.
+The last step will make use of the API Key we generated in Calyptia Cloud.
 
-In order to add a new secret to your repository find Settings > Secrets > New repository secret. the name for this secret should be `CALYPTIA_API_KEY`, paste the secret you obtained in the step before.
+In order to add a new secret to your repository find _Settings > Secrets > New repository secret_. the name for this secret should be `CALYPTIA_API_KEY`. Paste the secret you obtained in the step before.
 
 > note: Settings is often next to the insights tab. If is missing, you might need administrator permissions to add secrets to the repo.
 
