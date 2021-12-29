@@ -171,8 +171,10 @@ describe('fluent-linter-action', () => {
     expect(client.isDone()).toBe(true);
   });
 
-  it('Reports errors correctly matching problemMatcher on a fluentD file', async () => {
+  it.only('Reports errors correctly matching problemMatcher on a fluentD file', async () => {
     mockedInput.CONFIG_LOCATION_GLOB = '__fixtures__/fluentD_with_issues.conf';
+
+    mockedInput.CALYPTIA_API_KEY = 'eyJUb2tlbklEIjoiMzBiOTkxYTAtYjQ0My00ZTUwLWEwZGUtNDAwYThlMmEyNmVkIiwiUHJvamVjdElEIjoiN2JhZThmNTEtNGQwYi00ODY4LTllMmQtYWQzNWEzZTRlYTliIn0.7sSHp_u4Bz5r38CBavTmFmMrc2WL4gPcv4ta2EEiMUDcCe3_F2mR59DgnkdCqNH-'
 
     await main();
     expect(setFailed.mock.calls).toMatchInlineSnapshot(`
