@@ -15,7 +15,7 @@
 
 <p align="center">
   <a href="https://github.com/calyptia/fluent-linter-action">
-    <img src="logo.png" alt="Logo" width="128" height="128">
+    <img src="logo.svg" alt="Logo" width="95" height="105">
   </a>
 
   </p>
@@ -25,6 +25,8 @@
 - [Getting Started](#getting-started)
 - [Installation](#installation)
   - [Add workflow to your repository](#add-workflow-to-your-repository)
+    - [Using GitHub UI](#using-github-ui)
+    - [Manual](#manual)
   - [Get Calyptia API Key](#get-calyptia-api-key)
   - [Configure secret in your repository](#configure-secret-in-your-repository)
 - [Limitations](#limitations)
@@ -33,27 +35,58 @@
 
 # Getting started
 
-Fluent-bit and Fluent-d configurations are simple to use. Over time, when our use grows, complexity grows with it. This action will help stay away from common pitfalls. It will add linting to your development process through workflows.
+fluent-bit and fluent-d configurations are simple to use. But over time, use will grows and with that, complexity as well. This action will help stay away from common pitfalls. It will add linting to your development process through workflows.
 
 # Installation
 
-Follow the following steps to make the workflow is correctly set up in your repository.
+The next steps will help set up fluent linter action in your repository.
 
 ## Add workflow to your repository
 
-the first step is to actually create the workflow in your repository. There are many way we can achieve this, but we have opted for the plug-n-play approach:
+The first step is to actually create the workflow in your repository. There are many ways we can achieve this, but we will describe 2. Via [ Github UI ](#using-github-ui) or doing it [manually](#manually).
 
-0. Go to the repository you wish to add the fluent-linter-action workflow.
+### Manual
+
+1. Create the following directory in your repository `.github/workflows/`
+1. Under `.github/workflows/` create a file called `fluent-linter.yml`
+1. Open `.github/workflows/fluent-linter.yml`
+1. paste the following content:
+
+   ```yml
+   on: pull_request
+
+   name: Fluent-linter
+   jobs:
+     lint:
+       runs-on: ubuntu-latest
+       steps:
+         - uses: actions/checkout@master
+         - id: fluent_linter_action
+           uses: calyptia/fluent-linter-action@gg/use-example
+           with:
+             CALYPTIA_API_KEY: ${{ secrets.CALYPTIA_API_KEY }}
+             CONFIG_LOCATION_GLOB: '*.conf'
+   ```
+
+1. Make sure to change `CONFIG_LOCATION_GLOB` to a [glob](<https://en.wikipedia.org/wiki/Glob_(programming)>) that points to your fluent-d and/or fluent-bit configuration within the repository.
+
+_if you want to see it in action, take a look at the [example here](https://github.com/calyptia/fluent-linter-action/pull/9)_
+
+### Using GitHub UI
+
+1. Go to 4the repository you wish to add the fluent-linter-action workflow.
 1. Under the tab _Actions_ look for a button called _New workflow_.
-2. Under _Choose workflow_, you will find a text box, please type "fluent-linter".
-3. You will find Fluent-linter-action by Calyptia, look for a button called "Configure".
-4. Make sure to change `CONFIG_LOCATION_GLOB` to a [glob](<https://en.wikipedia.org/wiki/Glob_(programming)>) that points to your fluent-d and/or fluent-bit configuration within the repository.
+1. Under _Choose workflow_, you will find a text box, please type "fluent-linter".
+1. You will find Fluent-linter-action by Calyptia, look for a button called "Configure".
+1. Make sure to change `CONFIG_LOCATION_GLOB` to a [glob](<https://en.wikipedia.org/wiki/Glob_(programming)>) that points to your fluent-d and/or fluent-bit configuration within the repository.
 
 If everything goes well, you will have an editor that will let you change anything on the workflow before committing. Keep in mind that the version could be changed to a specific version instead of `main` (current version `v0.0.10`).
 
 _Make sure to commit the workflow to your repository._
 
 \_for more information about using workflows, take a look at\_ [github documentation](https://docs.github.com/en/actions/learn-github-actions/using-starter-workflows)
+
+If the options we have just described are not working out for you
 
 ## Get Calyptia API Key
 
@@ -69,7 +102,8 @@ In order to add a new secret to your repository find _Settings > Secrets > New r
 
 # Limitations
 
-The current fluent-linter-action only works with Fluent-bit configurations. Fluent-d configurations will be available shortly.
+- The current fluent-linter-action only works with `fluent-bit` configurations. fluent-d configurations will be available shortly.
+- The current fluent-lint-action doesn't support `@includes` yet. These if found, will be ignored. Please follow [this issue](https://github.com/calyptia/fluent-bit-config-parser/issues/9) for updates.
 
 <!-- CONTRIBUTING -->
 
@@ -87,4 +121,4 @@ Contributions are what makes the open-source community such an amazing place to 
 
 ## License
 
-Distributed under the MIT License. See `LICENSE` for more information.
+Distributed under the Apache-2.0 License. See `LICENSE` for more information.
