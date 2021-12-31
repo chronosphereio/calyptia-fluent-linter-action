@@ -103,7 +103,7 @@ In order to add a new secret to your repository find _Settings > Secrets > New r
 # Limitations
 
 - The current fluent-linter-action only works with `fluent-bit` configurations. fluent-d configurations will be available shortly.
-- The current fluent-lint-action doesn't follow `@includes` yet. Please follow this [issue](https://github.com/calyptia/fluent-bit-config-parser/issues/9) for updates.
+- The current fluent-lint-action doesn't support `@includes` yet. These if found, will be ignored. Please follow [this issue](https://github.com/calyptia/fluent-bit-config-parser/issues/9) for updates.
 
 <!-- CONTRIBUTING -->
 
