@@ -35,15 +35,15 @@
 
 # Getting started
 
-Fluent-bit and Fluent-d configurations are simple to use. Over time, when our use grows, complexity grows with it. This action will help stay away from common pitfalls. It will add linting to your development process through workflows.
+fluent-bit and fluent-d configurations are simple to use. But over time, use will grows and with that, complexity as well. This action will help stay away from common pitfalls. It will add linting to your development process through workflows.
 
 # Installation
 
-Follow the following steps to make the workflow is correctly set up in your repository.
+The next steps will help set up fluent linter action in your repository.
 
 ## Add workflow to your repository
 
-the first step is to actually create the workflow in your repository. There are many way we can achieve this, but we will describe 2. The using [ Github UI ](#using-github-ui) or doing it [manually](#manually).
+The first step is to actually create the workflow in your repository. There are many ways we can achieve this, but we will describe 2. Via [ Github UI ](#using-github-ui) or doing it [manually](#manually).
 
 ### Manual
 
@@ -51,20 +51,23 @@ the first step is to actually create the workflow in your repository. There are 
 1. Under `.github/workflows/` create a file called `fluent-linter.yml`
 1. Open `.github/workflows/fluent-linter.yml`
 1. paste the following content:
+
    ```yml
    on: pull_request
+
    name: Fluent-linter
    jobs:
      lint:
        runs-on: ubuntu-latest
        steps:
          - uses: actions/checkout@master
-         - id: running_linter
+         - id: fluent_linter_action
            uses: calyptia/fluent-linter-action@gg/use-example
            with:
              CALYPTIA_API_KEY: ${{ secrets.CALYPTIA_API_KEY }}
              CONFIG_LOCATION_GLOB: '*.conf'
    ```
+
 1. Make sure to change `CONFIG_LOCATION_GLOB` to a [glob](<https://en.wikipedia.org/wiki/Glob_(programming)>) that points to your fluent-d and/or fluent-bit configuration within the repository.
 
 _if you want to see it in action, take a look at the [example here](https://github.com/calyptia/fluent-linter-action/pull/9)_
