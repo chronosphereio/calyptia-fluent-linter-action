@@ -70,11 +70,11 @@ The first step is to actually create the workflow in your repository. There are 
 
 1. Make sure to change `CONFIG_LOCATION_GLOB` to a [glob](<https://en.wikipedia.org/wiki/Glob_(programming)>) that points to your fluent-d and/or fluent-bit configuration within the repository.
 
-_if you want to see it in action, take a look at the [example here](https://github.com/calyptia/fluent-linter-action/pull/9)_
+_If you want to see it in action, take a look at the [example here](https://github.com/calyptia/fluent-linter-action/pull/9)_
 
 ### Using GitHub UI
 
-1. Go to 4the repository you wish to add the fluent-linter-action workflow.
+1. Go to the repository you wish to add the fluent-linter-action workflow.
 1. Under the tab _Actions_ look for a button called _New workflow_.
 1. Under _Choose workflow_, you will find a text box, please type "fluent-linter".
 1. You will find Fluent-linter-action by Calyptia, look for a button called "Configure".
@@ -84,9 +84,9 @@ If everything goes well, you will have an editor that will let you change anythi
 
 _Make sure to commit the workflow to your repository._
 
-\_for more information about using workflows, take a look at\_ [github documentation](https://docs.github.com/en/actions/learn-github-actions/using-starter-workflows)
+_For more information about using workflows, take a look at\ [github documentation](https://docs.github.com/en/actions/learn-github-actions/using-starter-workflows)_
 
-If the options we have just described are not working out for you
+If the options we have just described are not working out for you try the [Manual approach](###Manual)
 
 ## Get Calyptia API Key
 
@@ -102,8 +102,8 @@ In order to add a new secret to your repository find _Settings > Secrets > New r
 
 # Limitations
 
-- The current fluent-linter-action only works with `fluent-bit` configurations. fluent-d configurations will be available shortly.
-- The current fluent-lint-action doesn't support `@includes` yet. These if found, will be ignored. Please follow [this issue](https://github.com/calyptia/fluent-bit-config-parser/issues/9) for updates.
+- The current `fluent-linter-action` only works with `fluent-bit` configurations. `fluent-d` configurations will be available shortly.
+- The current `fluent-linter-action` doesn't support `@includes` yet. These if found in your configurations, will be ignored. Please follow [this issue](https://github.com/calyptia/fluent-bit-config-parser/issues/9) for updates.
 
 <!-- CONTRIBUTING -->
 
