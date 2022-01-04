@@ -5,12 +5,13 @@
     "url": "git+ssh://git@github.com:calyptia/fluent-linter-action.git"
   },
   "license": "Apache-2.0",
-  "version": "0.0.11",
+  "version": "0.0.12",
   "description": "Linter action for Fluent-bit configuration",
   "main": "dist/index.js",
   "scripts": {
     "precommit": "lint-staged",
     "test": "jest",
+    "problem-matcher:build": "cp problem-matcher.json dist/",
     "build": "esbuild --bundle ./index.ts --platform=node --target=node12 --main-fields=main --outdir=dist && pretty-quick dist/index.js",
     "lint": "eslint src/* --ext .ts"
   },
@@ -34,6 +35,7 @@
     "*.ts": [
       "eslint --fix",
       "bash -c \"npm run build\"",
+      "bash -c \"npm run problem-matcher:build\"",
       "pretty-quick dist/index.js",
       "git add ."
     ]

@@ -3,9 +3,10 @@ import * as glob from '@actions/glob';
 import { readContent } from './utils/readContent';
 import { FluentBitSchema } from '@calyptia/fluent-bit-config-parser';
 import fetch from 'node-fetch';
-import { CALYPTIA_API_ENDPOINT, CALYPTIA_API_VALIDATION_PATH, PROBLEM_MATCHER_FILE_LOCATION } from './utils/constants';
+import { CALYPTIA_API_ENDPOINT, CALYPTIA_API_VALIDATION_PATH, PROBLEM_MATCHER_FILE_NAME } from './utils/constants';
 import { Annotation, FieldErrors, normalizeErrors } from './utils/normalizeErrors';
 import { formatErrorsPerFile } from './formatErrorsPerFile';
+import { resolve } from 'path';
 export enum InputValues {
   CONFIG_LOCATION_GLOB = 'CONFIG_LOCATION_GLOB',
   CALYPTIA_API_KEY = 'CALYPTIA_API_KEY',
@@ -71,7 +72,8 @@ export const main = async (): Promise<void> => {
   }
 
   if (annotations.length) {
-    console.log(`::add-matcher::${PROBLEM_MATCHER_FILE_LOCATION}`);
+    const location = resolve(__dirname, PROBLEM_MATCHER_FILE_NAME);
+    console.log(`::add-matcher::${location}`);
 
     const groupedByFile = annotations.reduce((memo, { filePath, errorGroups }) => {
       memo[filePath] = memo[filePath] ? [...memo[filePath], ...errorGroups] : errorGroups;

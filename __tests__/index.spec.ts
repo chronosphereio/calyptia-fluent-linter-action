@@ -59,7 +59,7 @@ describe('fluent-linter-action', () => {
     expect(consoleLogMock.mock.calls).toMatchInlineSnapshot(`
       Array [
         Array [
-          "::add-matcher::./problem-matcher.json",
+          "::add-matcher::<PROJECT_ROOT>/src/problem-matcher.json",
         ],
         Array [
           "<PROJECT_ROOT>/__fixtures__/invalid.conf: 0:0 error john   cannot initialize input plugin: john 
