@@ -68,7 +68,7 @@ The first step is to create the workflow in your repository. There are many ways
              CONFIG_LOCATION_GLOB: '*.conf'
    ```
 
-1. Make sure to change `CONFIG_LOCATION_GLOB` to a [glob](<https://en.wikipedia.org/wiki/Glob_(programming)>) that points to your `fluent-d` and `fluent-bit` configuration within the repository. Remember that GLOBs can contain 1 or multiple patterns, you can use [this page](https://globster.xyz/) to make sure your glob will match the necessary files.
+1. Make sure to change `CONFIG_LOCATION_GLOB` to a [glob](<https://en.wikipedia.org/wiki/Glob_(programming)>) that points to your `fluent-d` and `fluent-bit` configuration within the repository. you can use [this page](https://globster.xyz/) to make sure your glob will match the necessary files.
 
 _If you want to see it in action, take a look at the [example here](https://github.com/calyptia/fluent-linter-action/pull/9)_
 
