@@ -35,7 +35,7 @@
     "*.ts": [
       "eslint --fix",
       "bash -c \"npm run build\"",
-      "npm run problem-matcher:build",
+      "bash -c \"npm run problem-matcher:build\"",
       "pretty-quick dist/index.js",
       "git add ."
     ]
