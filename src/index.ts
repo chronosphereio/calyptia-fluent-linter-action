@@ -73,7 +73,6 @@ export const main = async (): Promise<void> => {
 
   if (annotations.length) {
     const location = resolve(__dirname, PROBLEM_MATCHER_FILE_NAME);
-    console.log('adding problem matcher from ', location);
     console.log(`::add-matcher::${location}`);
 
     const groupedByFile = annotations.reduce((memo, { filePath, errorGroups }) => {

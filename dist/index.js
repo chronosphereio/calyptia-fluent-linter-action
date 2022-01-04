@@ -20274,7 +20274,6 @@ var main = async () => {
   }
   if (annotations.length) {
     const location = (0, import_path2.resolve)(__dirname, PROBLEM_MATCHER_FILE_NAME);
-    console.log('adding problem matcher from ', location);
     console.log(`::add-matcher::${location}`);
     const groupedByFile = annotations.reduce((memo, { filePath, errorGroups }) => {
       memo[filePath] = memo[filePath] ? [...memo[filePath], ...errorGroups] : errorGroups;
