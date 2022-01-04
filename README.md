@@ -60,9 +60,9 @@ The first step is to create the workflow in your repository. We describe two way
      lint:
        runs-on: ubuntu-latest
        steps:
-         - uses: actions/checkout@master
+         - uses: actions/checkout@v2
          - id: fluent_linter_action
-           uses: calyptia/fluent-linter-action@gg/use-example
+           uses: calyptia/fluent-linter-action@main
            with:
              CALYPTIA_API_KEY: ${{ secrets.CALYPTIA_API_KEY }}
              CONFIG_LOCATION_GLOB: '*.conf'
@@ -104,6 +104,8 @@ Add a new secret to your repository find _Settings > Secrets > New repository se
 
 - The current `fluent-linter-action` only works with `fluent-bit` configurations. `fluentd` configurations will be available shortly.
 - The current `fluent-linter-action` doesn't support `@includes` yet. These, if found in your configurations, will be ignored. Please follow [this issue](https://github.com/calyptia/fluent-bit-config-parser/issues/9) for updates.
+- The current `fluent-linter-action` uses the latest master branch of `fluent-bit` to run the checks. Please follow [this issue](https://github.com/calyptia/fluent-linter-action/issues/18) for updates.
+- The current `fluent-linter-action` does not support ignoring or excluding any configuration from linting. Please follow [this issue](https://github.com/calyptia/fluent-linter-action/issues/19) for updates. Be aware of this if using custom plugins or images/builds which may use invalid configuration options from the point of view of the main Fluent Bit version.
 
 <!-- CONTRIBUTING -->
 
