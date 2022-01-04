@@ -1,0 +1,17 @@
+{
+  "problemMatcher": [
+    {
+      "owner": "fluent-linter",
+      "pattern": [
+        {
+          "regexp": "(.+\\/[^\\/]+):\\s(\\d+):(\\d+)\\s+(error|warning|info)\\s+(\\w+)\\s+(.*)$",
+          "file": 1,
+          "line": 2,
+          "column": 3,
+          "severity": 4,
+          "message": 6
+        }
+      ]
+    }
+  ]
+}
