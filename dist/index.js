@@ -621,13 +621,13 @@ var require_http_client = __commonJS({
         this.message = message;
       }
       readBody() {
-        return new Promise(async (resolve, reject) => {
+        return new Promise(async (resolve2, reject) => {
           let output = Buffer.alloc(0);
           this.message.on('data', (chunk) => {
             output = Buffer.concat([output, chunk]);
           });
           this.message.on('end', () => {
-            resolve(output.toString());
+            resolve2(output.toString());
           });
         });
       }
@@ -829,12 +829,12 @@ var require_http_client = __commonJS({
         this._disposed = true;
       }
       requestRaw(info, data) {
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve2, reject) => {
           let callbackForResult = function (err, res) {
             if (err) {
               reject(err);
             }
-            resolve(res);
+            resolve2(res);
           };
           this.requestRawWithCallback(info, data, callbackForResult);
         });
@@ -987,7 +987,7 @@ var require_http_client = __commonJS({
       _performExponentialBackoff(retryNumber) {
         retryNumber = Math.min(ExponentialBackoffCeiling, retryNumber);
         const ms = ExponentialBackoffTimeSlice * Math.pow(2, retryNumber);
-        return new Promise((resolve) => setTimeout(() => resolve(), ms));
+        return new Promise((resolve2) => setTimeout(() => resolve2(), ms));
       }
       static dateTimeDeserializer(key, value) {
         if (typeof value === 'string') {
@@ -999,7 +999,7 @@ var require_http_client = __commonJS({
         return value;
       }
       async _processResponse(res, options) {
-        return new Promise(async (resolve, reject) => {
+        return new Promise(async (resolve2, reject) => {
           const statusCode = res.message.statusCode;
           const response = {
             statusCode,
@@ -1007,7 +1007,7 @@ var require_http_client = __commonJS({
             headers: {},
           };
           if (statusCode == HttpCodes.NotFound) {
-            resolve(response);
+            resolve2(response);
           }
           let obj;
           let contents;
@@ -1036,7 +1036,7 @@ var require_http_client = __commonJS({
             err.result = response.result;
             reject(err);
           } else {
-            resolve(response);
+            resolve2(response);
           }
         });
       }
@@ -1110,11 +1110,11 @@ var require_oidc_utils = __commonJS({
         function adopt(value) {
           return value instanceof P
             ? value
-            : new P(function (resolve) {
-                resolve(value);
+            : new P(function (resolve2) {
+                resolve2(value);
               });
         }
-        return new (P || (P = Promise))(function (resolve, reject) {
+        return new (P || (P = Promise))(function (resolve2, reject) {
           function fulfilled(value) {
             try {
               step(generator.next(value));
@@ -1130,7 +1130,7 @@ var require_oidc_utils = __commonJS({
             }
           }
           function step(result) {
-            result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected);
+            result.done ? resolve2(result.value) : adopt(result.value).then(fulfilled, rejected);
           }
           step((generator = generator.apply(thisArg, _arguments || [])).next());
         });
@@ -1252,11 +1252,11 @@ var require_core = __commonJS({
         function adopt(value) {
           return value instanceof P
             ? value
-            : new P(function (resolve) {
-                resolve(value);
+            : new P(function (resolve2) {
+                resolve2(value);
               });
         }
-        return new (P || (P = Promise))(function (resolve, reject) {
+        return new (P || (P = Promise))(function (resolve2, reject) {
           function fulfilled(value) {
             try {
               step(generator.next(value));
@@ -1272,7 +1272,7 @@ var require_core = __commonJS({
             }
           }
           function step(result) {
-            result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected);
+            result.done ? resolve2(result.value) : adopt(result.value).then(fulfilled, rejected);
           }
           step((generator = generator.apply(thisArg, _arguments || [])).next());
         });
@@ -2963,11 +2963,11 @@ var require_internal_globber = __commonJS({
         function adopt(value) {
           return value instanceof P
             ? value
-            : new P(function (resolve) {
-                resolve(value);
+            : new P(function (resolve2) {
+                resolve2(value);
               });
         }
-        return new (P || (P = Promise))(function (resolve, reject) {
+        return new (P || (P = Promise))(function (resolve2, reject) {
           function fulfilled(value) {
             try {
               step(generator.next(value));
@@ -2983,7 +2983,7 @@ var require_internal_globber = __commonJS({
             }
           }
           function step(result) {
-            result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected);
+            result.done ? resolve2(result.value) : adopt(result.value).then(fulfilled, rejected);
           }
           step((generator = generator.apply(thisArg, _arguments || [])).next());
         });
@@ -3009,14 +3009,14 @@ var require_internal_globber = __commonJS({
           i[n] =
             o[n] &&
             function (v) {
-              return new Promise(function (resolve, reject) {
-                (v = o[n](v)), settle(resolve, reject, v.done, v.value);
+              return new Promise(function (resolve2, reject) {
+                (v = o[n](v)), settle(resolve2, reject, v.done, v.value);
               });
             };
         }
-        function settle(resolve, reject, d, v) {
+        function settle(resolve2, reject, d, v) {
           Promise.resolve(v).then(function (v2) {
-            resolve({ value: v2, done: d });
+            resolve2({ value: v2, done: d });
           }, reject);
         }
       };
@@ -3271,11 +3271,11 @@ var require_internal_hash_files = __commonJS({
         function adopt(value) {
           return value instanceof P
             ? value
-            : new P(function (resolve) {
-                resolve(value);
+            : new P(function (resolve2) {
+                resolve2(value);
               });
         }
-        return new (P || (P = Promise))(function (resolve, reject) {
+        return new (P || (P = Promise))(function (resolve2, reject) {
           function fulfilled(value) {
             try {
               step(generator.next(value));
@@ -3291,7 +3291,7 @@ var require_internal_hash_files = __commonJS({
             }
           }
           function step(result) {
-            result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected);
+            result.done ? resolve2(result.value) : adopt(result.value).then(fulfilled, rejected);
           }
           step((generator = generator.apply(thisArg, _arguments || [])).next());
         });
@@ -3317,14 +3317,14 @@ var require_internal_hash_files = __commonJS({
           i[n] =
             o[n] &&
             function (v) {
-              return new Promise(function (resolve, reject) {
-                (v = o[n](v)), settle(resolve, reject, v.done, v.value);
+              return new Promise(function (resolve2, reject) {
+                (v = o[n](v)), settle(resolve2, reject, v.done, v.value);
               });
             };
         }
-        function settle(resolve, reject, d, v) {
+        function settle(resolve2, reject, d, v) {
           Promise.resolve(v).then(function (v2) {
-            resolve({ value: v2, done: d });
+            resolve2({ value: v2, done: d });
           }, reject);
         }
       };
@@ -3398,11 +3398,11 @@ var require_glob = __commonJS({
         function adopt(value) {
           return value instanceof P
             ? value
-            : new P(function (resolve) {
-                resolve(value);
+            : new P(function (resolve2) {
+                resolve2(value);
               });
         }
-        return new (P || (P = Promise))(function (resolve, reject) {
+        return new (P || (P = Promise))(function (resolve2, reject) {
           function fulfilled(value) {
             try {
               step(generator.next(value));
@@ -3418,7 +3418,7 @@ var require_glob = __commonJS({
             }
           }
           function step(result) {
-            result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected);
+            result.done ? resolve2(result.value) : adopt(result.value).then(fulfilled, rejected);
           }
           step((generator = generator.apply(thisArg, _arguments || [])).next());
         });
@@ -14401,7 +14401,7 @@ var require_lib2 = __commonJS({
       let accum = [];
       let accumBytes = 0;
       let abort = false;
-      return new Body.Promise(function (resolve, reject) {
+      return new Body.Promise(function (resolve2, reject) {
         let resTimeout;
         if (_this4.timeout) {
           resTimeout = setTimeout(function () {
@@ -14442,7 +14442,7 @@ var require_lib2 = __commonJS({
           }
           clearTimeout(resTimeout);
           try {
-            resolve(Buffer.concat(accum, accumBytes));
+            resolve2(Buffer.concat(accum, accumBytes));
           } catch (err) {
             reject(
               new FetchError(
@@ -15074,7 +15074,7 @@ var require_lib2 = __commonJS({
         throw new Error('native promise missing, set fetch.Promise to your favorite alternative');
       }
       Body.Promise = fetch2.Promise;
-      return new fetch2.Promise(function (resolve, reject) {
+      return new fetch2.Promise(function (resolve2, reject) {
         const request = new Request(url, opts);
         const options = getNodeRequestOptions(request);
         const send = (options.protocol === 'https:' ? https : http).request;
@@ -15180,7 +15180,7 @@ var require_lib2 = __commonJS({
                   requestOpts.body = void 0;
                   requestOpts.headers.delete('content-length');
                 }
-                resolve(fetch2(new Request(locationURL, requestOpts)));
+                resolve2(fetch2(new Request(locationURL, requestOpts)));
                 finalize();
                 return;
             }
@@ -15207,7 +15207,7 @@ var require_lib2 = __commonJS({
             res.statusCode === 304
           ) {
             response = new Response(body, response_options);
-            resolve(response);
+            resolve2(response);
             return;
           }
           const zlibOptions = {
@@ -15217,7 +15217,7 @@ var require_lib2 = __commonJS({
           if (codings == 'gzip' || codings == 'x-gzip') {
             body = body.pipe(zlib.createGunzip(zlibOptions));
             response = new Response(body, response_options);
-            resolve(response);
+            resolve2(response);
             return;
           }
           if (codings == 'deflate' || codings == 'x-deflate') {
@@ -15229,18 +15229,18 @@ var require_lib2 = __commonJS({
                 body = body.pipe(zlib.createInflateRaw());
               }
               response = new Response(body, response_options);
-              resolve(response);
+              resolve2(response);
             });
             return;
           }
           if (codings == 'br' && typeof zlib.createBrotliDecompress === 'function') {
             body = body.pipe(zlib.createBrotliDecompress());
             response = new Response(body, response_options);
-            resolve(response);
+            resolve2(response);
             return;
           }
           response = new Response(body, response_options);
-          resolve(response);
+          resolve2(response);
         });
         writeToStream(req, request);
       });
@@ -20179,7 +20179,7 @@ var import_node_fetch = __toModule(require_lib2());
 var import_table = __toModule(require_src());
 var CALYPTIA_API_ENDPOINT = 'https://cloud-api.calyptia.com';
 var CALYPTIA_API_VALIDATION_PATH = 'v1/config_validate/fluentbit';
-var PROBLEM_MATCHER_FILE_LOCATION = './problem-matcher.json';
+var PROBLEM_MATCHER_FILE_NAME = 'problem-matcher.json';
 var NO_STYLES_IN_TABLE = {
   border: (0, import_table.getBorderCharacters)('void'),
   columnDefault: {
@@ -20223,6 +20223,7 @@ function formatErrorsPerFile(filePath, errorGroups) {
 }
 
 // src/index.ts
+var import_path2 = __toModule(require('path'));
 var InputValues = /* @__PURE__ */ ((InputValues2) => {
   InputValues2['CONFIG_LOCATION_GLOB'] = 'CONFIG_LOCATION_GLOB';
   InputValues2['CALYPTIA_API_KEY'] = 'CALYPTIA_API_KEY';
@@ -20272,7 +20273,8 @@ var main = async () => {
     }
   }
   if (annotations.length) {
-    console.log(`::add-matcher::${PROBLEM_MATCHER_FILE_LOCATION}`);
+    const location = (0, import_path2.resolve)(__dirname, PROBLEM_MATCHER_FILE_NAME);
+    console.log(`::add-matcher::${location}`);
     const groupedByFile = annotations.reduce((memo, { filePath, errorGroups }) => {
       memo[filePath] = memo[filePath] ? [...memo[filePath], ...errorGroups] : errorGroups;
       return memo;
