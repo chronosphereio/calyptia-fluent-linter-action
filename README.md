@@ -43,7 +43,7 @@ The following are steps to set up fluent linter action in your repository.
 
 ## Add workflow to your repository
 
-The first step is to create the workflow in your repository. We describe two ways: via [ Github UI ](#using-github-ui) or [manually](#manual).
+The first step is to create the workflow in your repository. We describe two ways: via [Github UI](#using-github-ui) or [manually](#manual).
 
 ### Manual
 
