@@ -20179,7 +20179,7 @@ var import_node_fetch = __toModule(require_lib2());
 var import_table = __toModule(require_src());
 var CALYPTIA_API_ENDPOINT = 'https://cloud-api.calyptia.com';
 var CALYPTIA_API_VALIDATION_PATH = 'v1/config_validate/fluentbit';
-var PROBLEM_MATCHER_FILE_LOCATION = '.github/problem-matcher.json';
+var PROBLEM_MATCHER_FILE_LOCATION = './problem-matcher.json';
 var NO_STYLES_IN_TABLE = {
   border: (0, import_table.getBorderCharacters)('void'),
   columnDefault: {
