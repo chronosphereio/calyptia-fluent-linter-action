@@ -6,7 +6,7 @@ jobs:
     steps:
       - uses: actions/checkout@master
       - id: running_linter
-        uses: calyptia/fluent-linter-action@gg/use-example
+        uses: calyptia/fluent-linter-action@main
         with:
           CALYPTIA_API_KEY: ${{ secrets.CALYPTIA_API_KEY }}
           CONFIG_LOCATION_GLOB: '__fixtures__/configurations/*.conf'
