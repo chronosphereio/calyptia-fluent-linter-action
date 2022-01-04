@@ -115,7 +115,8 @@ describe('fluent-linter-action', () => {
         ],
       ]
     `);
-    expect(consoleLogMock.mock.calls).toMatchInlineSnapshot('Array []');
+
+    expect(consoleLogMock).not.toHaveBeenCalled();
 
     expect(client.isDone()).toBe(true);
   });
@@ -134,17 +135,17 @@ describe('fluent-linter-action', () => {
         ],
       ]
     `);
-    expect(consoleLogMock.mock.calls).toMatchInlineSnapshot('Array []');
+    expect(consoleLogMock).not.toHaveBeenCalled();
 
     expect(client.isDone()).toBe(true);
   });
 
-  it('does not report if configuration is not fluent-bit/fluent-d', async () => {
+  it('does not report if configuration is not fluent-bit/fluentd', async () => {
     mockedInput.CONFIG_LOCATION_GLOB = '__fixtures__/nginx.conf';
 
     await main();
 
     expect(setFailed).not.toHaveBeenCalled();
-    expect(consoleLogMock.mock.calls).toMatchInlineSnapshot('Array []');
+    expect(consoleLogMock).not.toHaveBeenCalled();
   });
 });
