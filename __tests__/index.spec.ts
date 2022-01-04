@@ -59,10 +59,6 @@ describe('fluent-linter-action', () => {
     expect(consoleLogMock.mock.calls).toMatchInlineSnapshot(`
       Array [
         Array [
-          "adding problem matcher from ",
-          "<PROJECT_ROOT>/src/problem-matcher.json",
-        ],
-        Array [
           "::add-matcher::<PROJECT_ROOT>/src/problem-matcher.json",
         ],
         Array [
