@@ -4,7 +4,7 @@ import nock from 'nock';
 import failCase from '../__fixtures__/scenarios/failed_case.json';
 import { CALYPTIA_API_ENDPOINT, CALYPTIA_API_VALIDATION_PATH } from '../src/utils/constants';
 import { mockConsole, unMockConsole } from './helpers';
-import { problemMatcher } from '../.github/problem-matcher.json';
+import { problemMatcher } from '../problem-matcher.json';
 import { join } from 'path';
 describe('fluent-linter-action', () => {
   let consoleLogMock: jest.Mock;
@@ -115,7 +115,8 @@ describe('fluent-linter-action', () => {
         ],
       ]
     `);
-    expect(consoleLogMock.mock.calls).toMatchInlineSnapshot('Array []');
+
+    expect(consoleLogMock).not.toHaveBeenCalled();
 
     expect(client.isDone()).toBe(true);
   });
@@ -134,17 +135,17 @@ describe('fluent-linter-action', () => {
         ],
       ]
     `);
-    expect(consoleLogMock.mock.calls).toMatchInlineSnapshot('Array []');
+    expect(consoleLogMock).not.toHaveBeenCalled();
 
     expect(client.isDone()).toBe(true);
   });
 
-  it('does not report if configuration is not fluent-bit/fluent-d', async () => {
+  it('does not report if configuration is not fluent-bit/fluentd', async () => {
     mockedInput.CONFIG_LOCATION_GLOB = '__fixtures__/nginx.conf';
 
     await main();
 
     expect(setFailed).not.toHaveBeenCalled();
-    expect(consoleLogMock.mock.calls).toMatchInlineSnapshot('Array []');
+    expect(consoleLogMock).not.toHaveBeenCalled();
   });
 });

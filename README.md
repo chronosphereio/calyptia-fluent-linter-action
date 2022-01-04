@@ -35,7 +35,7 @@
 
 # Getting started
 
-fluent-bit and fluent-d configurations are simple to use. Over time, the use of these configurations will grow and complexity with it. This action will help stay away from common pitfalls. It will add linting to your development process through workflows.
+fluent-bit and fluentd configurations are simple to use. Over time, the use of these configurations will grow and complexity with it. This action will help stay away from common pitfalls. It will add linting to your development process through workflows.
 
 # Installation
 
@@ -43,7 +43,7 @@ The following are steps to set up fluent linter action in your repository.
 
 ## Add workflow to your repository
 
-The first step is to create the workflow in your repository. There are many ways we can achieve this, but we will describe 2. Via [Github UI](#using-github-ui) or doing it [manually](#manual).
+The first step is to create the workflow in your repository. We describe two ways: via [Github UI](#using-github-ui) or [manually](#manual).
 
 ### Manual
 
@@ -68,7 +68,7 @@ The first step is to create the workflow in your repository. There are many ways
              CONFIG_LOCATION_GLOB: '*.conf'
    ```
 
-1. Make sure to change `CONFIG_LOCATION_GLOB` to a [glob](<https://en.wikipedia.org/wiki/Glob_(programming)>) that points to your `fluent-d` and `fluent-bit` configuration within the repository. Remember that GLOBs can contain 1 or multiple patterns, you can use [this page](https://globster.xyz/) to make sure your glob will match the necessary files.
+1. Make sure to change `CONFIG_LOCATION_GLOB` to a [glob](<https://en.wikipedia.org/wiki/Glob_(programming)>) that points to your `fluentd` and `fluent-bit` configuration within the repository. you can use [this page](https://globster.xyz/) to make sure your glob will match the necessary files.
 
 _If you want to see it in action, take a look at the [example here](https://github.com/calyptia/fluent-linter-action/pull/9)_
 
@@ -78,7 +78,7 @@ _If you want to see it in action, take a look at the [example here](https://gith
 1. Under the tab _Actions_ look for a button called _New workflow_.
 1. Under _Choose workflow_, you will find a text box. Please type "fluent-linter"
 1. You will find Fluent-linter-action by Calyptia. Look for a button called "Configure"
-1. Make sure to change `CONFIG_LOCATION_GLOB` to a [glob](<https://en.wikipedia.org/wiki/Glob_(programming)>) that points to your fluent-d and fluent-bit configuration within the repository.
+1. Make sure to change `CONFIG_LOCATION_GLOB` to a [glob](<https://en.wikipedia.org/wiki/Glob_(programming)>) that points to your fluentd and fluent-bit configuration within the repository.
 
 If everything goes well, you will see an editor that will let you change anything on the workflow before committing. You can change the version from `main` to a specific one.
 
@@ -102,7 +102,7 @@ Add a new secret to your repository find _Settings > Secrets > New repository se
 
 # Limitations
 
-- The current `fluent-linter-action` only works with `fluent-bit` configurations. `fluent-d` configurations will be available shortly.
+- The current `fluent-linter-action` only works with `fluent-bit` configurations. `fluentd` configurations will be available shortly.
 - The current `fluent-linter-action` doesn't support `@includes` yet. These, if found in your configurations, will be ignored. Please follow [this issue](https://github.com/calyptia/fluent-bit-config-parser/issues/9) for updates.
 
 <!-- CONTRIBUTING -->
