@@ -105,13 +105,10 @@
     "@actions/core": "^1.6.0",
     "@actions/glob": "^0.2.0",
     "@calyptia/fluent-bit-config-parser": "^1.0.0",
-    "axios": "^0.24.0",
-    "got": "^12.0.0",
     "node-fetch": "^2.6.6",
     "table": "^6.7.5"
   },
   "devDependencies": {
-    "@types/debug": "4.1.7",
     "@types/jest": "26.0.24",
     "@types/node": "16.11.12",
     "@types/node-fetch": "^3.0.3",
@@ -125,7 +122,6 @@
     "eslint-config-prettier": "7.2.0",
     "husky": "4.3.8",
     "jest": "26.6.3",
-    "jest-mock-console": "^1.2.3",
     "jest-mock-process": "1.4.1",
     "jest-serializer-path": "^0.1.15",
     "lint-staged": "10.5.4",
