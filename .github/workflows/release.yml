@@ -27,5 +27,5 @@ jobs:
           body: |
             Changes in this Release
             ${{ steps.release_notes.outputs.notes }}
-          draft: false
+          draft: true
           prerelease: false
