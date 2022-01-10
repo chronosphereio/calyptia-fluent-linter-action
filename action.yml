@@ -11,5 +11,5 @@ inputs:
     description: Make sure to change `CONFIG_LOCATION_GLOB` to a [glob](https://en.wikipedia.org/wiki/Glob_(programming)) that points to your `fluentd` and `fluent-bit` configuration within the repository. you can use [this page](https://globster.xyz/) to make sure your glob will match the necessary files. ( example `*.conf` )'
     required: true
 runs:
-  using: 'node12'
+  using: 'node16'
   main: 'dist/index.js'
