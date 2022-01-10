@@ -111,8 +111,6 @@
   "devDependencies": {
     "@types/jest": "^27.4.0",
     "@types/node": "^16",
-    "@types/node-fetch": "^3.0.3",
-    "@types/table": "^6.3.2",
     "@typescript-eslint/eslint-plugin": "4.33.0",
     "@typescript-eslint/parser": "4.33.0",
     "ajv-keywords": "5.1.0",
