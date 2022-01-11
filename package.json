@@ -122,7 +122,7 @@
     "nock": "^13.2.1",
     "prettier": "2.5.1",
     "prettier-eslint": "^8.2.2",
-    "prettier-eslint-cli": "^4.2.1",
+    "prettier-eslint-cli": "^5.0.1",
     "pretty-quick": "3.1.2",
     "ts-jest": "^27.1.2",
     "ts-node": "9.1.1",
