@@ -13,7 +13,6 @@ declare let process: {
 function relativeFilePath(filePath: string): string {
   return filePath.replace(join(process.env.GITHUB_WORKSPACE, '/'), '');
 }
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function normalizeErrors(filePath: string, { runtime, ...errors }: FieldErrors): Annotation[] {
   const annotations = Object.entries(errors).reduce((memo, [command, issues]) => {
     if (Object.keys(issues).length) {
