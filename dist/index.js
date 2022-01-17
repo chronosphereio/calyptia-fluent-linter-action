@@ -4000,7 +4000,7 @@ var require_dist = __commonJS({
       },
     });
     __export(exports, {
-      FluentBitSchema: () => FluentBitSchema2,
+      FluentBitSchema: () => FluentBitSchema3,
     });
     var getFluentBitSchema = (ast) => {
       return {
@@ -4102,7 +4102,7 @@ var require_dist = __commonJS({
       });
       return configBlocks.filter(isValidFluentBitSchemaType);
     }
-    var FluentBitSchema2 = class {
+    var FluentBitSchema3 = class {
       constructor(source) {
         this._ast = parse2(source);
         this._source = source;
@@ -21348,14 +21348,15 @@ var readContent = async (filePath) => {
 };
 
 // src/index.ts
-var import_fluent_bit_config_parser = __toESM(require_dist());
+var import_fluent_bit_config_parser2 = __toESM(require_dist());
 var import_node_fetch = __toESM(require_lib2());
 
 // src/utils/constants.ts
 var import_table = __toESM(require_src());
 var CALYPTIA_API_ENDPOINT = 'https://cloud-api.calyptia.com';
-var CALYPTIA_API_VALIDATION_PATH = 'v1/config_validate/fluentbit';
+var CALYPTIA_API_VALIDATION_PATH = 'v1/config_validate';
 var PROBLEM_MATCHER_FILE_NAME = 'problem-matcher.json';
+var FLUENTD_REGEX = /(?<![#][ ]*)\<[a-zA-Z-@/. \_*\{\},]{1,}\>/g;
 var NO_STYLES_IN_TABLE = {
   border: (0, import_table.getBorderCharacters)('void'),
   columnDefault: {
@@ -21370,18 +21371,27 @@ var import_path = require('path');
 function relativeFilePath(filePath) {
   return filePath.replace((0, import_path.join)(process.env.GITHUB_WORKSPACE, '/'), '');
 }
-function normalizeErrors(filePath, _a) {
-  var _b = _a,
-    { runtime } = _b,
-    errors = __objRest(_b, ['runtime']);
-  const annotations = Object.entries(errors).reduce((memo, [command, issues]) => {
-    if (Object.keys(issues).length) {
-      const errorGroups = Object.entries(issues);
-      return [...memo, { filePath: relativeFilePath(filePath), section: command, errorGroups }];
-    }
-    return memo;
-  }, []);
-  return annotations;
+function normalizeErrors(filePath, agentType, errors) {
+  const _a = errors,
+    { runtime } = _a,
+    fieldErrors = __objRest(_a, ['runtime']);
+  if (agentType === 'fluentbit' /* FLUENT_BIT */) {
+    const annotations = Object.entries(fieldErrors).reduce((memo, [command, issues]) => {
+      if (Object.keys(issues).length) {
+        const errorGroups = Object.entries(issues);
+        return [...memo, { filePath: relativeFilePath(filePath), section: command, errorGroups }];
+      }
+      return memo;
+    }, []);
+    return annotations;
+  }
+  return [
+    {
+      filePath: relativeFilePath(filePath),
+      section: 'runtime',
+      errorGroups: [['runtime', runtime.filter(Boolean)]],
+    },
+  ];
 }
 
 // src/formatErrorsPerFile.ts
@@ -21396,6 +21406,23 @@ function formatErrorsPerFile(filePath, errorGroups) {
     }
   }
   return (0, import_table2.table)(data, NO_STYLES_IN_TABLE);
+}
+
+// src/utils/getAgentType.ts
+var import_fluent_bit_config_parser = __toESM(require_dist());
+
+// src/utils/isFluentD.ts
+var isFluentD = (config) => !!config.match(FLUENTD_REGEX);
+
+// src/utils/getAgentType.ts
+function getAgentType(content) {
+  if (import_fluent_bit_config_parser.FluentBitSchema.isFluentBitConfiguration(content)) {
+    return 'fluentbit' /* FLUENT_BIT */;
+  }
+  if (isFluentD(content)) {
+    return 'fluentd' /* FLUENT_D */;
+  }
+  return void 0;
 }
 
 // src/index.ts
@@ -21418,25 +21445,30 @@ var main = async () => {
   for await (const filePath of globber.globGenerator()) {
     (0, import_core.debug)(`evaluating file ${filePath}`);
     const content = await readContent(filePath);
-    if (import_fluent_bit_config_parser.FluentBitSchema.isFluentBitConfiguration(content)) {
-      (0, import_core.debug)(`File ${filePath} seems to be fluent-bit config, validating...`);
-      const URL2 = `${CALYPTIA_API_ENDPOINT}/${CALYPTIA_API_VALIDATION_PATH}`;
+    const agentType = getAgentType(content);
+    if (agentType) {
+      (0, import_core.debug)(`File ${filePath} seems to be ${agentType} config, validating...`);
       const headers = {
         'Content-Type': 'application/json',
         'x-project-token': input.CALYPTIA_API_KEY,
       };
       try {
-        const config = new import_fluent_bit_config_parser.FluentBitSchema(content);
+        let body = content;
+        if (agentType === 'fluentbit' /* FLUENT_BIT */) {
+          const config = new import_fluent_bit_config_parser2.FluentBitSchema(content);
+          body = JSON.stringify(config.schema);
+        }
+        const URL2 = `${CALYPTIA_API_ENDPOINT}/${CALYPTIA_API_VALIDATION_PATH}/${agentType}`;
         const response = await (0, import_node_fetch.default)(URL2, {
           method: 'POST',
-          body: JSON.stringify(config.schema),
+          body,
           headers,
         });
         const data = await response.json();
         if (response.status === 200) {
           (0, import_core.debug)(`[${filePath}]: ${JSON.stringify(data)}`);
           if (data.errors) {
-            const errors = normalizeErrors(filePath, data.errors);
+            const errors = normalizeErrors(filePath, agentType, data.errors);
             (0, import_core.debug)(`${filePath}, Found errors: ${JSON.stringify(errors, null, 2)}`);
             annotations = [...annotations, ...errors];
           }

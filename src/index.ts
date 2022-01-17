@@ -4,12 +4,16 @@ import { readContent } from './utils/readContent';
 import { FluentBitSchema } from '@calyptia/fluent-bit-config-parser';
 import fetch from 'node-fetch';
 
-import { AGENT_TYPE, CALYPTIA_API_ENDPOINT, CALYPTIA_API_VALIDATION_PATH, PROBLEM_MATCHER_FILE_NAME } from './utils/constants';
+import {
+  AGENT_TYPE,
+  CALYPTIA_API_ENDPOINT,
+  CALYPTIA_API_VALIDATION_PATH,
+  PROBLEM_MATCHER_FILE_NAME,
+} from './utils/constants';
 import { Annotation, FieldErrors, normalizeErrors } from './utils/normalizeErrors';
 import { formatErrorsPerFile } from './formatErrorsPerFile';
 import { getAgentType } from './utils/getAgentType';
 
-import { isFluentD } from './utils/isFluentD';
 import { resolve } from 'path';
 export enum InputValues {
   CONFIG_LOCATION_GLOB = 'CONFIG_LOCATION_GLOB',
@@ -42,14 +46,13 @@ export const main = async (): Promise<void> => {
     if (agentType) {
       debug(`File ${filePath} seems to be ${agentType} config, validating...`);
 
-
       const headers = {
         'Content-Type': 'application/json',
         'x-project-token': input.CALYPTIA_API_KEY,
       };
 
       try {
-        let body = JSON.stringify(content);
+        let body = content;
 
         if (agentType === AGENT_TYPE.FLUENT_BIT) {
           const config = new FluentBitSchema(content);
