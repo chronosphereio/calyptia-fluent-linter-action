@@ -3,9 +3,17 @@ import * as glob from '@actions/glob';
 import { readContent } from './utils/readContent';
 import { FluentBitSchema } from '@calyptia/fluent-bit-config-parser';
 import fetch from 'node-fetch';
-import { CALYPTIA_API_ENDPOINT, CALYPTIA_API_VALIDATION_PATH, PROBLEM_MATCHER_FILE_NAME } from './utils/constants';
+
+import {
+  AGENT_TYPE,
+  CALYPTIA_API_ENDPOINT,
+  CALYPTIA_API_VALIDATION_PATH,
+  PROBLEM_MATCHER_FILE_NAME,
+} from './utils/constants';
 import { Annotation, FieldErrors, normalizeErrors } from './utils/normalizeErrors';
 import { formatErrorsPerFile } from './formatErrorsPerFile';
+import { getAgentType } from './utils/getAgentType';
+
 import { resolve } from 'path';
 export enum InputValues {
   CONFIG_LOCATION_GLOB = 'CONFIG_LOCATION_GLOB',
@@ -33,10 +41,10 @@ export const main = async (): Promise<void> => {
 
     const content = await readContent(filePath);
 
-    if (FluentBitSchema.isFluentBitConfiguration(content)) {
-      debug(`File ${filePath} seems to be fluent-bit config, validating...`);
+    const agentType = getAgentType(content);
 
-      const URL = `${CALYPTIA_API_ENDPOINT}/${CALYPTIA_API_VALIDATION_PATH}`;
+    if (agentType) {
+      debug(`File ${filePath} seems to be ${agentType} config, validating...`);
 
       const headers = {
         'Content-Type': 'application/json',
@@ -44,10 +52,18 @@ export const main = async (): Promise<void> => {
       };
 
       try {
-        const config = new FluentBitSchema(content);
+        let body = content;
+
+        if (agentType === AGENT_TYPE.FLUENT_BIT) {
+          const config = new FluentBitSchema(content);
+          body = JSON.stringify(config.schema);
+        }
+
+        const URL = `${CALYPTIA_API_ENDPOINT}/${CALYPTIA_API_VALIDATION_PATH}/${agentType}`;
+
         const response = (await fetch(URL, {
           method: 'POST',
-          body: JSON.stringify(config.schema),
+          body,
           headers,
         })) as Response;
 
@@ -57,7 +73,7 @@ export const main = async (): Promise<void> => {
           debug(`[${filePath}]: ${JSON.stringify(data)}`);
 
           if (data.errors) {
-            const errors = normalizeErrors(filePath, data.errors);
+            const errors = normalizeErrors(filePath, agentType, data.errors);
 
             debug(`${filePath}, Found errors: ${JSON.stringify(errors, null, 2)}`);
             annotations = [...annotations, ...errors];
@@ -73,6 +89,7 @@ export const main = async (): Promise<void> => {
 
   if (annotations.length) {
     const location = resolve(__dirname, PROBLEM_MATCHER_FILE_NAME);
+
     console.log(`::add-matcher::${location}`);
 
     const groupedByFile = annotations.reduce((memo, { filePath, errorGroups }) => {
@@ -80,6 +97,7 @@ export const main = async (): Promise<void> => {
 
       return memo;
     }, {} as Record<string, unknown[]>);
+
     for (const file in groupedByFile) {
       console.log(formatErrorsPerFile(file, groupedByFile[file] as Annotation['errorGroups']));
     }

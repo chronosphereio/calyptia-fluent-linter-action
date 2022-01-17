@@ -1,11 +1,14 @@
 import { main, InputValues } from '../src';
 import { setFailed, getInput, setOutput } from '../__mocks__/@actions/core';
 import nock from 'nock';
-import failCase from '../__fixtures__/scenarios/failed_case.json';
-import { CALYPTIA_API_ENDPOINT, CALYPTIA_API_VALIDATION_PATH } from '../src/utils/constants';
-import { mockConsole, unMockConsole } from './helpers';
+
+import failCaseFluentBit from '../__fixtures__/scenarios/failed_case_fluent_bit.json';
+import failCaseFluentD from '../__fixtures__/scenarios/failed_case_fluent_d.json';
+import { CALYPTIA_API_ENDPOINT } from '../src/utils/constants';
+import { mockConsole, unMockConsole, urlByAgentType } from './helpers';
 import { problemMatcher } from '../problem-matcher.json';
 import { join } from 'path';
+
 describe('fluent-linter-action', () => {
   let consoleLogMock: jest.Mock;
   const mockedInput = {
@@ -36,17 +39,18 @@ describe('fluent-linter-action', () => {
   it('Reports no issues when configuration has no errors', async () => {
     mockedInput.CONFIG_LOCATION_GLOB = '__fixtures__/basic.conf';
     const client = nock(CALYPTIA_API_ENDPOINT);
-    client['post']('/' + CALYPTIA_API_VALIDATION_PATH).reply(200, { config: {} });
+    client['post']('/' + urlByAgentType('FLUENT_BIT')).reply(200, { config: {} });
 
     await main();
 
     expect(setFailed).not.toHaveBeenCalled();
-    expect(consoleLogMock.mock.calls).toMatchInlineSnapshot('Array []');
+    expect(consoleLogMock).not.toHaveBeenCalled();
   });
+
   it('Reports errors correctly matching problemMatcher', async () => {
     mockedInput.CONFIG_LOCATION_GLOB = '__fixtures__/invalid.conf';
     const client = nock(CALYPTIA_API_ENDPOINT);
-    client['post']('/' + CALYPTIA_API_VALIDATION_PATH).reply(200, failCase);
+    client['post']('/' + urlByAgentType('FLUENT_BIT')).reply(200, failCaseFluentBit);
 
     await main();
     expect(setFailed.mock.calls).toMatchInlineSnapshot(`
@@ -104,7 +108,7 @@ describe('fluent-linter-action', () => {
     mockedInput.CONFIG_LOCATION_GLOB = '__fixtures__/basic.conf';
     const client = nock(CALYPTIA_API_ENDPOINT);
 
-    client['post']('/' + CALYPTIA_API_VALIDATION_PATH).replyWithError(new Error('Server Error'));
+    client['post']('/' + urlByAgentType('FLUENT_BIT')).replyWithError(new Error('Server Error'));
 
     await main();
 
@@ -124,7 +128,7 @@ describe('fluent-linter-action', () => {
   it('Reports errors when request fails with other than 500', async () => {
     mockedInput.CONFIG_LOCATION_GLOB = '__fixtures__/basic.conf';
     const client = nock(CALYPTIA_API_ENDPOINT);
-    client['post']('/' + CALYPTIA_API_VALIDATION_PATH).reply(401, new Error('Auth Error'));
+    client['post']('/' + urlByAgentType('FLUENT_BIT')).reply(401, new Error('Auth Error'));
 
     await main();
 
@@ -147,5 +151,77 @@ describe('fluent-linter-action', () => {
 
     expect(setFailed).not.toHaveBeenCalled();
     expect(consoleLogMock).not.toHaveBeenCalled();
+  });
+
+  it('Reports errors when request fails with other than 500', async () => {
+    mockedInput.CONFIG_LOCATION_GLOB = '__fixtures__/basic.conf';
+    const client = nock(CALYPTIA_API_ENDPOINT);
+    client['post']('/' + urlByAgentType('FLUENT_BIT')).reply(401, new Error('Auth Error'));
+
+    await main();
+
+    expect(setFailed.mock.calls).toMatchInlineSnapshot(`
+      Array [
+        Array [
+          "The request failed:  status: 401, data: {}",
+        ],
+      ]
+    `);
+    expect(consoleLogMock.mock.calls).toMatchInlineSnapshot('Array []');
+
+    expect(client.isDone()).toBe(true);
+  });
+
+  it('Reports errors correctly matching problemMatcher on a fluentD file', async () => {
+    mockedInput.CONFIG_LOCATION_GLOB = '__fixtures__/fluentD_with_issues.conf';
+
+    const client = nock(CALYPTIA_API_ENDPOINT);
+
+    client['post']('/' + urlByAgentType('FLUENT_D')).reply(200, failCaseFluentD);
+
+    await main();
+
+    expect(setFailed.mock.calls).toMatchInlineSnapshot(`
+          Array [
+            Array [
+              "We found errors in your configurations. Please check your logs",
+            ],
+          ]
+      `);
+    const matcherLog = consoleLogMock.mock.calls[0][0];
+
+    expect(matcherLog).toMatchInlineSnapshot('"::add-matcher::<PROJECT_ROOT>/src/problem-matcher.json"');
+
+    const linterLines = consoleLogMock.mock.calls[1];
+
+    const [
+      {
+        pattern: [{ regexp }],
+      },
+    ] = problemMatcher;
+
+    const [issues] = linterLines as string[];
+
+    const errors = issues.split('\n');
+
+    errors.pop(); // We end up with a last line jump for format that we don't want in the loop.
+
+    for (const error of errors) {
+      const issue = error.match(new RegExp(regexp));
+
+      if (issue) {
+        const [, file, line, column, severity, , message] = issue;
+
+        expect({
+          file,
+          line,
+          column,
+          severity,
+          message,
+        }).toMatchSnapshot(file.replace(join(__dirname, '../'), ''));
+      }
+    }
+
+    expect(client.isDone()).toBe(true);
   });
 });

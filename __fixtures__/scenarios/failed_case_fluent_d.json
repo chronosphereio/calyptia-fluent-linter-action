@@ -1,0 +1,10 @@
+{
+  "errors": {
+    "runtime": [
+      "2021-12-28 20:42:02 +0000 [warn]: parameter '# http://this.host:9880/myapp.access?json={\"event\":\"data\"}\n<source>\n  @type http\n  port 9880\n</source>\n\n<filter myapp.access>\n  @type record_transformer\n  <record>\n    host_param \"localhost\"\n  </record>\n</filter>\n\n<match myapp.access>\n  @type file-that-errors\n  path /var/log/fluent/access\n</match>\n' in <ROOT>\n  # http://this.host:9880/myapp.access?json={\"event\":\"data\"}\n<source>\n  @type http\n  port 9880\n</source>\n\n<filter myapp.access>\n  @type record_transformer\n  <record>\n    host_param \"localhost\"\n  </record>\n</filter>\n\n<match myapp.access>\n  @type file-that-errors\n  path /var/log/fluent/access\n</match>\n \n</ROOT> is not used.\n"
+    ],
+    "input": {},
+    "output": {},
+    "filter": {}
+  }
+}
