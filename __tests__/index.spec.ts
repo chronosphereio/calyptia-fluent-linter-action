@@ -189,50 +189,38 @@ describe('fluent-linter-action', () => {
           ]
       `);
     const matcherLog = consoleLogMock.mock.calls[0][0];
-    const linterLines = consoleLogMock.mock.calls[1][0];
 
     expect(matcherLog).toMatchInlineSnapshot('"::add-matcher::<PROJECT_ROOT>/src/problem-matcher.json"');
-    expect(linterLines).toMatchInlineSnapshot(`
-      "<PROJECT_ROOT>/__fixtures__/fluentD_with_issues.conf: 0:0 error runtime 2021-12-28 20:42:02 +0000 [warn]: parameter '# http://this.host:9880/myapp.access?json={\\"event\\":\\"data\\"} 
-                                                                                                              <source>                                                                                                
-                                                                                                                @type http                                                                                            
-                                                                                                                port 9880                                                                                             
-                                                                                                              </source>                                                                                               
-                                                                                                                                                                                                                      
-                                                                                                              <filter myapp.access>                                                                                   
-                                                                                                                @type record_transformer                                                                              
-                                                                                                                <record>                                                                                              
-                                                                                                                  host_param \\"localhost\\"                                                                              
-                                                                                                                </record>                                                                                             
-                                                                                                              </filter>                                                                                               
-                                                                                                                                                                                                                      
-                                                                                                              <match myapp.access>                                                                                    
-                                                                                                                @type file-that-errors                                                                                
-                                                                                                                path /var/log/fluent/access                                                                           
-                                                                                                              </match>                                                                                                
-                                                                                                              ' in <ROOT>                                                                                             
-                                                                                                                # http://this.host:9880/myapp.access?json={\\"event\\":\\"data\\"}                                            
-                                                                                                              <source>                                                                                                
-                                                                                                                @type http                                                                                            
-                                                                                                                port 9880                                                                                             
-                                                                                                              </source>                                                                                               
-                                                                                                                                                                                                                      
-                                                                                                              <filter myapp.access>                                                                                   
-                                                                                                                @type record_transformer                                                                              
-                                                                                                                <record>                                                                                              
-                                                                                                                  host_param \\"localhost\\"                                                                              
-                                                                                                                </record>                                                                                             
-                                                                                                              </filter>                                                                                               
-                                                                                                                                                                                                                      
-                                                                                                              <match myapp.access>                                                                                    
-                                                                                                                @type file-that-errors                                                                                
-                                                                                                                path /var/log/fluent/access                                                                           
-                                                                                                              </match>                                                                                                
-                                                                                                                                                                                                                      
-                                                                                                              </ROOT> is not used.                                                                                    
-                                                                                                                                                                                                                      
-      "
-    `);
+
+    const linterLines = consoleLogMock.mock.calls[1];
+
+    const [
+      {
+        pattern: [{ regexp }],
+      },
+    ] = problemMatcher;
+
+    const [issues] = linterLines as string[];
+
+    const errors = issues.split('\n');
+
+    errors.pop(); // We end up with a last line jump for format that we don't want in the loop.
+
+    for (const error of errors) {
+      const issue = error.match(new RegExp(regexp));
+
+      if (issue) {
+        const [, file, line, column, severity, , message] = issue;
+
+        expect({
+          file,
+          line,
+          column,
+          severity,
+          message,
+        }).toMatchSnapshot(file.replace(join(__dirname, '../'), ''));
+      }
+    }
 
     expect(client.isDone()).toBe(true);
   });

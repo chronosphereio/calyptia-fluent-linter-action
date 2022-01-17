@@ -1,5 +1,15 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`fluent-linter-action Reports errors correctly matching problemMatcher on a fluentD file: __fixtures__/fluentD_with_issues.conf 1`] = `
+Object {
+  "column": "0",
+  "file": "<PROJECT_ROOT>/__fixtures__/fluentD_with_issues.conf",
+  "line": "0",
+  "message": "2021-12-28 20:42:02 +0000 [warn]: parameter '# http://this.host:9880/myapp.access?json={\\"event\\":\\"data\\"} ",
+  "severity": "error",
+}
+`;
+
 exports[`fluent-linter-action Reports errors correctly matching problemMatcher: __fixtures__/invalid.conf 1`] = `
 Object {
   "column": "0",
