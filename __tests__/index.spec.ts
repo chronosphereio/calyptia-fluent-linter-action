@@ -3,6 +3,7 @@ import { setFailed, getInput, setOutput } from '../__mocks__/@actions/core';
 import nock from 'nock';
 
 import failCaseFluentBit from '../__fixtures__/scenarios/failed_case_fluent_bit.json';
+import failCaseFluentD from '../__fixtures__/scenarios/failed_case_fluent_d.json';
 import { CALYPTIA_API_ENDPOINT } from '../src/utils/constants';
 import { mockConsole, unMockConsole, urlByAgentType } from './helpers';
 import { problemMatcher } from '../problem-matcher.json';
@@ -38,18 +39,18 @@ describe('fluent-linter-action', () => {
   it('Reports no issues when configuration has no errors', async () => {
     mockedInput.CONFIG_LOCATION_GLOB = '__fixtures__/basic.conf';
     const client = nock(CALYPTIA_API_ENDPOINT);
-    client['post'](urlByAgentType('FLUENT_BIT')).reply(200, { config: {} });
+    client['post']('/' + urlByAgentType('FLUENT_BIT')).reply(200, { config: {} });
 
     await main();
 
     expect(setFailed).not.toHaveBeenCalled();
-    expect(consoleLogMock.mock.calls).toMatchInlineSnapshot('Array []');
+    expect(consoleLogMock).not.toHaveBeenCalled();
   });
 
   it('Reports errors correctly matching problemMatcher', async () => {
     mockedInput.CONFIG_LOCATION_GLOB = '__fixtures__/invalid.conf';
     const client = nock(CALYPTIA_API_ENDPOINT);
-    client['post'](urlByAgentType('FLUENT_BIT')).reply(200, failCaseFluentBit);
+    client['post']('/' + urlByAgentType('FLUENT_BIT')).reply(200, failCaseFluentBit);
 
     await main();
     expect(setFailed.mock.calls).toMatchInlineSnapshot(`
@@ -107,7 +108,7 @@ describe('fluent-linter-action', () => {
     mockedInput.CONFIG_LOCATION_GLOB = '__fixtures__/basic.conf';
     const client = nock(CALYPTIA_API_ENDPOINT);
 
-    client['post'](urlByAgentType('FLUENT_BIT')).replyWithError(new Error('Server Error'));
+    client['post']('/' + urlByAgentType('FLUENT_BIT')).replyWithError(new Error('Server Error'));
 
     await main();
 
@@ -127,7 +128,7 @@ describe('fluent-linter-action', () => {
   it('Reports errors when request fails with other than 500', async () => {
     mockedInput.CONFIG_LOCATION_GLOB = '__fixtures__/basic.conf';
     const client = nock(CALYPTIA_API_ENDPOINT);
-    client['post'](urlByAgentType('FLUENT_BIT')).reply(401, new Error('Auth Error'));
+    client['post']('/' + urlByAgentType('FLUENT_BIT')).reply(401, new Error('Auth Error'));
 
     await main();
 
@@ -155,7 +156,7 @@ describe('fluent-linter-action', () => {
   it('Reports errors when request fails with other than 500', async () => {
     mockedInput.CONFIG_LOCATION_GLOB = '__fixtures__/basic.conf';
     const client = nock(CALYPTIA_API_ENDPOINT);
-    client['post'](urlByAgentType('FLUENT_BIT')).reply(401, new Error('Auth Error'));
+    client['post']('/' + urlByAgentType('FLUENT_BIT')).reply(401, new Error('Auth Error'));
 
     await main();
 
@@ -171,31 +172,71 @@ describe('fluent-linter-action', () => {
     expect(client.isDone()).toBe(true);
   });
 
-  it.only('Reports errors correctly matching problemMatcher on a fluentD file', async () => {
+  it('Reports errors correctly matching problemMatcher on a fluentD file', async () => {
     mockedInput.CONFIG_LOCATION_GLOB = '__fixtures__/fluentD_with_issues.conf';
 
-    mockedInput.CALYPTIA_API_KEY = 'eyJUb2tlbklEIjoiMzBiOTkxYTAtYjQ0My00ZTUwLWEwZGUtNDAwYThlMmEyNmVkIiwiUHJvamVjdElEIjoiN2JhZThmNTEtNGQwYi00ODY4LTllMmQtYWQzNWEzZTRlYTliIn0.7sSHp_u4Bz5r38CBavTmFmMrc2WL4gPcv4ta2EEiMUDcCe3_F2mR59DgnkdCqNH-'
+    const client = nock(CALYPTIA_API_ENDPOINT);
+
+    client['post']('/' + urlByAgentType('FLUENT_D')).reply(200, failCaseFluentD);
 
     await main();
+
     expect(setFailed.mock.calls).toMatchInlineSnapshot(`
-    Array [
-      Array [
-        "We found errors in your configurations. Please check your logs",
-      ],
-    ]
-  `);
+          Array [
+            Array [
+              "We found errors in your configurations. Please check your logs",
+            ],
+          ]
+      `);
     expect(consoleLogMock.mock.calls).toMatchInlineSnapshot(`
-    Array [
       Array [
-        "::add-matcher::.github/problem-matcher.json",
-      ],
-      Array [
-        "<PROJECT_ROOT>/__fixtures__/invalid.conf: 0:0 error john   cannot initialize input plugin: john 
-    <PROJECT_ROOT>/__fixtures__/invalid.conf: 0:0 error syslog Unknown syslog mode abc              
-    <PROJECT_ROOT>/__fixtures__/invalid.conf: 0:0 error parser missing 'key_name'                   
-    ",
-      ],
-    ]
-  `);
+        Array [
+          "::add-matcher::<PROJECT_ROOT>/src/problem-matcher.json",
+        ],
+        Array [
+          "<PROJECT_ROOT>/__fixtures__/fluentD_with_issues.conf: 0:0 error runtime 2021-12-28 20:42:02 +0000 [warn]: parameter '# http://this.host:9880/myapp.access?json={\\"event\\":\\"data\\"} 
+                                                                                                              <source>                                                                                                
+                                                                                                                @type http                                                                                            
+                                                                                                                port 9880                                                                                             
+                                                                                                              </source>                                                                                               
+                                                                                                                                                                                                                      
+                                                                                                              <filter myapp.access>                                                                                   
+                                                                                                                @type record_transformer                                                                              
+                                                                                                                <record>                                                                                              
+                                                                                                                  host_param \\"localhost\\"                                                                              
+                                                                                                                </record>                                                                                             
+                                                                                                              </filter>                                                                                               
+                                                                                                                                                                                                                      
+                                                                                                              <match myapp.access>                                                                                    
+                                                                                                                @type file-that-errors                                                                                
+                                                                                                                path /var/log/fluent/access                                                                           
+                                                                                                              </match>                                                                                                
+                                                                                                              ' in <ROOT>                                                                                             
+                                                                                                                # http://this.host:9880/myapp.access?json={\\"event\\":\\"data\\"}                                            
+                                                                                                              <source>                                                                                                
+                                                                                                                @type http                                                                                            
+                                                                                                                port 9880                                                                                             
+                                                                                                              </source>                                                                                               
+                                                                                                                                                                                                                      
+                                                                                                              <filter myapp.access>                                                                                   
+                                                                                                                @type record_transformer                                                                              
+                                                                                                                <record>                                                                                              
+                                                                                                                  host_param \\"localhost\\"                                                                              
+                                                                                                                </record>                                                                                             
+                                                                                                              </filter>                                                                                               
+                                                                                                                                                                                                                      
+                                                                                                              <match myapp.access>                                                                                    
+                                                                                                                @type file-that-errors                                                                                
+                                                                                                                path /var/log/fluent/access                                                                           
+                                                                                                              </match>                                                                                                
+                                                                                                                                                                                                                      
+                                                                                                              </ROOT> is not used.                                                                                    
+                                                                                                                                                                                                                      
+      ",
+        ],
+      ]
+    `);
+
+    expect(client.isDone()).toBe(true);
   });
 });
