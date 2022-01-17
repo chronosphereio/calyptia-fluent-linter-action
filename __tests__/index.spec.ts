@@ -188,13 +188,12 @@ describe('fluent-linter-action', () => {
             ],
           ]
       `);
-    expect(consoleLogMock.mock.calls).toMatchInlineSnapshot(`
-      Array [
-        Array [
-          "::add-matcher::<PROJECT_ROOT>/src/problem-matcher.json",
-        ],
-        Array [
-          "<PROJECT_ROOT>/__fixtures__/fluentD_with_issues.conf: 0:0 error runtime 2021-12-28 20:42:02 +0000 [warn]: parameter '# http://this.host:9880/myapp.access?json={\\"event\\":\\"data\\"} 
+    const matcherLog = consoleLogMock.mock.calls[0][0];
+    const linterLines = consoleLogMock.mock.calls[1][0];
+
+    expect(matcherLog).toMatchInlineSnapshot('"::add-matcher::<PROJECT_ROOT>/src/problem-matcher.json"');
+    expect(linterLines).toMatchInlineSnapshot(`
+      "<PROJECT_ROOT>/__fixtures__/fluentD_with_issues.conf: 0:0 error runtime 2021-12-28 20:42:02 +0000 [warn]: parameter '# http://this.host:9880/myapp.access?json={\\"event\\":\\"data\\"} 
                                                                                                               <source>                                                                                                
                                                                                                                 @type http                                                                                            
                                                                                                                 port 9880                                                                                             
@@ -232,9 +231,7 @@ describe('fluent-linter-action', () => {
                                                                                                                                                                                                                       
                                                                                                               </ROOT> is not used.                                                                                    
                                                                                                                                                                                                                       
-      ",
-        ],
-      ]
+      "
     `);
 
     expect(client.isDone()).toBe(true);
