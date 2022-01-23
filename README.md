@@ -35,7 +35,7 @@
 
 # Getting started
 
-fluent-bit and fluentd configurations are simple to use. Over time, the use of these configurations will grow and complexity with it. This action will help stay away from common pitfalls. It will add linting to your development process through workflows.
+Fluent Bit and fluentd configurations are simple to use. Over time, the use of these configurations will grow and complexity with it. This action will help stay away from common pitfalls. It will add linting to your development process through workflows.
 
 # Installation
 
@@ -68,7 +68,7 @@ The first step is to create the workflow in your repository. We describe two way
              CONFIG_LOCATION_GLOB: '*.conf'
    ```
 
-1. Make sure to change `CONFIG_LOCATION_GLOB` to a [glob](<https://en.wikipedia.org/wiki/Glob_(programming)>) that points to your `fluentd` and `fluent-bit` configuration within the repository. you can use [this page](https://globster.xyz/) to make sure your glob will match the necessary files.
+1. Make sure to change `CONFIG_LOCATION_GLOB` to a [glob](<https://en.wikipedia.org/wiki/Glob_(programming)>) that points to your `fluentd` and `Fluent Bit` configuration within the repository. You can use [this page](https://globster.xyz/) to make sure your glob will match the necessary files.
 
 _If you want to see it in action, take a look at the [example here](https://github.com/calyptia/fluent-linter-action/pull/9)_
 
@@ -102,9 +102,9 @@ Add a new secret to your repository find _Settings > Secrets > New repository se
 
 # Limitations
 
-- The current `fluent-linter-action` only works with `fluent-bit` configurations. `fluentd` configurations will be available shortly.
-- The current `fluent-linter-action` doesn't support `@includes` yet. These, if found in your configurations, will be ignored. Please follow [this issue](https://github.com/calyptia/fluent-bit-config-parser/issues/9) for updates.
-- The current `fluent-linter-action` uses the latest master branch of `fluent-bit` to run the checks. Please follow [this issue](https://github.com/calyptia/fluent-linter-action/issues/18) for updates.
+- The current `fluent-linter-action` only works with `Fluent Bit` configurations. `fluentd` configurations will be available shortly.
+- The current `fluent-linter-action` doesn't support `@includes` yet. These, if found in your configurations, will be ignored. Please follow [this issue](https://github.com/calyptia/Fluent Bit-config-parser/issues/9) for updates.
+- The current `fluent-linter-action` uses the latest master branch of `Fluent Bit` to run the checks. Please follow [this issue](https://github.com/calyptia/fluent-linter-action/issues/18) for updates.
 - The current `fluent-linter-action` does not support ignoring or excluding any configuration from linting. Please follow [this issue](https://github.com/calyptia/fluent-linter-action/issues/19) for updates. Be aware of this if using custom plugins or images/builds which may use invalid configuration options from the point of view of the main Fluent Bit version.
 
 <!-- CONTRIBUTING -->

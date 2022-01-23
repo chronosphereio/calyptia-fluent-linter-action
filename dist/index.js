@@ -21419,7 +21419,7 @@ var main = async () => {
     (0, import_core.debug)(`evaluating file ${filePath}`);
     const content = await readContent(filePath);
     if (import_fluent_bit_config_parser.FluentBitSchema.isFluentBitConfiguration(content)) {
-      (0, import_core.debug)(`File ${filePath} seems to be fluent-bit config, validating...`);
+      (0, import_core.debug)(`File ${filePath} seems to be Fluent Bit config, validating...`);
       const URL2 = `${CALYPTIA_API_ENDPOINT}/${CALYPTIA_API_VALIDATION_PATH}`;
       const headers = {
         'Content-Type': 'application/json',

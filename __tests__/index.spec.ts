@@ -140,7 +140,7 @@ describe('fluent-linter-action', () => {
     expect(client.isDone()).toBe(true);
   });
 
-  it('does not report if configuration is not fluent-bit/fluentd', async () => {
+  it('does not report if configuration is not Fluent Bit/fluentd', async () => {
     mockedInput.CONFIG_LOCATION_GLOB = '__fixtures__/nginx.conf';
 
     await main();

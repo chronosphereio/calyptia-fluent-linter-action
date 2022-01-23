@@ -6,7 +6,7 @@
   },
   "license": "Apache-2.0",
   "version": "0.0.12",
-  "description": "Linter action for Fluentd and Fluent-bit configuration",
+  "description": "Linter action for Fluentd and Fluent Bit configuration",
   "main": "dist/index.js",
   "scripts": {
     "precommit": "lint-staged",
@@ -21,7 +21,7 @@
   "keywords": [
     "linter",
     "action",
-    "fluent-bit"
+    "Fluent Bit"
   ],
   "husky": {
     "hooks": {
