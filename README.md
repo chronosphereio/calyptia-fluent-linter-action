@@ -102,7 +102,7 @@ Add a new secret to your repository find _Settings > Secrets > New repository se
 
 # Limitations
 
-- The current `fluent-linter-action` only works with `Fluent Bit` configurations. `fluentd` configurations will be available shortly.
+- The current `fluent-linter-action` only works with `Fluent Bit` configurations. `Fluentd` configurations will be available shortly.
 - The current `fluent-linter-action` doesn't support `@includes` yet. These, if found in your configurations, will be ignored. Please follow [this issue](https://github.com/calyptia/Fluent Bit-config-parser/issues/9) for updates.
 - The current `fluent-linter-action` uses the latest master branch of `Fluent Bit` to run the checks. Please follow [this issue](https://github.com/calyptia/fluent-linter-action/issues/18) for updates.
 - The current `fluent-linter-action` does not support ignoring or excluding any configuration from linting. Please follow [this issue](https://github.com/calyptia/fluent-linter-action/issues/19) for updates. Be aware of this if using custom plugins or images/builds which may use invalid configuration options from the point of view of the main Fluent Bit version.
