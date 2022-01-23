@@ -34,7 +34,7 @@ export const main = async (): Promise<void> => {
     const content = await readContent(filePath);
 
     if (FluentBitSchema.isFluentBitConfiguration(content)) {
-      debug(`File ${filePath} seems to be fluent-bit config, validating...`);
+      debug(`File ${filePath} seems to be Fluent Bit config, validating...`);
 
       const URL = `${CALYPTIA_API_ENDPOINT}/${CALYPTIA_API_VALIDATION_PATH}`;
 
