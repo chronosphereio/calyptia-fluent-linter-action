@@ -1,5 +1,5 @@
 name: 'fluent-linter-action'
-description: 'Linter action for fluentd and Fluent Bit configurations'
+description: 'Linter action for Fluentd and Fluent Bit configurations'
 branding:
   icon: check
   color: purple
