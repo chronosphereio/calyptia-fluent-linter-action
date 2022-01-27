@@ -16,6 +16,7 @@
     "strictNullChecks": true,
     "strictFunctionTypes": true,
     "strictPropertyInitialization": true,
+    "importsNotUsedAsValues": "error",
     "noImplicitThis": true,
     "alwaysStrict": true,
     "noUnusedLocals": true,
