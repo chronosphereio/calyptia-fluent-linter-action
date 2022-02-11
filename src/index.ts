@@ -77,6 +77,8 @@ export const main = async (): Promise<void> => {
           const { filePath, line, col, message } = e as TokenError;
           const response = table([formatError({ filePath, line, col, message })], NO_STYLES_IN_TABLE);
           console.log(response);
+        } else {
+          setFailed(e.message);
         }
         setFailed('We found an error, please check, please check your logs');
       }

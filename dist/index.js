@@ -28216,6 +28216,8 @@ var main = async () => {
             NO_STYLES_IN_TABLE
           );
           console.log(response);
+        } else {
+          (0, import_core.setFailed)(e.message);
         }
         (0, import_core.setFailed)('We found an error, please check, please check your logs');
       }
