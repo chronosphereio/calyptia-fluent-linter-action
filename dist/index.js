@@ -28211,7 +28211,7 @@ var main = async () => {
       } catch (e) {
         if (e instanceof import_fluent_bit_config_parser.TokenError) {
           const { filePath: _filePath, line, col, message } = e;
-          const response = formatErrorsPerFile(_filePath, [['PARSE', [[line, col, message]]]]);
+          const response = formatErrorsPerFile(relativeFilePath(_filePath), [['PARSE', [[line, col, message]]]]);
           console.log(response);
         } else {
           (0, import_core.setFailed)(e.message);

@@ -4,7 +4,7 @@ import { readContent } from './utils/readContent';
 import { FluentBitSchema, TokenError } from '@calyptia/fluent-bit-config-parser';
 import fetch from 'node-fetch';
 import { CALYPTIA_API_ENDPOINT, CALYPTIA_API_VALIDATION_PATH, PROBLEM_MATCHER_FILE_NAME } from './utils/constants';
-import { Annotation, FieldErrors, normalizeErrors } from './utils/normalizeErrors';
+import { Annotation, FieldErrors, normalizeErrors, relativeFilePath } from './utils/normalizeErrors';
 import { formatErrorsPerFile } from './formatErrorsPerFile';
 import { resolve } from 'path';
 export enum InputValues {
@@ -69,7 +69,7 @@ export const main = async (): Promise<void> => {
       } catch (e: any) {
         if (e instanceof TokenError) {
           const { filePath: _filePath, line, col, message } = e as TokenError;
-          const response = formatErrorsPerFile(_filePath, [['PARSE', [[line, col, message]]]]);
+          const response = formatErrorsPerFile(relativeFilePath(_filePath), [['PARSE', [[line, col, message]]]]);
           console.log(response);
         } else {
           setFailed(e.message);
