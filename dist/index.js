@@ -10665,8 +10665,11 @@ ${value}`);
       const keys = (0, import_moo.keywords)(defs);
       return (value) => {
         const matches = value.match(/@(\w+)\s+\w+/) || [];
-        const lala = keys(matches[1].toUpperCase());
-        return lala;
+        try {
+          return keys(matches[1].toUpperCase());
+        } catch (e) {
+          return keys('');
+        }
       };
     };
     var stateSet = {
@@ -10713,9 +10716,9 @@ ${value}`);
       for (const token of lexer) {
         if (token.type === TOKEN_TYPES.DIRECTIVES) {
           throw new TokenError2(
-            `You have defined a Directive not supported (${token.text}). The supported directives are: ${Object.keys(
-              TOKEN_TYPES_DIRECTIVES
-            )}`,
+            `You have defined a directive that cannot be parse (${
+              token.text
+            }). The supported directives are: ${Object.keys(TOKEN_TYPES_DIRECTIVES)}`,
             filePath,
             token.line,
             token.col
@@ -10728,7 +10731,7 @@ ${value}`);
           const [, includeFilePath, ...rest] = token.text.split(' ');
           if (rest.length) {
             throw new TokenError2(
-              `You are trying to include ${includeFilePath}, but we also found more arguments (${rest}). Includes can only have a single value (ex: @includes path/to/a/file)`,
+              `You are trying to include ${includeFilePath}, but we also found more arguments (${rest}). @INCLUDE directive can only have a single value (ex: @INCLUDE path/to/a/file)`,
               filePath,
               token.line,
               token.col
@@ -10752,7 +10755,7 @@ ${value}`);
             if (e instanceof TokenError2) {
               throw e;
             }
-            throw new TokenError2(`Can not read file, loading from ${filePath} `, fullPath, token.line, token.col);
+            throw new TokenError2(`Can not read file ${includeFilePath}`, filePath, token.line, token.col);
           }
           directives.push(__spreadProps2(__spreadValues2({}, token), { filePath: fullPath }));
           const includeTokens = tokenize(includeConfig, fullPath, directives, pathMemo);
