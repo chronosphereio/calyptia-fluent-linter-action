@@ -76,7 +76,14 @@ export const main = async (): Promise<void> => {
         if (e instanceof TokenError) {
           const { filePath: _filePath, line, col } = e as TokenError;
           const response = table(
-            [formatError({ filePath, line, col, message: `${relativeFilePath(_filePath)}` })],
+            [
+              formatError({
+                filePath: relativeFilePath(filePath),
+                line,
+                col,
+                message: `${relativeFilePath(_filePath)}`,
+              }),
+            ],
             NO_STYLES_IN_TABLE
           );
           console.log(response);
