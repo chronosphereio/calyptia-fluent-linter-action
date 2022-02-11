@@ -10,7 +10,7 @@ declare let process: {
   };
 };
 
-function relativeFilePath(filePath: string): string {
+export function relativeFilePath(filePath: string): string {
   return filePath.replace(join(process.env.GITHUB_WORKSPACE, '/'), '');
 }
 export function normalizeErrors(filePath: string, { runtime, ...errors }: FieldErrors): Annotation[] {

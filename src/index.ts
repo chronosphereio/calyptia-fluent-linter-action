@@ -9,7 +9,7 @@ import {
   NO_STYLES_IN_TABLE,
   PROBLEM_MATCHER_FILE_NAME,
 } from './utils/constants';
-import { Annotation, FieldErrors, normalizeErrors } from './utils/normalizeErrors';
+import { Annotation, FieldErrors, normalizeErrors, relativeFilePath } from './utils/normalizeErrors';
 import { formatError, formatErrorsPerFile } from './formatErrorsPerFile';
 import { resolve } from 'path';
 import { table } from 'table';
@@ -74,8 +74,11 @@ export const main = async (): Promise<void> => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (e: any) {
         if (e instanceof TokenError) {
-          const { filePath, line, col, message } = e as TokenError;
-          const response = table([formatError({ filePath, line, col, message })], NO_STYLES_IN_TABLE);
+          const { filePath: _filePath, line, col, message } = e as TokenError;
+          const response = table(
+            [formatError({ filePath: relativeFilePath(_filePath), line, col, message })],
+            NO_STYLES_IN_TABLE
+          );
           console.log(response);
         } else {
           setFailed(e.message);

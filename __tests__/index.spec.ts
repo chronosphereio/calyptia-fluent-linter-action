@@ -13,7 +13,7 @@ describe('fluent-linter-action', () => {
     [InputValues.CONFIG_LOCATION_GLOB]: '__fixtures__/*.conf',
   };
 
-  process.env.GITHUB_WORKSPACE = __dirname;
+  process.env.GITHUB_WORKSPACE = '<PROJECT_ROOT>';
   beforeAll(() => {
     getInput.mockImplementation((key: Partial<InputValues>) => {
       return mockedInput[key];
@@ -46,7 +46,36 @@ describe('fluent-linter-action', () => {
         ],
       ]
     `);
+
     expect(setFailed).toHaveBeenCalled();
+
+    const [
+      {
+        pattern: [{ regexp }],
+      },
+    ] = problemMatcher;
+
+    const [issues] = consoleLogMock.mock.calls[0] as string[];
+
+    const errors = issues.split('\n');
+
+    errors.pop(); // We end up with a last line jump for format that we don't want in the loop.
+
+    for (const error of errors) {
+      const issue = error.match(new RegExp(regexp));
+
+      if (issue) {
+        const [, file, line, column, severity, , message] = issue;
+
+        expect({
+          file,
+          line,
+          column,
+          severity,
+          message,
+        }).toMatchSnapshot(file.replace(join(__dirname, '../'), ''));
+      }
+    }
   });
   it('Reports no issues with @INCLUDE', async () => {
     mockedInput.CONFIG_LOCATION_GLOB = '__fixtures__/scenarios/withInclude/include.conf';
