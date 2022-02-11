@@ -33,6 +33,33 @@ describe('fluent-linter-action', () => {
     consoleLogMock.mockClear();
   });
 
+  it('Reports missing file with @INCLUDE', async () => {
+    mockedInput.CONFIG_LOCATION_GLOB = '__fixtures__/scenarios/withInclude/wrongPathInclude.conf';
+    const client = nock(CALYPTIA_API_ENDPOINT);
+    client['post']('/' + CALYPTIA_API_VALIDATION_PATH).reply(200, { config: {} });
+
+    await main();
+
+    expect(consoleLogMock.mock.calls).toMatchInlineSnapshot(`
+      Array [
+        Array [
+          "<PROJECT_ROOT>/__fixtures__/scenarios/withInclude/tail.conf: 1:1 error Can not read file, loading from <PROJECT_ROOT>/__fixtures__/scenarios/withInclude/wrongPathInclude.conf  
+      ",
+        ],
+      ]
+    `);
+    expect(setFailed).toHaveBeenCalled();
+  });
+  it('Reports no issues with @INCLUDE', async () => {
+    mockedInput.CONFIG_LOCATION_GLOB = '__fixtures__/scenarios/withInclude/include.conf';
+    const client = nock(CALYPTIA_API_ENDPOINT);
+    client['post']('/' + CALYPTIA_API_VALIDATION_PATH).reply(200, { config: {} });
+
+    await main();
+
+    expect(setFailed).not.toHaveBeenCalled();
+    expect(consoleLogMock).not.toHaveBeenCalled();
+  });
   it('Reports no issues when configuration has no errors', async () => {
     mockedInput.CONFIG_LOCATION_GLOB = '__fixtures__/basic.conf';
     const client = nock(CALYPTIA_API_ENDPOINT);

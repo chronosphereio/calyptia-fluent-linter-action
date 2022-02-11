@@ -1,12 +1,18 @@
 import { getInput, setFailed, debug } from '@actions/core';
 import * as glob from '@actions/glob';
 import { readContent } from './utils/readContent';
-import { FluentBitSchema } from '@calyptia/fluent-bit-config-parser';
+import { FluentBitSchema, TokenError } from '@calyptia/fluent-bit-config-parser';
 import fetch from 'node-fetch';
-import { CALYPTIA_API_ENDPOINT, CALYPTIA_API_VALIDATION_PATH, PROBLEM_MATCHER_FILE_NAME } from './utils/constants';
+import {
+  CALYPTIA_API_ENDPOINT,
+  CALYPTIA_API_VALIDATION_PATH,
+  NO_STYLES_IN_TABLE,
+  PROBLEM_MATCHER_FILE_NAME,
+} from './utils/constants';
 import { Annotation, FieldErrors, normalizeErrors } from './utils/normalizeErrors';
-import { formatErrorsPerFile } from './formatErrorsPerFile';
+import { formatError, formatErrorsPerFile } from './formatErrorsPerFile';
 import { resolve } from 'path';
+import { table } from 'table';
 export enum InputValues {
   CONFIG_LOCATION_GLOB = 'CONFIG_LOCATION_GLOB',
   CALYPTIA_API_KEY = 'CALYPTIA_API_KEY',
@@ -44,7 +50,7 @@ export const main = async (): Promise<void> => {
       };
 
       try {
-        const config = new FluentBitSchema(content);
+        const config = new FluentBitSchema(content, filePath);
         const response = (await fetch(URL, {
           method: 'POST',
           body: JSON.stringify(config.schema),
@@ -65,8 +71,14 @@ export const main = async (): Promise<void> => {
         } else {
           setFailed(`The request failed:  status: ${response.status}, data: ${JSON.stringify(data)}`);
         }
-      } catch (e) {
-        setFailed(`something went very wrong ${JSON.stringify((e as Error).message)}`);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } catch (e: any) {
+        if (e instanceof TokenError) {
+          const { filePath, line, col, message } = e as TokenError;
+          const response = table([formatError({ filePath, line, col, message })], NO_STYLES_IN_TABLE);
+          console.log(response);
+        }
+        setFailed('We found an error, please check, please check your logs');
       }
     }
   }
