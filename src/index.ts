@@ -3,16 +3,10 @@ import * as glob from '@actions/glob';
 import { readContent } from './utils/readContent';
 import { FluentBitSchema, TokenError } from '@calyptia/fluent-bit-config-parser';
 import fetch from 'node-fetch';
-import {
-  CALYPTIA_API_ENDPOINT,
-  CALYPTIA_API_VALIDATION_PATH,
-  NO_STYLES_IN_TABLE,
-  PROBLEM_MATCHER_FILE_NAME,
-} from './utils/constants';
-import { Annotation, FieldErrors, normalizeErrors, relativeFilePath } from './utils/normalizeErrors';
-import { formatError, formatErrorsPerFile } from './formatErrorsPerFile';
+import { CALYPTIA_API_ENDPOINT, CALYPTIA_API_VALIDATION_PATH, PROBLEM_MATCHER_FILE_NAME } from './utils/constants';
+import { Annotation, FieldErrors, normalizeErrors } from './utils/normalizeErrors';
+import { formatErrorsPerFile } from './formatErrorsPerFile';
 import { resolve } from 'path';
-import { table } from 'table';
 export enum InputValues {
   CONFIG_LOCATION_GLOB = 'CONFIG_LOCATION_GLOB',
   CALYPTIA_API_KEY = 'CALYPTIA_API_KEY',
@@ -75,17 +69,7 @@ export const main = async (): Promise<void> => {
       } catch (e: any) {
         if (e instanceof TokenError) {
           const { filePath: _filePath, line, col, message } = e as TokenError;
-          const response = table(
-            [
-              formatError({
-                filePath: relativeFilePath(_filePath),
-                line,
-                col,
-                message: message,
-              }),
-            ],
-            NO_STYLES_IN_TABLE
-          );
+          const response = formatErrorsPerFile(_filePath, [['PARSE', [[line, col, message]]]]);
           console.log(response);
         } else {
           setFailed(e.message);

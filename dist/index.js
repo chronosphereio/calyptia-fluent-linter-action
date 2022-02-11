@@ -9925,7 +9925,7 @@ var require_dist = __commonJS({
         var truncateTableData_1 = require_truncateTableData2();
         var utils_1 = require_utils4();
         var validateTableData_1 = require_validateTableData2();
-        var table22 = (data, userConfig = {}) => {
+        var table2 = (data, userConfig = {}) => {
           (0, validateTableData_1.validateTableData)(data);
           let rows = (0, stringifyTableData_1.stringifyTableData)(data);
           const [injectedRows, injectedSpanningCellConfig] = (0, injectHeaderConfig_1.injectHeaderConfig)(
@@ -9942,7 +9942,7 @@ var require_dist = __commonJS({
           const outputColumnWidths = (0, calculateOutputColumnWidths_1.calculateOutputColumnWidths)(config);
           return (0, drawTable_1.drawTable)(rows, outputColumnWidths, rowHeights, config);
         };
-        exports2.table = table22;
+        exports2.table = table2;
       },
     });
     var require_api2 = __commonJS2({
@@ -10541,7 +10541,7 @@ var require_dist = __commonJS({
     var validate = import_dist.default.validate;
     var stringify = import_dist.default.stringify;
     var parse = import_dist.default.parse;
-    var import_table4 = __toModule(require_src2());
+    var import_table3 = __toModule(require_src2());
     var COMMANDS = /* @__PURE__ */ ((COMMANDS2) => {
       COMMANDS2['OUTPUT'] = 'OUTPUT';
       COMMANDS2['INPUT'] = 'INPUT';
@@ -10570,7 +10570,7 @@ var require_dist = __commonJS({
     var FLUENTBIT_INCLUDE_REGEX = /(@include+\s.*){1,}/g;
     var EXCLUDED_TAGS = /* @__PURE__ */ new Set(['service', 'parser', 'node', 'upstream']);
     var NO_STYLES_IN_TABLE2 = {
-      border: (0, import_table4.getBorderCharacters)('void'),
+      border: (0, import_table3.getBorderCharacters)('void'),
       columnDefault: {
         paddingLeft: 0,
         paddingRight: 1,
@@ -10584,10 +10584,10 @@ var require_dist = __commonJS({
     })(CUSTOM_SECTIONS_NAMES || {});
     var isFluentBit = (config) => !!(config.match(FLUENTBIT_REGEX) || config.match(FLUENTBIT_INCLUDE_REGEX));
     var isValidFluentBitSection = (schema) => !!schema && !EXCLUDED_TAGS.has(schema.command.toLowerCase());
-    var isString = (value) => typeof value === 'string';
-    var isCommandType = (type) => isString(type) && Object.keys(COMMANDS).includes(type);
+    var isString2 = (value) => typeof value === 'string';
+    var isCommandType = (type) => isString2(type) && Object.keys(COMMANDS).includes(type);
     var isCustomSectionName = (block) =>
-      !!isString(block.name) &&
+      !!isString2(block.name) &&
       (block.name.includes(CUSTOM_SECTIONS_NAMES.FLUENTBIT_METRICS) ||
         block.name.includes(CUSTOM_SECTIONS_NAMES.CALYPTIA));
     var import_moo = __toModule(require_moo());
@@ -28010,7 +28010,7 @@ var require_table = __commonJS({
     var truncateTableData_1 = require_truncateTableData();
     var utils_1 = require_utils3();
     var validateTableData_1 = require_validateTableData();
-    var table3 = (data, userConfig = {}) => {
+    var table2 = (data, userConfig = {}) => {
       (0, validateTableData_1.validateTableData)(data);
       let rows = (0, stringifyTableData_1.stringifyTableData)(data);
       const [injectedRows, injectedSpanningCellConfig] = (0, injectHeaderConfig_1.injectHeaderConfig)(rows, userConfig);
@@ -28024,7 +28024,7 @@ var require_table = __commonJS({
       const outputColumnWidths = (0, calculateOutputColumnWidths_1.calculateOutputColumnWidths)(config);
       return (0, drawTable_1.drawTable)(rows, outputColumnWidths, rowHeights, config);
     };
-    exports.table = table3;
+    exports.table = table2;
   },
 });
 
@@ -28141,25 +28141,23 @@ function normalizeErrors(filePath, _a) {
 
 // src/formatErrorsPerFile.ts
 var import_table2 = __toESM(require_src());
-var DEFAULT_LINE = 0;
-var DEFAULT_COLUMN = 0;
+
+// src/utils/guards.ts
+var isString = (value) => typeof value === 'string';
+
+// src/formatErrorsPerFile.ts
+var DEFAULT_LINE_AND_COLUMN = '0:0';
 var ISSUE_LEVEL = 'error';
-function formatError({ filePath, line, col, issueLevel = ISSUE_LEVEL, message }) {
-  return [`${filePath}:`, `${line}:${col}`, issueLevel, message];
-}
 function formatErrorsPerFile(filePath, errorGroups) {
   const data = [];
   for (const [group, errors] of errorGroups) {
     for (const reason of errors) {
-      data.push(
-        formatError({
-          filePath,
-          line: DEFAULT_LINE,
-          col: DEFAULT_COLUMN,
-          issueLevel: ISSUE_LEVEL,
-          message: `${group} ${reason}`,
-        })
-      );
+      if (isString(reason)) {
+        data.push([`${filePath}:`, DEFAULT_LINE_AND_COLUMN, ISSUE_LEVEL, group, reason]);
+      } else {
+        const [line, col, message] = reason;
+        data.push([`${filePath}:`, `${line}:${col}`, ISSUE_LEVEL, group, message]);
+      }
     }
   }
   return (0, import_table2.table)(data, NO_STYLES_IN_TABLE);
@@ -28167,7 +28165,6 @@ function formatErrorsPerFile(filePath, errorGroups) {
 
 // src/index.ts
 var import_path2 = require('path');
-var import_table3 = __toESM(require_src());
 var InputValues = /* @__PURE__ */ ((InputValues2) => {
   InputValues2['CONFIG_LOCATION_GLOB'] = 'CONFIG_LOCATION_GLOB';
   InputValues2['CALYPTIA_API_KEY'] = 'CALYPTIA_API_KEY';
@@ -28214,17 +28211,7 @@ var main = async () => {
       } catch (e) {
         if (e instanceof import_fluent_bit_config_parser.TokenError) {
           const { filePath: _filePath, line, col, message } = e;
-          const response = (0, import_table3.table)(
-            [
-              formatError({
-                filePath: relativeFilePath(_filePath),
-                line,
-                col,
-                message,
-              }),
-            ],
-            NO_STYLES_IN_TABLE
-          );
+          const response = formatErrorsPerFile(_filePath, [['PARSE', [[line, col, message]]]]);
           console.log(response);
         } else {
           (0, import_core.setFailed)(e.message);

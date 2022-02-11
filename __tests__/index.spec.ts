@@ -41,7 +41,7 @@ describe('fluent-linter-action', () => {
     expect(consoleLogMock.mock.calls).toMatchInlineSnapshot(`
       Array [
         Array [
-          "<PROJECT_ROOT>/__fixtures__/scenarios/withInclude/wrongPathInclude.conf: 1:1 error Can not read file tail.conf 
+          "<PROJECT_ROOT>/__fixtures__/scenarios/withInclude/wrongPathInclude.conf: 1:1 error PARSE Can not read file tail.conf 
       ",
         ],
       ]
@@ -65,7 +65,7 @@ describe('fluent-linter-action', () => {
       const issue = error.match(new RegExp(regexp));
 
       if (issue) {
-        const [, file, line, column, severity, message] = issue;
+        const [, file, line, column, severity, , message] = issue;
 
         expect({
           file,
@@ -119,9 +119,9 @@ describe('fluent-linter-action', () => {
           "::add-matcher::<PROJECT_ROOT>/src/problem-matcher.json",
         ],
         Array [
-          "<PROJECT_ROOT>/__fixtures__/invalid.conf: 0:0 error john cannot initialize input plugin: john 
-      <PROJECT_ROOT>/__fixtures__/invalid.conf: 0:0 error syslog Unknown syslog mode abc            
-      <PROJECT_ROOT>/__fixtures__/invalid.conf: 0:0 error parser missing 'key_name'                 
+          "<PROJECT_ROOT>/__fixtures__/invalid.conf: 0:0 error john   cannot initialize input plugin: john 
+      <PROJECT_ROOT>/__fixtures__/invalid.conf: 0:0 error syslog Unknown syslog mode abc              
+      <PROJECT_ROOT>/__fixtures__/invalid.conf: 0:0 error parser missing 'key_name'                   
       ",
         ],
       ]
@@ -142,7 +142,7 @@ describe('fluent-linter-action', () => {
       const issue = error.match(new RegExp(regexp));
 
       if (issue) {
-        const [, file, line, column, severity, message] = issue;
+        const [, file, line, column, severity, , message] = issue;
 
         expect({
           file,

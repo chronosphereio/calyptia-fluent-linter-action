@@ -5,7 +5,7 @@ Object {
   "column": "0",
   "file": "<PROJECT_ROOT>/__fixtures__/invalid.conf",
   "line": "0",
-  "message": "john cannot initialize input plugin: john ",
+  "message": "cannot initialize input plugin: john ",
   "severity": "error",
 }
 `;
@@ -15,7 +15,7 @@ Object {
   "column": "0",
   "file": "<PROJECT_ROOT>/__fixtures__/invalid.conf",
   "line": "0",
-  "message": "syslog Unknown syslog mode abc            ",
+  "message": "Unknown syslog mode abc              ",
   "severity": "error",
 }
 `;
@@ -25,7 +25,7 @@ Object {
   "column": "0",
   "file": "<PROJECT_ROOT>/__fixtures__/invalid.conf",
   "line": "0",
-  "message": "parser missing 'key_name'                 ",
+  "message": "missing 'key_name'                   ",
   "severity": "error",
 }
 `;

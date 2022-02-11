@@ -1,7 +1,8 @@
 import { join } from 'path';
 
 export type FieldErrors = Record<string, Record<string, string[]>>;
-type ErrorGroup = [group: string, reasons: string[]];
+type Reasons = string[] | [line: number, col: number, reason: string][];
+type ErrorGroup = [group: string, reasons: Reasons];
 export type Annotation = { filePath: string; errorGroups: ErrorGroup[]; section: string };
 
 declare let process: {
