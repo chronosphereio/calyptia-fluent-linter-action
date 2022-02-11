@@ -68,13 +68,13 @@ export const main = async (): Promise<void> => {
           setFailed(`The request failed:  status: ${response.status}, data: ${JSON.stringify(data)}`);
         }
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } catch (e: any) {
+      } catch (e) {
         if (e instanceof TokenError) {
           const { filePath: _filePath, line, col, message } = e as TokenError;
-          const response = formatErrorsPerFile(relativeFilePath(_filePath), [['PARSE', [[line, col, message]]]]);
-          console.log(response);
+          const errorReport = formatErrorsPerFile(relativeFilePath(_filePath), [['PARSE', [[line, col, message]]]]);
+          console.log(errorReport);
         } else {
-          setFailed(e.message);
+          setFailed((e as Error).message);
         }
         setFailed('We found an error, please check, please check your logs');
       }
