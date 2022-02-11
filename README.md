@@ -90,7 +90,7 @@ If these instructions are not working for you, you can try the [Manual approach]
 
 ## Get Calyptia API Key
 
-In order to get the full linting capabilities from this action, you will need to get a Calyptia token. The token is easy to get. Head over to [Calyptia Cloud](https://cloud.calyptia.com/) and login (you can use your GitHub account). On the left panel, find _Account > settings > Generate API key_. Give a recognizable name for safekeeping (you could name it _linter_). Please copy this token.
+In order to get the full linting capabilities from this action, you will need to get a Calyptia token. The token is easy to get. Head over to [Calyptia Cloud](https://cloud.calyptia.com/) and log in (you can use your GitHub account). On the left panel, find _Account > settings > Generate API key_. Give a recognizable name for safekeeping (you could name it _linter_). Please copy this token.
 
 ## Configure secret in your repository
 
@@ -103,7 +103,6 @@ Add a new secret to your repository find _Settings > Secrets > New repository se
 # Limitations
 
 - The current `fluent-linter-action` only works with `Fluent Bit` configurations. `Fluentd` configurations will be available shortly.
-- The current `fluent-linter-action` doesn't support `@includes` yet. These, if found in your configurations, will be ignored. Please follow [this issue](https://github.com/calyptia/Fluent Bit-config-parser/issues/9) for updates.
 - The current `fluent-linter-action` uses the latest master branch of `Fluent Bit` to run the checks. Please follow [this issue](https://github.com/calyptia/fluent-linter-action/issues/18) for updates.
 - The current `fluent-linter-action` does not support ignoring or excluding any configuration from linting. Please follow [this issue](https://github.com/calyptia/fluent-linter-action/issues/19) for updates. Be aware of this if using custom plugins or images/builds which may use invalid configuration options from the point of view of the main Fluent Bit version.
 
