@@ -13,7 +13,7 @@ describe('fluent-linter-action', () => {
     [InputValues.CONFIG_LOCATION_GLOB]: '__fixtures__/*.conf',
   };
 
-  process.env.GITHUB_WORKSPACE = __dirname;
+  process.env.GITHUB_WORKSPACE = '<PROJECT_ROOT>';
   beforeAll(() => {
     getInput.mockImplementation((key: Partial<InputValues>) => {
       return mockedInput[key];
@@ -33,6 +33,65 @@ describe('fluent-linter-action', () => {
     consoleLogMock.mockClear();
   });
 
+  it('Reports missing file with @INCLUDE', async () => {
+    mockedInput.CONFIG_LOCATION_GLOB = '__fixtures__/scenarios/withInclude/wrongPathInclude.conf';
+
+    await main();
+
+    expect(consoleLogMock.mock.calls).toMatchInlineSnapshot(`
+      Array [
+        Array [
+          "::add-matcher::<PROJECT_ROOT>/src/problem-matcher.json",
+        ],
+        Array [
+          "<PROJECT_ROOT>/__fixtures__/scenarios/withInclude/wrongPathInclude.conf: 1:1 error PARSE Can not read file tail.conf 
+      ",
+        ],
+      ]
+    `);
+
+    expect(setFailed).toHaveBeenCalled();
+
+    const [
+      {
+        pattern: [{ regexp }],
+      },
+    ] = problemMatcher;
+
+    const [issues] = consoleLogMock.mock.calls[0] as string[];
+
+    const errors = issues.split('\n');
+
+    errors.pop(); // We end up with a last line jump for format that we don't want in the loop.
+
+    for (const error of errors) {
+      const issue = error.match(new RegExp(regexp));
+
+      if (issue) {
+        const [, file, line, column, severity, , message] = issue;
+
+        expect({
+          file,
+          line,
+          column,
+          severity,
+          message,
+        }).toMatchSnapshot(file.replace(join(__dirname, '../'), ''));
+      }
+    }
+  });
+  it('Reports no issues with @INCLUDE', async () => {
+    mockedInput.CONFIG_LOCATION_GLOB = '__fixtures__/scenarios/withInclude/include.conf';
+    const client = nock(CALYPTIA_API_ENDPOINT);
+    client['post']('/' + CALYPTIA_API_VALIDATION_PATH).reply(200, { config: {} });
+
+    await main();
+
+    expect(consoleLogMock).toHaveBeenCalledTimes(1);
+    expect(setFailed).not.toHaveBeenCalled();
+
+    expect(client.isDone()).toBe(true);
+  });
   it('Reports no issues when configuration has no errors', async () => {
     mockedInput.CONFIG_LOCATION_GLOB = '__fixtures__/basic.conf';
     const client = nock(CALYPTIA_API_ENDPOINT);
@@ -41,7 +100,8 @@ describe('fluent-linter-action', () => {
     await main();
 
     expect(setFailed).not.toHaveBeenCalled();
-    expect(consoleLogMock.mock.calls).toMatchInlineSnapshot('Array []');
+    expect(consoleLogMock).toHaveBeenCalledTimes(1);
+    expect(client.isDone()).toBe(true);
   });
   it('Reports errors correctly matching problemMatcher', async () => {
     mockedInput.CONFIG_LOCATION_GLOB = '__fixtures__/invalid.conf';
@@ -111,12 +171,29 @@ describe('fluent-linter-action', () => {
     expect(setFailed.mock.calls).toMatchInlineSnapshot(`
       Array [
         Array [
-          "something went very wrong \\"request to https://cloud-api.calyptia.com/v1/config_validate/fluentbit failed, reason: Server Error\\"",
+          "request to https://cloud-api.calyptia.com/v1/config_validate/fluentbit failed, reason: Server Error",
+        ],
+        Array [
+          "We found an error, please check, please check your logs",
         ],
       ]
     `);
 
-    expect(consoleLogMock).not.toHaveBeenCalled();
+    expect(consoleLogMock).toMatchInlineSnapshot(`
+      [MockFunction] {
+        "calls": Array [
+          Array [
+            "::add-matcher::<PROJECT_ROOT>/src/problem-matcher.json",
+          ],
+        ],
+        "results": Array [
+          Object {
+            "type": "return",
+            "value": undefined,
+          },
+        ],
+      }
+    `);
 
     expect(client.isDone()).toBe(true);
   });
@@ -135,7 +212,7 @@ describe('fluent-linter-action', () => {
         ],
       ]
     `);
-    expect(consoleLogMock).not.toHaveBeenCalled();
+    expect(consoleLogMock).toHaveBeenCalledTimes(1);
 
     expect(client.isDone()).toBe(true);
   });
@@ -146,6 +223,6 @@ describe('fluent-linter-action', () => {
     await main();
 
     expect(setFailed).not.toHaveBeenCalled();
-    expect(consoleLogMock).not.toHaveBeenCalled();
+    expect(consoleLogMock).toHaveBeenCalledTimes(1);
   });
 });

@@ -1,10 +1,10 @@
 import { getInput, setFailed, debug } from '@actions/core';
 import * as glob from '@actions/glob';
 import { readContent } from './utils/readContent';
-import { FluentBitSchema } from '@calyptia/fluent-bit-config-parser';
+import { FluentBitSchema, TokenError } from '@calyptia/fluent-bit-config-parser';
 import fetch from 'node-fetch';
 import { CALYPTIA_API_ENDPOINT, CALYPTIA_API_VALIDATION_PATH, PROBLEM_MATCHER_FILE_NAME } from './utils/constants';
-import { Annotation, FieldErrors, normalizeErrors } from './utils/normalizeErrors';
+import { Annotation, FieldErrors, normalizeErrors, relativeFilePath } from './utils/normalizeErrors';
 import { formatErrorsPerFile } from './formatErrorsPerFile';
 import { resolve } from 'path';
 export enum InputValues {
@@ -27,6 +27,8 @@ export const main = async (): Promise<void> => {
   const globber = await glob.create(input.CONFIG_LOCATION_GLOB, { matchDirectories: false });
 
   let annotations = [] as Annotation[];
+  const location = resolve(__dirname, PROBLEM_MATCHER_FILE_NAME);
+  console.log(`::add-matcher::${location}`);
 
   for await (const filePath of globber.globGenerator()) {
     debug(`evaluating file ${filePath}`);
@@ -44,7 +46,7 @@ export const main = async (): Promise<void> => {
       };
 
       try {
-        const config = new FluentBitSchema(content);
+        const config = new FluentBitSchema(content, filePath);
         const response = (await fetch(URL, {
           method: 'POST',
           body: JSON.stringify(config.schema),
@@ -65,16 +67,21 @@ export const main = async (): Promise<void> => {
         } else {
           setFailed(`The request failed:  status: ${response.status}, data: ${JSON.stringify(data)}`);
         }
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (e) {
-        setFailed(`something went very wrong ${JSON.stringify((e as Error).message)}`);
+        if (e instanceof TokenError) {
+          const { filePath: _filePath, line, col, message } = e as TokenError;
+          const errorReport = formatErrorsPerFile(relativeFilePath(_filePath), [['PARSE', [[line, col, message]]]]);
+          console.log(errorReport);
+        } else {
+          setFailed((e as Error).message);
+        }
+        setFailed('We found an error, please check, please check your logs');
       }
     }
   }
 
   if (annotations.length) {
-    const location = resolve(__dirname, PROBLEM_MATCHER_FILE_NAME);
-    console.log(`::add-matcher::${location}`);
-
     const groupedByFile = annotations.reduce((memo, { filePath, errorGroups }) => {
       memo[filePath] = memo[filePath] ? [...memo[filePath], ...errorGroups] : errorGroups;
 
