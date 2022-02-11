@@ -74,14 +74,14 @@ export const main = async (): Promise<void> => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (e: any) {
         if (e instanceof TokenError) {
-          const { filePath: _filePath, line, col } = e as TokenError;
+          const { filePath: _filePath, line, col, message } = e as TokenError;
           const response = table(
             [
               formatError({
-                filePath: relativeFilePath(filePath),
+                filePath: relativeFilePath(_filePath),
                 line,
                 col,
-                message: `${relativeFilePath(_filePath)}`,
+                message: message,
               }),
             ],
             NO_STYLES_IN_TABLE

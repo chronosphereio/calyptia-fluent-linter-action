@@ -28213,14 +28213,14 @@ var main = async () => {
         }
       } catch (e) {
         if (e instanceof import_fluent_bit_config_parser.TokenError) {
-          const { filePath: _filePath, line, col } = e;
+          const { filePath: _filePath, line, col, message } = e;
           const response = (0, import_table3.table)(
             [
               formatError({
-                filePath: relativeFilePath(filePath),
+                filePath: relativeFilePath(_filePath),
                 line,
                 col,
-                message: `${relativeFilePath(_filePath)}`,
+                message,
               }),
             ],
             NO_STYLES_IN_TABLE

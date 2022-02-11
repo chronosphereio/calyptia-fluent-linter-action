@@ -35,7 +35,7 @@ Object {
   "column": "1",
   "file": "<PROJECT_ROOT>/__fixtures__/scenarios/withInclude/wrongPathInclude.conf",
   "line": "1",
-  "message": "<PROJECT_ROOT>/__fixtures__/scenarios/withInclude/wrongPathInclude.conf ",
+  "message": "Can not read file tail.conf ",
   "severity": "error",
 }
 `;
