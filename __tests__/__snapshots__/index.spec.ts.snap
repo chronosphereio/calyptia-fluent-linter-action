@@ -29,13 +29,3 @@ Object {
   "severity": "error",
 }
 `;
-
-exports[`fluent-linter-action Reports missing file with @INCLUDE: __fixtures__/scenarios/withInclude/wrongPathInclude.conf 1`] = `
-Object {
-  "column": "1",
-  "file": "<PROJECT_ROOT>/__fixtures__/scenarios/withInclude/wrongPathInclude.conf",
-  "line": "1",
-  "message": "Can not read file tail.conf ",
-  "severity": "error",
-}
-`;

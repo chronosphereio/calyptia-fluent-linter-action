@@ -41,6 +41,9 @@ describe('fluent-linter-action', () => {
     expect(consoleLogMock.mock.calls).toMatchInlineSnapshot(`
       Array [
         Array [
+          "::add-matcher::<PROJECT_ROOT>/src/problem-matcher.json",
+        ],
+        Array [
           "<PROJECT_ROOT>/__fixtures__/scenarios/withInclude/wrongPathInclude.conf: 1:1 error PARSE Can not read file tail.conf 
       ",
         ],
@@ -84,8 +87,8 @@ describe('fluent-linter-action', () => {
 
     await main();
 
+    expect(consoleLogMock).toHaveBeenCalledTimes(1);
     expect(setFailed).not.toHaveBeenCalled();
-    expect(consoleLogMock).not.toHaveBeenCalled();
 
     expect(client.isDone()).toBe(true);
   });
@@ -97,7 +100,7 @@ describe('fluent-linter-action', () => {
     await main();
 
     expect(setFailed).not.toHaveBeenCalled();
-    expect(consoleLogMock.mock.calls).toMatchInlineSnapshot('Array []');
+    expect(consoleLogMock).toHaveBeenCalledTimes(1);
     expect(client.isDone()).toBe(true);
   });
   it('Reports errors correctly matching problemMatcher', async () => {
@@ -176,7 +179,21 @@ describe('fluent-linter-action', () => {
       ]
     `);
 
-    expect(consoleLogMock).not.toHaveBeenCalled();
+    expect(consoleLogMock).toMatchInlineSnapshot(`
+      [MockFunction] {
+        "calls": Array [
+          Array [
+            "::add-matcher::<PROJECT_ROOT>/src/problem-matcher.json",
+          ],
+        ],
+        "results": Array [
+          Object {
+            "type": "return",
+            "value": undefined,
+          },
+        ],
+      }
+    `);
 
     expect(client.isDone()).toBe(true);
   });
@@ -195,7 +212,7 @@ describe('fluent-linter-action', () => {
         ],
       ]
     `);
-    expect(consoleLogMock).not.toHaveBeenCalled();
+    expect(consoleLogMock).toHaveBeenCalledTimes(1);
 
     expect(client.isDone()).toBe(true);
   });
@@ -206,6 +223,6 @@ describe('fluent-linter-action', () => {
     await main();
 
     expect(setFailed).not.toHaveBeenCalled();
-    expect(consoleLogMock).not.toHaveBeenCalled();
+    expect(consoleLogMock).toHaveBeenCalledTimes(1);
   });
 });

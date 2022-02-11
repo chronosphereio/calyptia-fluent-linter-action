@@ -28180,6 +28180,8 @@ var main = async () => {
   const input = getActionInput();
   const globber = await glob.create(input.CONFIG_LOCATION_GLOB, { matchDirectories: false });
   let annotations = [];
+  const location = (0, import_path2.resolve)(__dirname, PROBLEM_MATCHER_FILE_NAME);
+  console.log(`::add-matcher::${location}`);
   for await (const filePath of globber.globGenerator()) {
     (0, import_core.debug)(`evaluating file ${filePath}`);
     const content = await readContent(filePath);
@@ -28221,8 +28223,6 @@ var main = async () => {
     }
   }
   if (annotations.length) {
-    const location = (0, import_path2.resolve)(__dirname, PROBLEM_MATCHER_FILE_NAME);
-    console.log(`::add-matcher::${location}`);
     const groupedByFile = annotations.reduce((memo, { filePath, errorGroups }) => {
       memo[filePath] = memo[filePath] ? [...memo[filePath], ...errorGroups] : errorGroups;
       return memo;

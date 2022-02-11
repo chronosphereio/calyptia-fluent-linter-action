@@ -27,6 +27,8 @@ export const main = async (): Promise<void> => {
   const globber = await glob.create(input.CONFIG_LOCATION_GLOB, { matchDirectories: false });
 
   let annotations = [] as Annotation[];
+  const location = resolve(__dirname, PROBLEM_MATCHER_FILE_NAME);
+  console.log(`::add-matcher::${location}`);
 
   for await (const filePath of globber.globGenerator()) {
     debug(`evaluating file ${filePath}`);
@@ -80,9 +82,6 @@ export const main = async (): Promise<void> => {
   }
 
   if (annotations.length) {
-    const location = resolve(__dirname, PROBLEM_MATCHER_FILE_NAME);
-    console.log(`::add-matcher::${location}`);
-
     const groupedByFile = annotations.reduce((memo, { filePath, errorGroups }) => {
       memo[filePath] = memo[filePath] ? [...memo[filePath], ...errorGroups] : errorGroups;
 
