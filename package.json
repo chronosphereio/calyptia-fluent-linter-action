@@ -5,7 +5,7 @@
     "url": "git+ssh://git@github.com:calyptia/fluent-linter-action.git"
   },
   "license": "Apache-2.0",
-  "version": "0.0.12",
+  "version": "0.1.0",
   "description": "Linter action for Fluentd and Fluent Bit configuration",
   "main": "dist/index.js",
   "scripts": {
