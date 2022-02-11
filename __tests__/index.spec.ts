@@ -41,7 +41,7 @@ describe('fluent-linter-action', () => {
     expect(consoleLogMock.mock.calls).toMatchInlineSnapshot(`
       Array [
         Array [
-          "<PROJECT_ROOT>/__fixtures__/scenarios/withInclude/tail.conf: 1:1 error Can not read file, loading from <PROJECT_ROOT>/__fixtures__/scenarios/withInclude/wrongPathInclude.conf  
+          "<PROJECT_ROOT>/__fixtures__/scenarios/withInclude/wrongPathInclude.conf: 1:1 error <PROJECT_ROOT>/__fixtures__/scenarios/withInclude/tail.conf 
       ",
         ],
       ]
