@@ -65,7 +65,7 @@ describe('fluent-linter-action', () => {
       const issue = error.match(new RegExp(regexp));
 
       if (issue) {
-        const [, file, line, column, severity, , message] = issue;
+        const [, file, line, column, severity, message] = issue;
 
         expect({
           file,
@@ -142,7 +142,7 @@ describe('fluent-linter-action', () => {
       const issue = error.match(new RegExp(regexp));
 
       if (issue) {
-        const [, file, line, column, severity, , message] = issue;
+        const [, file, line, column, severity, message] = issue;
 
         expect({
           file,

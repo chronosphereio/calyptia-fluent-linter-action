@@ -5,7 +5,7 @@ Object {
   "column": "0",
   "file": "<PROJECT_ROOT>/__fixtures__/invalid.conf",
   "line": "0",
-  "message": "cannot initialize input plugin: john ",
+  "message": "john cannot initialize input plugin: john ",
   "severity": "error",
 }
 `;
@@ -15,7 +15,7 @@ Object {
   "column": "0",
   "file": "<PROJECT_ROOT>/__fixtures__/invalid.conf",
   "line": "0",
-  "message": "Unknown syslog mode abc            ",
+  "message": "syslog Unknown syslog mode abc            ",
   "severity": "error",
 }
 `;
@@ -25,7 +25,7 @@ Object {
   "column": "0",
   "file": "<PROJECT_ROOT>/__fixtures__/invalid.conf",
   "line": "0",
-  "message": "missing 'key_name'                 ",
+  "message": "parser missing 'key_name'                 ",
   "severity": "error",
 }
 `;
@@ -35,7 +35,7 @@ Object {
   "column": "1",
   "file": "<PROJECT_ROOT>/__fixtures__/scenarios/withInclude/tail.conf",
   "line": "1",
-  "message": "not read file, loading from <PROJECT_ROOT>/__fixtures__/scenarios/withInclude/wrongPathInclude.conf  ",
+  "message": "Can not read file, loading from <PROJECT_ROOT>/__fixtures__/scenarios/withInclude/wrongPathInclude.conf  ",
   "severity": "error",
 }
 `;
