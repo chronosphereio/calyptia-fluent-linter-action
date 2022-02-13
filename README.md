@@ -65,6 +65,7 @@ The first step is to create the workflow in your repository. We describe two way
            uses: calyptia/fluent-linter-action@main
            with:
              CALYPTIA_API_KEY: ${{ secrets.CALYPTIA_API_KEY }}
+             FOLLOW_SYMBOLIC_LINKS: 'true' # this is optional. It defaults to false.
              CONFIG_LOCATION_GLOB: '*.conf'
    ```
 
