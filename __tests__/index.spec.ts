@@ -11,6 +11,7 @@ describe('fluent-linter-action', () => {
   const mockedInput = {
     [InputValues.CALYPTIA_API_KEY]: 'API_TOKEN',
     [InputValues.CONFIG_LOCATION_GLOB]: '__fixtures__/*.conf',
+    [InputValues.FOLLOW_SYMBOLIC_LINKS]: 'false',
   };
 
   process.env.GITHUB_WORKSPACE = '<PROJECT_ROOT>';
@@ -35,6 +36,7 @@ describe('fluent-linter-action', () => {
 
   it('Reports missing file with @INCLUDE', async () => {
     mockedInput.CONFIG_LOCATION_GLOB = '__fixtures__/scenarios/withInclude/wrongPathInclude.conf';
+    mockedInput.FOLLOW_SYMBOLIC_LINKS = 'true';
 
     await main();
 
@@ -62,7 +64,8 @@ describe('fluent-linter-action', () => {
 
     const errors = issues.split('\n');
 
-    errors.pop(); // We end up with a last line jump for format that we don't want in the loop.
+    // We end up with a last line jump for format that we don't want in the loop.
+    errors.pop();
 
     for (const error of errors) {
       const issue = error.match(new RegExp(regexp));
@@ -82,6 +85,10 @@ describe('fluent-linter-action', () => {
   });
   it('Reports no issues with @INCLUDE', async () => {
     mockedInput.CONFIG_LOCATION_GLOB = '__fixtures__/scenarios/withInclude/include.conf';
+    getInput.mockImplementation((key: Partial<Exclude<InputValues, 'FOLLOW_SYMBOLIC_LINKS'>>) => {
+      const { FOLLOW_SYMBOLIC_LINKS, ...rest } = mockedInput;
+      return rest[key];
+    });
     const client = nock(CALYPTIA_API_ENDPOINT);
     client['post']('/' + CALYPTIA_API_VALIDATION_PATH).reply(200, { config: {} });
 
@@ -198,6 +205,20 @@ describe('fluent-linter-action', () => {
     expect(client.isDone()).toBe(true);
   });
 
+  it('Reports failure when the CONFIG_LOCATION_GLOB does not provide any results', async () => {
+    mockedInput.CONFIG_LOCATION_GLOB = '__fixtures__/*.nonexistent';
+
+    await main();
+
+    expect(setFailed).toHaveBeenCalled();
+    expect(setFailed.mock.calls).toMatchInlineSnapshot(`
+      Array [
+        Array [
+          "We could not find any files from using the provided GLOB (__fixtures__/*.nonexistent)",
+        ],
+      ]
+    `);
+  });
   it('Reports errors when request fails with other than 500', async () => {
     mockedInput.CONFIG_LOCATION_GLOB = '__fixtures__/basic.conf';
     const client = nock(CALYPTIA_API_ENDPOINT);

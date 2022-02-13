@@ -28111,6 +28111,7 @@ var import_table = __toESM(require_src());
 var CALYPTIA_API_ENDPOINT = 'https://cloud-api.calyptia.com';
 var CALYPTIA_API_VALIDATION_PATH = 'v1/config_validate/fluentbit';
 var PROBLEM_MATCHER_FILE_NAME = 'problem-matcher.json';
+var FALSE_VALUE = 'false';
 var NO_STYLES_IN_TABLE = {
   border: (0, import_table.getBorderCharacters)('void'),
   columnDefault: {
@@ -28168,6 +28169,7 @@ var import_path2 = require('path');
 var InputValues = /* @__PURE__ */ ((InputValues2) => {
   InputValues2['CONFIG_LOCATION_GLOB'] = 'CONFIG_LOCATION_GLOB';
   InputValues2['CALYPTIA_API_KEY'] = 'CALYPTIA_API_KEY';
+  InputValues2['FOLLOW_SYMBOLIC_LINKS'] = 'FOLLOW_SYMBOLIC_LINKS';
   return InputValues2;
 })(InputValues || {});
 var getActionInput = () => {
@@ -28177,12 +28179,19 @@ var getActionInput = () => {
   }, {});
 };
 var main = async () => {
-  const input = getActionInput();
-  const globber = await glob.create(input.CONFIG_LOCATION_GLOB, { matchDirectories: false });
+  const { FOLLOW_SYMBOLIC_LINKS = 'false', CONFIG_LOCATION_GLOB, CALYPTIA_API_KEY } = getActionInput();
+  const globber = await glob.create(CONFIG_LOCATION_GLOB, {
+    matchDirectories: false,
+    followSymbolicLinks: FOLLOW_SYMBOLIC_LINKS.toLowerCase() !== FALSE_VALUE,
+  });
+  const files = await globber.glob();
+  if (!files.length) {
+    (0, import_core.setFailed)(`We could not find any files from using the provided GLOB (${CONFIG_LOCATION_GLOB})`);
+  }
   let annotations = [];
   const location = (0, import_path2.resolve)(__dirname, PROBLEM_MATCHER_FILE_NAME);
   console.log(`::add-matcher::${location}`);
-  for await (const filePath of globber.globGenerator()) {
+  for await (const filePath of files) {
     (0, import_core.debug)(`evaluating file ${filePath}`);
     const content = await readContent(filePath);
     if (import_fluent_bit_config_parser.FluentBitSchema.isFluentBitConfiguration(content)) {
@@ -28190,7 +28199,7 @@ var main = async () => {
       const URL2 = `${CALYPTIA_API_ENDPOINT}/${CALYPTIA_API_VALIDATION_PATH}`;
       const headers = {
         'Content-Type': 'application/json',
-        'x-project-token': input.CALYPTIA_API_KEY,
+        'x-project-token': CALYPTIA_API_KEY,
       };
       try {
         const config = new import_fluent_bit_config_parser.FluentBitSchema(content, filePath);
