@@ -1,0 +1,3011 @@
+openapi: 3.0.3
+info:
+  title: Calyptia Cloud API
+  version: '1.0'
+  description: HTTP API service of Calyptia Cloud
+  contact:
+    name: Calyptia
+    email: hello@calyptia.com
+    url: 'https://cloud.calyptia.com'
+  termsOfService: 'https://calyptia.com/terms/'
+servers:
+  - url: 'http://localhost:{port}'
+    description: local
+    variables:
+      port:
+        default: '5000'
+  - url: 'https://cloud-api-dev.calyptia.com'
+    description: dev
+  - url: 'https://cloud-api-prod.calyptia.com'
+    description: prod
+tags:
+  - name: user
+  - name: project
+  - name: token
+  - name: membership
+  - name: invitation
+  - name: agent
+  - name: agent_config
+  - name: aggregator
+  - name: resource_profile
+  - name: pipeline
+  - name: pipeline_config
+  - name: pipeline_status
+  - name: pipeline_file
+  - name: pipeline_secret
+  - name: pipeline_port
+  - name: config_validator
+  - name: config_validator_v2
+  - name: metric
+components:
+  securitySchemes:
+    user:
+      type: http
+      scheme: bearer
+    project:
+      name: X-Project-Token
+      type: apiKey
+      in: header
+  schemas:
+    User:
+      type: object
+      description: User model.
+      properties:
+        id:
+          type: string
+          format: uuid
+        email:
+          type: string
+          format: email
+        name:
+          type: string
+          example: user
+        avatarURL:
+          type: string
+          nullable: true
+          format: uri
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - email
+        - name
+        - avatarURL
+        - createdAt
+        - updatedAt
+    Project:
+      type: object
+      description: Project model.
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          example: my-project
+        membersCount:
+          type: integer
+          minimum: 1
+          format: int64
+        agentsCount:
+          type: integer
+          format: int64
+          minimum: 0
+        aggregatorsCount:
+          type: integer
+          format: int64
+          maximum: 0
+        createdAt:
+          type: string
+          format: date-time
+        membership:
+          $ref: '#/components/schemas/Membership'
+      required:
+        - id
+        - name
+        - membersCount
+        - agentsCount
+        - aggregatorsCount
+        - createdAt
+    Token:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        token:
+          type: string
+          example: redacted
+        name:
+          type: string
+          example: my-token
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - token
+        - name
+        - createdAt
+      description: Token model.
+    Membership:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        roles:
+          type: array
+          nullable: true
+          uniqueItems: true
+          items:
+            type: string
+            enum:
+              - creator
+              - admin
+        createdAt:
+          type: string
+          format: date-time
+        user:
+          $ref: '#/components/schemas/User'
+      required:
+        - id
+        - roles
+        - createdAt
+      description: Membership of a user in a project.
+    Agent:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        token:
+          type: string
+          example: redacted
+        name:
+          type: string
+          example: my-agent
+          format: hostname
+        machineID:
+          type: string
+        type:
+          type: string
+          enum:
+            - fluentbit
+            - fluentd
+        version:
+          type: string
+          example: v1.8.6
+        edition:
+          type: string
+          enum:
+            - community
+            - enterprise
+        flags:
+          type: array
+          nullable: true
+          uniqueItems: true
+          items:
+            type: string
+        rawConfig:
+          type: string
+        metadata:
+          type: object
+          nullable: true
+        firstMetricsAddedAt:
+          type: string
+          format: date-time
+        lastMetricsAddedAt:
+          type: string
+          format: date-time
+        metricsCount:
+          type: integer
+          format: int64
+          minimum: 0
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - token
+        - name
+        - machineID
+        - type
+        - version
+        - edition
+        - flags
+        - rawConfig
+        - metadata
+        - firstMetricsAddedAt
+        - lastMetricsAddedAt
+        - metricsCount
+        - createdAt
+        - updatedAt
+      description: Agent model.
+    AgentConfig:
+      type: object
+      description: Agent configuration history entry.
+      properties:
+        id:
+          type: string
+          format: uuid
+        rawConfig:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - rawConfig
+        - createdAt
+    Aggregator:
+      type: object
+      description: Aggregator model.
+      properties:
+        id:
+          type: string
+          format: uuid
+        token:
+          type: string
+          example: redacted
+        name:
+          type: string
+          format: hostname
+          example: my-aggregator
+        pipelinesCount:
+          type: integer
+          format: int64
+          minimum: 0
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - token
+        - name
+        - pipelinesCount
+        - createdAt
+        - updatedAt
+    ResourceProfile:
+      type: object
+      description: Resource profile model.
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          example: my-resource-profile
+        storageMaxChunksUp:
+          type: integer
+          format: int32
+        storageSyncFull:
+          type: boolean
+        storageBacklogMemLimit:
+          type: string
+          example: 1Mi
+        storageVolumeSize:
+          type: string
+          example: 2Mi
+        storageMaxChunksPause:
+          type: boolean
+        cpuBufferWorkers:
+          type: integer
+          format: int32
+        cpuLimit:
+          type: string
+          example: 3Mi
+        cpuRequest:
+          type: string
+          example: 4Mi
+        memoryLimit:
+          type: string
+          example: 5Mi
+        memoryRequest:
+          type: string
+          example: 6Mi
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - name
+        - storageMaxChunksUp
+        - storageSyncFull
+        - storageBacklogMemLimit
+        - storageVolumeSize
+        - storageMaxChunksPause
+        - cpuBufferWorkers
+        - cpuLimit
+        - cpuRequest
+        - memoryLimit
+        - memoryRequest
+        - createdAt
+        - updatedAt
+    Pipeline:
+      type: object
+      description: Pipeline model.
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          description: DNS label format as of defined on RFC1123
+          example: my-pipeline
+        config:
+          $ref: '#/components/schemas/PipelineConfig'
+        status:
+          $ref: '#/components/schemas/PipelineStatus'
+        resourceProfile:
+          $ref: '#/components/schemas/ResourceProfile'
+        replicasCount:
+          type: integer
+          format: int64
+          minimum: 0
+        metadata:
+          type: object
+          nullable: true
+          properties:
+            nodeSelector:
+              type: object
+              nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - name
+        - config
+        - status
+        - resourceProfile
+        - replicasCount
+        - metadata
+        - createdAt
+        - updatedAt
+    PipelineConfig:
+      type: object
+      description: Pipeline configuration history entry.
+      properties:
+        id:
+          type: string
+          format: uuid
+        rawConfig:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - rawConfig
+        - createdAt
+    PipelineStatus:
+      type: object
+      description: Pipeline status history entry.
+      properties:
+        id:
+          type: string
+          format: uuid
+        config:
+          $ref: '#/components/schemas/AgentConfig'
+        status:
+          type: string
+          enum:
+            - NEW
+            - FAILED
+            - STARTING
+            - STARTED
+            - DELETED
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - config
+        - status
+        - createdAt
+    PipelineFile:
+      type: object
+      description: Pipeline file model.
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          example: myfile
+        contents:
+          type: string
+          format: byte
+        encrypted:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - name
+        - contents
+        - encrypted
+        - createdAt
+        - updatedAt
+    PipelineSecret:
+      type: object
+      description: Pipeline secret model.
+      properties:
+        id:
+          type: string
+          format: uuid
+        key:
+          type: string
+          example: mysecret
+        value:
+          type: string
+          format: byte
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - key
+        - value
+        - createdAt
+        - updatedAt
+    PipelinePort:
+      type: object
+      description: Pipeline port model.
+      properties:
+        id:
+          type: string
+          format: uuid
+        protocol:
+          type: string
+          example: tcp
+        frontendPort:
+          type: integer
+          format: int32
+          minimum: 0
+        backendPort:
+          type: integer
+          format: int32
+          minimum: 0
+        endpoint:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - protocol
+        - frontendPort
+        - backendPort
+        - endpoint
+        - createdAt
+        - updatedAt
+    ProjectMetrics:
+      type: object
+      description: Project metrics model.
+      properties:
+        measurements:
+          type: object
+          additionalProperties:
+            type: object
+            properties:
+              totals:
+                type: object
+                additionalProperties:
+                  type: number
+                  nullable: true
+                  format: float
+              plugins:
+                type: object
+                additionalProperties:
+                  $ref: '#/components/schemas/Metrics'
+            required:
+              - totals
+              - plugins
+        topPlugins:
+          type: object
+          additionalProperties:
+            type: object
+            additionalProperties:
+              type: number
+              nullable: true
+              format: float
+      required:
+        - measurements
+        - topPlugins
+    AgentMetrics:
+      type: object
+      description: Agent metrics model.
+      properties:
+        measurements:
+          type: object
+          additionalProperties:
+            type: object
+            properties:
+              plugins:
+                type: object
+                additionalProperties:
+                  $ref: '#/components/schemas/Metrics'
+              totals:
+                type: object
+                additionalProperties:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/MetricFields'
+            required:
+              - plugins
+              - totals
+      required:
+        - measurements
+    AggregatorMetrics:
+      type: object
+      description: Agent metrics model.
+      properties:
+        measurements:
+          type: object
+          additionalProperties:
+            type: object
+            properties:
+              metrics:
+                type: object
+                additionalProperties:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/MetricFields'
+              totals:
+                type: object
+                additionalProperties:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/MetricFields'
+            required:
+              - metrics
+              - totals
+      required:
+        - measurements
+      example: |
+        {
+          "measurements": {
+            "fluentbit_filter": {
+              "metrics": {
+                "drop_records": [
+                  {
+                    "time": "2022-02-07T11:00:00Z",
+                    "value": 0
+                  },
+                  {
+                    "time": "2022-02-07T12:00:00Z",
+                    "value": 0
+                  },
+                  {
+                    "time": "2022-02-07T12:55:20.003028413Z",
+                    "value": 119
+                  }
+                ],
+                "emit_records": [
+                  {
+                    "time": "2022-02-07T11:00:00Z",
+                    "value": 0
+                  },
+                  {
+                    "time": "2022-02-07T12:00:00Z",
+                    "value": 0
+                  },
+                  {
+                    "time": "2022-02-07T12:55:20.003028413Z",
+                    "value": 119
+                  }
+                ]
+              },
+              "totals": {
+                "drop_records": [
+                  {
+                    "time": "2022-02-07T12:55:04.78743322Z",
+                    "value": 119
+                  }
+                ],
+                "emit_records": [
+                  {
+                    "time": "2022-02-07T12:55:04.787434277Z",
+                    "value": 119
+                  }
+                ]
+              }
+            },
+            "fluentbit_input": {
+              "metrics": {
+                "bytes": [
+                  {
+                    "time": "2022-02-07T11:00:00Z",
+                    "value": 0
+                  },
+                  {
+                    "time": "2022-02-07T12:00:00Z",
+                    "value": 0
+                  },
+                  {
+                    "time": "2022-02-07T12:55:20.029124832Z",
+                    "value": 4760
+                  }
+                ],
+                "records": [
+                  {
+                    "time": "2022-02-07T11:00:00Z",
+                    "value": 0
+                  },
+                  {
+                    "time": "2022-02-07T12:00:00Z",
+                    "value": 0
+                  },
+                  {
+                    "time": "2022-02-07T12:55:20.029124832Z",
+                    "value": 119
+                  }
+                ]
+              },
+              "totals": {
+                "bytes": [
+                  {
+                    "time": "2022-02-07T12:55:04.787450155Z",
+                    "value": 4760
+                  }
+                ],
+                "records": [
+                  {
+                    "time": "2022-02-07T12:55:04.787450155Z",
+                    "value": 119
+                  }
+                ]
+              }
+            },
+            "fluentbit_output": {
+              "metrics": {
+                "bytes": [
+                  {
+                    "time": "2022-02-07T11:00:00Z",
+                    "value": 0
+                  },
+                  {
+                    "time": "2022-02-07T12:00:00Z",
+                    "value": 0
+                  },
+                  {
+                    "time": "2022-02-07T12:55:20.059227599Z",
+                    "value": 4560
+                  }
+                ],
+                "records": [
+                  {
+                    "time": "2022-02-07T11:00:00Z",
+                    "value": 0
+                  },
+                  {
+                    "time": "2022-02-07T12:00:00Z",
+                    "value": 0
+                  },
+                  {
+                    "time": "2022-02-07T12:55:20.059227599Z",
+                    "value": 114
+                  }
+                ]
+              },
+              "totals": {
+                "bytes": [
+                  {
+                    "time": "2022-02-07T12:55:00.785234434Z",
+                    "value": 4560
+                  }
+                ],
+                "records": [
+                  {
+                    "time": "2022-02-07T12:55:00.785234434Z",
+                    "value": 114
+                  }
+                ]
+              }
+            }
+          }
+        }
+    Metrics:
+      type: object
+      description: Metrics model.
+      properties:
+        metrics:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              $ref: '#/components/schemas/MetricFields'
+      required:
+        - metrics
+    MetricFields:
+      type: object
+      description: Metric fields model.
+      properties:
+        time:
+          type: string
+          format: date-time
+        value:
+          type: number
+          nullable: true
+          format: float
+      required:
+        - time
+        - value
+    CreateProject:
+      description: Create project request body.
+      type: object
+      properties:
+        name:
+          type: string
+          example: new-project
+      required:
+        - name
+    UpdateProject:
+      description: Update project request body.
+      type: object
+      properties:
+        name:
+          type: string
+          example: new-project
+          nullable: true
+    CreateToken:
+      description: Create token request body.
+      type: object
+      properties:
+        name:
+          type: string
+          example: new-token
+      required:
+        - name
+    UpdateToken:
+      description: Update token request body.
+      type: object
+      properties:
+        name:
+          type: string
+          example: new-token
+          nullable: true
+    CreateInvitation:
+      description: Create invitation request body.
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        redirectURI:
+          type: string
+          format: uri
+      required:
+        - email
+        - redirectURI
+    AcceptInvitation:
+      description: Accept invitation request body.
+      type: object
+      properties:
+        token:
+          type: string
+          example: redacted
+      required:
+        - token
+    RegisterAgent:
+      description: Register agent request body.
+      type: object
+      properties:
+        name:
+          type: string
+          example: new-agent
+          format: hostname
+        machineID:
+          type: string
+        type:
+          type: string
+          enum:
+            - fluentbit
+            - fluentd
+        version:
+          type: string
+          example: v1.8.6
+        edition:
+          type: string
+          enum:
+            - community
+            - enterprise
+        flags:
+          type: array
+          nullable: true
+          items:
+            type: string
+        rawConfig:
+          type: string
+        metadata:
+          type: object
+          nullable: true
+      required:
+        - name
+        - machineID
+        - type
+        - version
+        - edition
+        - flags
+        - rawConfig
+    UpdateAgent:
+      description: Update agent request body.
+      type: object
+      properties:
+        name:
+          type: string
+          example: new-agent
+          format: hostname
+          nullable: true
+        version:
+          type: string
+          example: v1.8.6
+          nullable: true
+        edition:
+          type: string
+          enum:
+            - community
+            - enterprise
+          nullable: true
+        flags:
+          type: array
+          nullable: true
+          items:
+            type: string
+        rawConfig:
+          type: string
+          nullable: true
+        metadata:
+          type: object
+          nullable: true
+    CreateAggregator:
+      description: Create aggregator request body.
+      type: object
+      properties:
+        name:
+          type: string
+          format: hostname
+          example: new-aggregator
+        addHealthCheckPipeline:
+          type: boolean
+        healthCheckPipelinePort:
+          type: integer
+          format: int32
+          minimum: 0
+      required:
+        - name
+        - addHealthCheckPipeline
+        - healthCheckPipelinePort
+    UpdateAggregator:
+      description: Update aggregator request body.
+      type: object
+      properties:
+        name:
+          type: string
+          format: hostname
+          example: new-aggregator
+          nullable: true
+    CreateResourceProfile:
+      description: Create resource profile request body.
+      type: object
+      properties:
+        name:
+          type: string
+          example: my-resource-profile
+        storageMaxChunksUp:
+          type: integer
+          format: int32
+        storageSyncFull:
+          type: boolean
+        storageBacklogMemLimit:
+          type: string
+          example: 1Mi
+        storageVolumeSize:
+          type: string
+          example: 2Mi
+        storageMaxChunksPause:
+          type: boolean
+        cpuBufferWorkers:
+          type: integer
+          format: int32
+        cpuLimit:
+          type: string
+          example: 3Mi
+        cpuRequest:
+          type: string
+          example: 4Mi
+        memoryLimit:
+          type: string
+          example: 5Mi
+        memoryRequest:
+          type: string
+          example: 6Mi
+      required:
+        - name
+        - storageMaxChunksUp
+        - storageSyncFull
+        - storageBacklogMemLimit
+        - storageVolumeSize
+        - storageMaxChunksPause
+        - cpuBufferWorkers
+        - cpuLimit
+        - cpuRequest
+        - memoryLimit
+        - memoryRequest
+    UpdateResourceProfile:
+      description: Update resource profile request body.
+      type: object
+      properties:
+        name:
+          type: string
+          example: my-resource-profile
+          nullable: true
+        storageMaxChunksUp:
+          type: integer
+          format: int32
+          nullable: true
+        storageSyncFull:
+          type: boolean
+          nullable: true
+        storageBacklogMemLimit:
+          type: string
+          example: 1Mi
+          nullable: true
+        storageVolumeSize:
+          type: string
+          example: 2Mi
+          nullable: true
+        storageMaxChunksPause:
+          type: boolean
+          nullable: true
+        cpuBufferWorkers:
+          type: integer
+          format: int32
+          nullable: true
+        cpuLimit:
+          type: string
+          example: 3Mi
+          nullable: true
+        cpuRequest:
+          type: string
+          example: 4Mi
+          nullable: true
+        memoryLimit:
+          type: string
+          example: 5Mi
+          nullable: true
+        memoryRequest:
+          type: string
+          example: 6Mi
+          nullable: true
+    CreatePipeline:
+      description: Create pipeline request body.
+      type: object
+      properties:
+        name:
+          type: string
+          description: DNS label format as of defined on RFC1123
+          example: new-pipeline
+        replicasCount:
+          type: integer
+          format: int64
+          minimum: 0
+        rawConfig:
+          type: string
+        secrets:
+          type: array
+          nullable: true
+          items:
+            $ref: '#/components/schemas/CreatePipelineSecret'
+        files:
+          type: array
+          nullable: true
+          items:
+            $ref: '#/components/schemas/CreatePipelineFile'
+        resourceProfile:
+          type: string
+          example: my-resource-profile
+        autoCreatePortsFromConfig:
+          type: boolean
+        metadata:
+          type: object
+          nullable: true
+          properties:
+            nodeSelector:
+              type: object
+              nullable: true
+      required:
+        - name
+        - replicasCount
+        - rawConfig
+        - secrets
+        - files
+        - resourceProfile
+        - autoCreatePortsFromConfig
+    UpdatePipeline:
+      description: Update pipeline request body.
+      type: object
+      properties:
+        name:
+          type: string
+          description: DNS label format as of defined on RFC1123
+          example: new-pipeline
+          nullable: true
+        replicasCount:
+          type: integer
+          format: int64
+          nullable: true
+        rawConfig:
+          type: string
+          nullable: true
+        secrets:
+          type: array
+          nullable: true
+          items:
+            $ref: '#/components/schemas/UpdatePipelineSecret'
+        files:
+          type: array
+          nullable: true
+          items:
+            $ref: '#/components/schemas/UpdatePipelineFile'
+        resourceProfile:
+          type: string
+          example: my-resource-profile
+          nullable: true
+        autoCreatePortsFromConfig:
+          type: boolean
+          nullable: true
+        metadata:
+          type: object
+          nullable: true
+          properties:
+            nodeSelector:
+              type: object
+              nullable: true
+    CreatePipelineFile:
+      description: Create pipeline file request body.
+      type: object
+      properties:
+        name:
+          type: string
+          example: newfile
+        contents:
+          type: string
+          format: byte
+        encrypted:
+          type: boolean
+      required:
+        - name
+        - contents
+        - encrypted
+    UpdatePipelineFile:
+      description: Update pipeline file request body.
+      type: object
+      properties:
+        name:
+          type: string
+          example: newfile
+          nullable: true
+        contents:
+          type: string
+          format: byte
+          nullable: true
+        encrypted:
+          type: boolean
+          nullable: true
+    CreatePipelineSecret:
+      description: Create pipeline secret request body.
+      type: object
+      properties:
+        key:
+          type: string
+          example: newsecret
+        value:
+          type: string
+          format: byte
+      required:
+        - key
+        - value
+    UpdatePipelineSecret:
+      description: Update pipeline secret request body.
+      type: object
+      properties:
+        key:
+          type: string
+          example: newsecret
+          nullable: true
+        value:
+          type: string
+          format: byte
+          nullable: true
+    CreatePipelinePort:
+      description: Create pipeline port request body.
+      type: object
+      properties:
+        protocol:
+          type: string
+          example: tcp
+        frontendPort:
+          type: integer
+          format: int32
+          minimum: 0
+        backendPort:
+          type: integer
+          format: int32
+          minimum: 0
+        endpoint:
+          type: string
+      required:
+        - protocol
+        - frontendPort
+        - backendPort
+        - endpoint
+    UpdatePipelinePort:
+      description: Update pipeline port request body.
+      type: object
+      properties:
+        protocol:
+          type: string
+          example: tcp
+          nullable: true
+        frontendPort:
+          type: integer
+          format: int32
+          nullable: true
+        backendPort:
+          type: integer
+          format: int32
+          nullable: true
+        endpoint:
+          type: string
+          nullable: true
+    ValidatingConfig:
+      description: Validating configuration request body.
+      type: object
+      properties:
+        config:
+          type: array
+          items:
+            type: object
+            properties:
+              command:
+                type: string
+              name:
+                type: string
+              optional:
+                type: object
+                additionalProperties:
+                  type: string
+                nullable: true
+              id:
+                type: string
+            required:
+              - command
+              - name
+              - id
+      required:
+        - config
+    CreatedProject:
+      type: object
+      description: Created project response body.
+      properties:
+        id:
+          type: string
+        token:
+          type: string
+          example: redacted
+        createdAt:
+          type: string
+          format: date-time
+        membership:
+          $ref: '#/components/schemas/Membership'
+      required:
+        - id
+        - token
+        - createdAt
+        - membership
+    RegisteredAgent:
+      type: object
+      description: Registered agent response body.
+      properties:
+        id:
+          type: string
+          format: uuid
+        token:
+          type: string
+          example: redacted
+        name:
+          type: string
+          example: my-agent
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - token
+        - name
+        - createdAt
+    CreatedAggregator:
+      type: object
+      description: Created aggregator response body.
+      properties:
+        id:
+          type: string
+          format: uuid
+        token:
+          type: string
+          example: redacted
+        privateRSAKey:
+          type: string
+          format: byte
+        publicRSAKey:
+          type: string
+          format: byte
+        name:
+          type: string
+          format: hostname
+          example: my-aggregator
+        createdAt:
+          type: string
+          format: date-time
+        healthCheckPipeline:
+          $ref: '#/components/schemas/Pipeline'
+        resourceProfiles:
+          type: array
+          items:
+            $ref: '#/components/schemas/ResourceProfile'
+      required:
+        - id
+        - token
+        - privateRSAKey
+        - publicRSAKey
+        - name
+        - createdAt
+        - resourceProfiles
+    CreatedResourceProfile:
+      type: object
+      description: Created resource profile response body.
+      properties:
+        id:
+          type: string
+          format: uuid
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - createdAt
+    CreatedPipeline:
+      type: object
+      description: Created pipeline response body.
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          example: my-pipeline
+        config:
+          $ref: '#/components/schemas/PipelineConfig'
+        secrets:
+          type: array
+          items:
+            $ref: '#/components/schemas/PipelineSecret'
+        files:
+          type: array
+          items:
+            $ref: '#/components/schemas/PipelineFile'
+        status:
+          $ref: '#/components/schemas/PipelineStatus'
+        resourceProfile:
+          $ref: '#/components/schemas/ResourceProfile'
+        replicasCount:
+          type: integer
+          format: int64
+          minimum: 0
+        createdAt:
+          type: string
+          format: date-time
+    UpdatedPipeline:
+      type: object
+      description: Updated pipeline response body.
+      properties:
+        addedPorts:
+          type: array
+          items:
+            $ref: '#/components/schemas/PipelinePort'
+    CreatedPipelineFile:
+      type: object
+      description: Created pipeline file response body.
+      properties:
+        id:
+          type: string
+          format: uuid
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - createdAt
+    CreatedPipelineSecret:
+      type: object
+      description: Created pipeline secret response body.
+      properties:
+        id:
+          type: string
+          format: uuid
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - createdAt
+    CreatedPipelinePort:
+      type: object
+      description: Created pipeline port response body.
+      properties:
+        id:
+          type: string
+          format: uuid
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - createdAt
+    ValidatedConfig:
+      type: object
+      description: Validate config response body.
+      properties:
+        errors:
+          type: object
+          properties:
+            runtime:
+              type: array
+              items:
+                type: string
+            input:
+              type: object
+              additionalProperties:
+                type: array
+                items:
+                  type: string
+            output:
+              type: object
+              additionalProperties:
+                type: array
+                items:
+                  type: string
+            filter:
+              type: object
+              additionalProperties:
+                type: array
+                items:
+                  type: string
+          required:
+            - runtime
+            - input
+            - output
+            - filter
+      required:
+        - errors
+
+    ConfigValidityV2Property:
+      type: object
+      description: Property of the validated configuration section
+      properties:
+        id:
+          description: ID of the configuration section
+          type: string
+        property:
+          description: property name
+          type: string
+        text:
+          description: property name, value
+          type: string
+        errors:
+          type: array
+          items:
+            type: string
+      required:
+        - id
+        - property
+        - text
+        - errors
+
+    ConfigValidityV2Runtime:
+      type: object
+      description: Runtime errors for the validated configuration.
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+        id:
+          description: Id of the configuration section
+          type: string
+      required:
+        - id
+        - errors
+
+    ValidatedConfigV2:
+      type: object
+      description: Validation V2 config response.
+      properties:
+        errors:
+          type: object
+          properties:
+            runtime:
+              type: array
+              additionalProperties:
+                $ref: '#/components/schemas/ConfigValidityV2Runtime'
+            input:
+              type: object
+              additionalProperties:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ConfigValidityV2Property'
+            output:
+              type: object
+              additionalProperties:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ConfigValidityV2Property'
+            filter:
+              type: object
+              additionalProperties:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ConfigValidityV2Property'
+          required:
+            - runtime
+            - input
+            - output
+            - filter
+      required:
+        - errors
+
+paths:
+  /v1/verification_email:
+    post:
+      tags:
+        - user
+      summary: Send verification email
+      operationId: sendVerificationEmail
+      description: |-
+        Sends a verification email to the user.
+        When a new user registers within Calyptia Cloud with password, it should receive a verification email, in the case it didn't receive it, or the email expired already, use this endpoint to request a new one.
+      security:
+        - user: []
+      responses:
+        '204':
+          description: No Content
+  /v1/projects:
+    post:
+      tags:
+        - project
+      summary: Create project
+      operationId: createProject
+      description: |-
+        Creates a new project.
+        A project is the base unit of work at Calyptia Cloud.
+        You can register agents here, create aggregators in which you can deploy an entire set of pipelines, and monitor them.
+        You can even invite other people to the project and have a team.
+      security:
+        - user: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateProject'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreatedProject'
+    get:
+      tags:
+        - project
+      summary: Projects
+      operationId: projects
+      description: Projects you are a member of.
+      security:
+        - user: []
+      parameters:
+        - schema:
+            type: integer
+            format: int64
+            minimum: 0
+          in: query
+          name: last
+          description: Last projects.
+        - schema:
+            type: string
+          in: query
+          name: name
+          description: Name matching projects.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Project'
+  '/v1/projects/{projectID}':
+    parameters:
+      - schema:
+          type: string
+          format: uuid
+        name: projectID
+        in: path
+        required: true
+    get:
+      tags:
+        - project
+      summary: Project
+      operationId: project
+      description: Project by ID.
+      security:
+        - user: []
+        - project: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Project'
+    patch:
+      tags:
+        - project
+      summary: Update project
+      operationId: updateProject
+      description: Update project by its ID.
+      security:
+        - user: []
+        - project: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateProject'
+      responses:
+        '204':
+          description: No Content
+  '/v1/projects/{projectID}/tokens':
+    parameters:
+      - schema:
+          type: string
+          format: uuid
+        name: projectID
+        in: path
+        required: true
+    post:
+      tags:
+        - token
+      summary: Create token
+      operationId: createToken
+      description: |-
+        Create token within a project.
+        These tokens are to authorize other applications to access the project.
+        For example:
+         - an agent might use it to register itself to the project.
+         - you might create a new aggregator in the project using the aggregator CLI.
+         - you might use it within the Calyptia CLI to grant access to your project.
+      security:
+        - user: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateToken'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Token'
+    get:
+      tags:
+        - token
+      summary: Tokens
+      operationId: tokens
+      description: Tokens from a project.
+      security:
+        - user: []
+      parameters:
+        - schema:
+            type: integer
+            format: int64
+            minimum: 0
+          in: query
+          name: last
+          description: Last tokens.
+        - schema:
+            type: string
+          in: query
+          name: name
+          description: Name matching tokens.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Token'
+  '/v1/project_tokens/{tokenID}':
+    parameters:
+      - schema:
+          type: string
+          format: uuid
+        name: tokenID
+        in: path
+        required: true
+    get:
+      tags:
+        - token
+      summary: Token
+      operationId: token
+      description: Token by ID.
+      security:
+        - user: []
+        - project: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Token'
+    patch:
+      tags:
+        - token
+      summary: Update token
+      operationId: updateToken
+      description: Update token by its ID.
+      security:
+        - user: []
+        - project: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateToken'
+      responses:
+        '204':
+          description: No Content
+    delete:
+      tags:
+        - token
+      summary: Delete token
+      operationId: deleteToken
+      description: Delete token by its ID.
+      security:
+        - user: []
+        - project: []
+      responses:
+        '204':
+          description: No Content
+  '/v1/projects/{projectID}/members':
+    parameters:
+      - schema:
+          type: string
+          format: uuid
+        name: projectID
+        in: path
+        required: true
+    get:
+      tags:
+        - membership
+      summary: Members
+      operationId: members
+      description: Members from a project.
+      security:
+        - user: []
+        - project: []
+      parameters:
+        - schema:
+            type: integer
+            format: int64
+            minimum: 0
+          in: query
+          name: last
+          description: Last members.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Membership'
+  '/v1/projects/{projectID}/invite':
+    parameters:
+      - schema:
+          type: string
+          format: uuid
+        name: projectID
+        in: path
+        required: true
+    post:
+      tags:
+        - invitation
+      summary: Create invitation
+      operationId: createInvitation
+      description: |-
+        Create invitation to a project.
+        This will send an invitation email with a link to join to the email address provided.
+      security:
+        - user: []
+        - project: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateInvitation'
+      responses:
+        '204':
+          description: No Content
+  /v1/join_project:
+    post:
+      tags:
+        - invitation
+      summary: Accept invitation
+      operationId: acceptInvitation
+      description: |-
+        Accept invitation to a project.
+        The project to which you join is parsed from the token.
+      security:
+        - user: []
+        - project: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AcceptInvitation'
+      responses:
+        '204':
+          description: No Content
+  /v1/agents:
+    post:
+      tags:
+        - agent
+      summary: Register agent
+      operationId: registerAgent
+      description: |-
+        Register agent within a project.
+        The project in which the agent is registered is parsed from the authorization token.
+        Users are not allowed to register agents.
+      security:
+        - project: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterAgent'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegisteredAgent'
+  '/v1/projects/{projectID}/agents':
+    parameters:
+      - schema:
+          type: string
+          format: uuid
+        name: projectID
+        in: path
+        required: true
+    get:
+      tags:
+        - agent
+      summary: Agents
+      operationId: agents
+      description: Agents from a project.
+      security:
+        - user: []
+        - project: []
+      parameters:
+        - schema:
+            type: integer
+            format: int64
+            minimum: 0
+          in: query
+          name: last
+          description: Last agents.
+        - schema:
+            type: string
+          in: query
+          name: name
+          description: Name matching agents.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Agent'
+  '/v1/agents/{agentID}':
+    parameters:
+      - schema:
+          type: string
+          format: uuid
+        name: agentID
+        in: path
+        required: true
+    get:
+      tags:
+        - agent
+      summary: Agent
+      operationId: agent
+      description: Agents by ID.
+      security:
+        - user: []
+        - project: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Agent'
+    patch:
+      tags:
+        - agent
+      summary: Update agent
+      operationId: updateAgent
+      description: Update agent by its ID.
+      security:
+        - user: []
+        - project: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateAgent'
+      responses:
+        '204':
+          description: No Content
+    delete:
+      tags:
+        - agent
+      summary: Delete agent
+      operationId: deleteAgent
+      description: Delete agent by its ID.
+      security:
+        - user: []
+        - project: []
+      responses:
+        '204':
+          description: No Content
+  '/v1/agents/{agentID}/config_history':
+    parameters:
+      - schema:
+          type: string
+          format: uuid
+        name: agentID
+        in: path
+        required: true
+    get:
+      tags:
+        - agent_config
+      summary: Agent configuration history
+      operationId: agentConfigHistory
+      description: |-
+        Configuration history from an agent.
+        Every time an agent config is updated, a new history entry with the change is created.
+      security:
+        - user: []
+        - project: []
+      parameters:
+        - schema:
+            type: integer
+            format: int64
+            minimum: 0
+          in: query
+          name: last
+          description: Last config history entries.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AgentConfig'
+  /v1/aggregators:
+    post:
+      tags:
+        - aggregator
+      summary: Create aggregator
+      operationId: createAggregator
+      description: |-
+        Create aggregator within a project.
+        The project in which the aggregator is created is parser from the authorization token.
+        Users are not allowed to create aggregators.
+      security:
+        - project: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAggregator'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreatedAggregator'
+  '/v1/projects/{projectID}/aggregators':
+    parameters:
+      - schema:
+          type: string
+          format: uuid
+        name: projectID
+        in: path
+        required: true
+    get:
+      tags:
+        - aggregator
+      summary: Aggregators
+      operationId: aggregators
+      description: Aggregators from a project.
+      security:
+        - user: []
+        - project: []
+      parameters:
+        - schema:
+            type: integer
+            format: int64
+            minimum: 0
+          in: query
+          name: last
+          description: Last aggregators.
+        - schema:
+            type: string
+          in: query
+          name: name
+          description: Name matching aggregators.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Aggregator'
+  '/v1/aggregators/{aggregatorID}':
+    parameters:
+      - schema:
+          type: string
+          format: uuid
+        name: aggregatorID
+        in: path
+        required: true
+    get:
+      tags:
+        - aggregator
+      summary: Aggregator
+      operationId: aggregator
+      description: Aggregator by ID.
+      security:
+        - user: []
+        - project: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Aggregator'
+    patch:
+      tags:
+        - aggregator
+      summary: Update aggregator
+      operationId: updateAggregator
+      description: Update aggregator by its ID.
+      security:
+        - user: []
+        - project: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateAggregator'
+      responses:
+        '204':
+          description: No Content
+    delete:
+      tags:
+        - aggregator
+      summary: Delete aggregator
+      operationId: deleteAggregator
+      description: Delete aggregator by its ID.
+      security:
+        - user: []
+        - project: []
+      responses:
+        '204':
+          description: No Content
+  '/v1/aggregators/{aggregatorID}/resource_profiles':
+    parameters:
+      - schema:
+          type: string
+          format: uuid
+        name: aggregatorID
+        in: path
+        required: true
+    post:
+      tags:
+        - resource_profile
+      summary: Create resource profile
+      operationId: createResourceProfile
+      description: |-
+        Create resource profile within an aggregator.
+        A resource profile is a specification of a resource used during the deployment of a pipeline.
+        By default, when you setup an aggregator, Calyptia Cloud will generate 3 resource profiles for you:
+         - high-performance-guaranteed-delivery.
+         - high-performance-optimal-throughput.
+         - best-effort-low-resource.
+      security:
+        - user: []
+        - project: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateResourceProfile'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreatedResourceProfile'
+    get:
+      tags:
+        - resource_profile
+      summary: Resource profiles
+      operationId: resourceProfiles
+      description: Resource profiles from an aggregator.
+      security:
+        - user: []
+        - project: []
+      parameters:
+        - schema:
+            type: integer
+            format: int64
+            minimum: 0
+          in: query
+          name: last
+          description: Last tokens.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ResourceProfile'
+  '/v1/resource_profiles/{resourceProfileID}':
+    parameters:
+      - schema:
+          type: string
+          format: uuid
+        name: resourceProfileID
+        in: path
+        required: true
+    get:
+      tags:
+        - resource_profile
+      summary: Resource profile
+      operationId: resourceProfile
+      description: Resource profile by ID.
+      security:
+        - user: []
+        - project: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceProfile'
+    patch:
+      tags:
+        - resource_profile
+      summary: Update resource profile
+      operationId: updateResourceProfile
+      description: Update resource profile by its ID.
+      security:
+        - user: []
+        - project: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateResourceProfile'
+      responses:
+        '204':
+          description: No Content
+    delete:
+      tags:
+        - resource_profile
+      summary: Delete resource profile
+      operationId: deleteResourceProfile
+      description: Delete resource profile by its ID.
+      security:
+        - user: []
+        - project: []
+      responses:
+        '204':
+          description: No Content
+  '/v1/aggregators/{aggregatorID}/pipelines':
+    parameters:
+      - schema:
+          type: string
+          format: uuid
+        name: aggregatorID
+        in: path
+        required: true
+    post:
+      tags:
+        - pipeline
+      summary: Create pipeline
+      operationId: createPipeline
+      description: |-
+        Create pipeline within an aggregator.
+        The pipeline name must be unique within the aggregator.
+        The resource profile must exist already. If you don't provide one, it will default to "best-effort-low-resource".
+        Use them to easily deploy configured agents to the aggregator.
+      security:
+        - user: []
+        - project: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePipeline'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreatedPipeline'
+    get:
+      tags:
+        - pipeline
+      summary: Pipelines
+      operationId: pipelines
+      description: Pipelines from an aggregator.
+      security:
+        - user: []
+        - project: []
+      parameters:
+        - schema:
+            type: integer
+            format: int64
+            minimum: 0
+          in: query
+          name: last
+          description: Last pipelines.
+        - schema:
+            type: string
+          in: query
+          name: name
+          description: Name matching pipelines.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Pipeline'
+  '/v1/projects/{projectID}/pipelines':
+    parameters:
+      - schema:
+          type: string
+          format: uuid
+        name: projectID
+        in: path
+        required: true
+    get:
+      tags:
+        - pipeline
+      summary: Project pipelines
+      operationId: projectPipelines
+      description: Pipelines from a project.
+      security:
+        - user: []
+        - project: []
+      parameters:
+        - schema:
+            type: integer
+            format: int64
+            minimum: 0
+          in: query
+          name: last
+          description: Last pipelines.
+        - schema:
+            type: string
+          in: query
+          name: name
+          description: Name matching pipelines.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Pipeline'
+  '/v1/aggregator_pipelines/{pipelineID}':
+    parameters:
+      - schema:
+          type: string
+          format: uuid
+        name: pipelineID
+        in: path
+        required: true
+    get:
+      tags:
+        - pipeline
+      summary: Pipeline
+      operationId: pipeline
+      description: Pipeline by ID.
+      security:
+        - user: []
+        - project: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pipeline'
+    patch:
+      tags:
+        - pipeline
+      summary: Update pipeline
+      operationId: updatePipeline
+      description: Update pipeline by its ID.
+      security:
+        - user: []
+        - project: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePipeline'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdatedPipeline'
+    delete:
+      tags:
+        - pipeline
+      summary: Delete pipeline
+      operationId: deletePipeline
+      description: Delete pipeline by its ID.
+      security:
+        - user: []
+        - project: []
+      responses:
+        '204':
+          description: No Content
+  '/v1/aggregator_pipelines/{pipeline}/config_history':
+    parameters:
+      - schema:
+          type: string
+          format: uuid
+        name: pipeline
+        in: path
+        required: true
+    get:
+      tags:
+        - pipeline_config
+      summary: Pipeline configuration history
+      operationId: pipelineConfigHistory
+      description: |-
+        Configuration history from a pipeline.
+        Every time a pipeline config is updated, a new history entry with the change is created.
+      security:
+        - user: []
+        - project: []
+      parameters:
+        - schema:
+            type: integer
+            format: int64
+            minimum: 0
+          in: query
+          name: last
+          description: Last history entries.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PipelineConfig'
+  '/v1/aggregator_pipelines/{pipeline}/status_history':
+    parameters:
+      - schema:
+          type: string
+          format: uuid
+        name: pipeline
+        in: path
+        required: true
+    get:
+      tags:
+        - pipeline_status
+      summary: Pipeline status history
+      operationId: pipelineStatusHistory
+      description: |-
+        Status history from a pipeline.
+        Every time a pipeline status is changed, a new history entry with the change is created.
+      security:
+        - user: []
+        - project: []
+      parameters:
+        - schema:
+            type: integer
+            format: int64
+            minimum: 0
+          in: query
+          name: last
+          description: Last history entries.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PipelineStatus'
+  '/v1/aggregator_pipelines/{pipelineID}/files':
+    parameters:
+      - schema:
+          type: string
+          format: uuid
+        name: pipelineID
+        in: path
+        required: true
+    post:
+      tags:
+        - pipeline_file
+      summary: Create pipeline file
+      operationId: createPipelineFile
+      description: |-
+        Create file within a pipeline.
+        The given name is unique within the pipeline.
+        These files can be referenced by their name within a fluentbit configuration file like so `{{files.thename}}`.
+        Use them to share common stuff like parsers.
+      security:
+        - user: []
+        - project: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePipelineFile'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreatedPipelineFile'
+    get:
+      tags:
+        - pipeline_file
+      summary: Pipeline files
+      operationId: pipelineFiles
+      description: Files from a pipeline.
+      security:
+        - user: []
+        - project: []
+      parameters:
+        - schema:
+            type: integer
+            format: int64
+            minimum: 0
+          in: query
+          name: last
+          description: Last files.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PipelineFile'
+  '/v1/pipeline_files/{fileID}':
+    parameters:
+      - schema:
+          type: string
+          format: uuid
+        name: fileID
+        in: path
+        required: true
+    get:
+      tags:
+        - pipeline_file
+      summary: Pipeline file
+      operationId: pipelineFile
+      description: File by ID.
+      security:
+        - user: []
+        - project: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PipelineFile'
+    patch:
+      tags:
+        - pipeline_file
+      summary: Update pipeline file
+      operationId: updatePipelineFile
+      description: Update file by its ID.
+      security:
+        - user: []
+        - project: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePipelineFile'
+      responses:
+        '204':
+          description: No Content
+    delete:
+      tags:
+        - pipeline_file
+      summary: Delete pipeline file
+      operationId: deletePipelineFile
+      description: |-
+        Delete pipeline file by its ID.
+        The file cannot be deleted if some pipeline config is still referencing it;
+        you must delete the pipeline first if you want to delete the file.
+      security:
+        - user: []
+        - project: []
+      responses:
+        '204':
+          description: No Content
+  '/v1/aggregator_pipelines/{pipelineID}/secrets':
+    parameters:
+      - schema:
+          type: string
+          format: uuid
+        name: pipelineID
+        in: path
+        required: true
+    post:
+      tags:
+        - pipeline_secret
+      summary: Create pipeline secret
+      operationId: createPipelineSecret
+      description: |-
+        Create secret within a pipeline.
+        The given name is unique within the pipeline.
+        These secrets can be referenced by their name within a fluentbit configuration file like so `{{secrets.thename}}`.
+        Use them to hide sensible values from your config file.
+      security:
+        - user: []
+        - project: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePipelineSecret'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreatedPipelineSecret'
+    get:
+      tags:
+        - pipeline_secret
+      summary: Pipeline secrets
+      operationId: pipelineSecrets
+      description: Secrets from a pipeline.
+      security:
+        - user: []
+        - project: []
+      parameters:
+        - schema:
+            type: integer
+            format: int64
+            minimum: 0
+          in: query
+          name: last
+          description: Last secrets.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PipelineSecret'
+  '/v1/pipeline_secrets/{secretID}':
+    parameters:
+      - schema:
+          type: string
+          format: uuid
+        name: secretID
+        in: path
+        required: true
+    get:
+      tags:
+        - pipeline_secret
+      summary: Pipeline secret
+      operationId: pipelineSecret
+      description: Secret by ID.
+      security:
+        - user: []
+        - project: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PipelineSecret'
+    patch:
+      tags:
+        - pipeline_secret
+      summary: Update pipeline secret
+      operationId: updatePipelineSecret
+      description: Update secret by its ID.
+      security:
+        - user: []
+        - project: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePipelineSecret'
+      responses:
+        '204':
+          description: No Content
+    delete:
+      tags:
+        - pipeline_secret
+      summary: Delete pipeline secret
+      operationId: deletePipelineSecret
+      description: |-
+        Delete pipeline secret by its ID.
+        The secret cannot be deleted if some pipeline config is still referencing it;
+        you must delete the pipeline first if you want to delete the secret.
+      security:
+        - user: []
+        - project: []
+      responses:
+        '204':
+          description: No Content
+  '/v1/aggregator_pipelines/{pipelineID}/ports':
+    parameters:
+      - schema:
+          type: string
+          format: uuid
+        name: pipelineID
+        in: path
+        required: true
+    post:
+      tags:
+        - pipeline_port
+      summary: Create pipeline port
+      operationId: createPipelinePort
+      description: |-
+        Create port within a pipeline.
+        Ports can automatically be parsed from a config file, but this action allows you to programatically add more.
+      security:
+        - user: []
+        - project: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePipelinePort'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreatedPipelinePort'
+    get:
+      tags:
+        - pipeline_port
+      summary: Pipeline ports
+      operationId: pipelinePorts
+      description: Ports from a pipeline.
+      security:
+        - user: []
+        - project: []
+      parameters:
+        - schema:
+            type: integer
+            format: int64
+            minimum: 0
+          in: query
+          name: last
+          description: Last ports.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PipelinePort'
+  '/v1/pipeline_ports/{portID}':
+    parameters:
+      - schema:
+          type: string
+          format: uuid
+        name: portID
+        in: path
+        required: true
+    get:
+      tags:
+        - pipeline_port
+      summary: Pipeline port
+      operationId: pipelinePort
+      description: Port by ID.
+      security:
+        - user: []
+        - project: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PipelinePort'
+    patch:
+      tags:
+        - pipeline_port
+      summary: Update pipeline port
+      operationId: updatePipelinePort
+      description: Update port by its ID.
+      security:
+        - user: []
+        - project: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePipelinePort'
+      responses:
+        '204':
+          description: No Content
+    delete:
+      tags:
+        - pipeline_port
+      summary: Delete pipeline port
+      operationId: deletePipelinePort
+      description: Delete port by its ID.
+      security:
+        - user: []
+        - project: []
+      responses:
+        '204':
+          description: No Content
+  '/v1/config_validate/{agentType}':
+    parameters:
+      - schema:
+          type: string
+          enum:
+            - fluentbit
+            - fluentd
+        name: agentType
+        in: path
+        required: true
+    post:
+      tags:
+        - config_validator
+      summary: Validate configuration
+      operationId: validateConfig
+      description: |-
+        Validates that an already parsed fluentbit or fluentd config is semantically valid.
+        To parse the raw agent config take a look at https://github.com/calyptia/fluent-bit-config-parser.
+      security:
+        - user: []
+        - project: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ValidatingConfig'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidatedConfig'
+  '/v1/config_validate_v2':
+    post:
+      tags:
+        - config_validator_v2
+      summary: Validate configuration on the v2 endpoint of the service
+      operationId: validateConfigV2
+      description: |-
+        Validates that an already parsed fluentbit config is semantically valid under the V2 error specification
+        To parse the raw agent config take a look at https://github.com/calyptia/fluent-bit-config-parser.
+      security:
+        - user: []
+        - project: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ValidatingConfig'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidatedConfigV2'
+
+  # TODO: due to limitations on the way x-msgpack body fields are processed
+  # by schemathesis, we aren't not exposing this endpoint yet until
+  # we have a valid cmetrics encoder.
+  #"/v1/agent_metrics":
+  #    post:
+  #      tags:
+  #        - metric
+  #      summary: Add agent metrics
+  #      operationId: addAgentMetrics
+  #      description: |-
+  #        Store the incomming metrics from the agent.
+  #      security:
+  #        - project: []
+  #      requestBody:
+  #        content:
+  #          application/x-msgpack:
+  #            schema:
+  #              type: string
+  #              format: binary
+  #              description: |-
+  #                Msgpack encoded metrics using cmetrics library.
+  #      responses:
+  #        "201":
+  #          description: Created
+  #          content:
+  #            application/json:
+  #              schema:
+  #                type: object
+  #                description: Total number of inserted metrics.
+  #                properties:
+  #                  totalInserted:
+  #                    type: integer
+  #                    format: int64
+  #                    minimum: 0
+  #                required:
+  #                  - totalInserted
+  '/v1/projects/{projectID}/metrics':
+    parameters:
+      - schema:
+          type: string
+          format: uuid
+        name: projectID
+        in: path
+        required: true
+    get:
+      tags:
+        - metric
+      summary: Project metrics
+      operationId: projectMetrics
+      description: |-
+        Contains an overview of the aggregated metrics for a project.
+        It includes metrics link the amount of records, bytes, and errors per plugin.
+      security:
+        - user: []
+        - project: []
+      parameters:
+        - schema:
+            type: string
+            format: duration
+            default: '-24h'
+          name: start
+          in: query
+        - schema:
+            type: string
+            format: duration
+            default: 1h
+          name: interval
+          in: query
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectMetrics'
+  '/v1/agents/{agentID}/metrics':
+    parameters:
+      - schema:
+          type: string
+          format: uuid
+        name: agentID
+        in: path
+        required: true
+    get:
+      tags:
+        - metric
+      summary: Agent metrics
+      operationId: agentMetrics
+      description: |-
+        Contains an overview of the aggregated metrics for an agent.
+        It includes metrics link the amount of records, bytes, and errors per plugin.
+      security:
+        - user: []
+        - project: []
+      parameters:
+        - schema:
+            type: string
+            format: duration
+            default: '-24h'
+          name: start
+          in: query
+        - schema:
+            type: string
+            format: duration
+            default: 1h
+          name: interval
+          in: query
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AgentMetrics'
+  '/v1/pipeline_metrics/{pipelineID}':
+    parameters:
+      - schema:
+          type: string
+          format: uuid
+        name: pipelineID
+        in: path
+        required: true
+    get:
+      tags:
+        - metric
+      summary: Pipeline metrics
+      operationId: pipelineMetrics
+      description: |-
+        Contains an overview of the aggregated metrics for a pipeline.
+        It includes metrics link the amount of records, bytes, and errors per plugin.
+      security:
+        - user: []
+        - project: []
+      parameters:
+        - schema:
+            type: string
+            format: duration
+            default: '-24h'
+          name: start
+          in: query
+        - schema:
+            type: string
+            format: duration
+            default: 1h
+          name: interval
+          in: query
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AgentMetrics'
+  '/v1/aggregator_metrics/{aggregatorID}':
+    parameters:
+      - name: aggregatorID
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    get:
+      parameters:
+        - name: start
+          required: false
+          in: query
+          description: |
+            Option to filter metrics since the given time ago
+          schema:
+            type: string
+            format: duration
+            default: -24h
+        - name: interval
+          required: false
+          in: query
+          description: |
+            Option to set the time window to group metrics
+          schema:
+            type: string
+            format: duration
+            default: 1h
+      security:
+        - user: []
+        - project: []
+      summary: Aggregator metrics
+      operationId: aggregatorMetrics
+      tags:
+        - metric
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AggregatorMetrics'

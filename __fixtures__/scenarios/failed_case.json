@@ -1,13 +1,26 @@
 {
   "errors": {
-    "runtime": [],
+    "runtime": [{ "id": "47b5f893-b617-498f-a644-09bbdf88f014", "errors": ["cannot initialize input plugin: john"] }],
     "input": {
-      "john": ["cannot initialize input plugin: john"],
-      "syslog": ["Unknown syslog mode abc"]
+      "syslog": [
+        {
+          "id": "49e66e6c-aac6-4ef4-8a9d-8829b91c72d2",
+          "property": "start",
+          "text": "",
+          "errors": ["Unknown syslog mode abc"]
+        }
+      ]
     },
     "output": {},
     "filter": {
-      "parser": ["missing 'key_name'"]
+      "parser": [
+        {
+          "id": "9df81e1e-0504-4f8e-a186-7f19d432651c",
+          "property": "start",
+          "text": "",
+          "errors": ["missing 'key_name'"]
+        }
+      ]
     }
   }
 }

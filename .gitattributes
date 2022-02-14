@@ -1,0 +1,2 @@
+   generated/**/*.ts   -diff -merge 
+    generated/**/*.ts linguist-generated=true

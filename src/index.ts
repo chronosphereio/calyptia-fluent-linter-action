@@ -9,16 +9,15 @@ import {
   FALSE_VALUE,
   PROBLEM_MATCHER_FILE_NAME,
 } from './utils/constants';
-import { Annotation, FieldErrors, normalizeErrors, relativeFilePath } from './utils/normalizeErrors';
+import { Annotation, normalizeErrors, getRelativeFilePath } from './utils/normalizeErrors';
 import { formatErrorsPerFile } from './formatErrorsPerFile';
 import { resolve } from 'path';
+import type { ValidatedConfigV2 } from '../generated/calyptia';
 export enum InputValues {
   CONFIG_LOCATION_GLOB = 'CONFIG_LOCATION_GLOB',
   CALYPTIA_API_KEY = 'CALYPTIA_API_KEY',
   FOLLOW_SYMBOLIC_LINKS = 'FOLLOW_SYMBOLIC_LINKS',
 }
-
-type ValidationResponse = { errors?: FieldErrors };
 
 const getActionInput = () => {
   return Object.keys(InputValues).reduce((memo, prop) => {
@@ -42,6 +41,7 @@ export const main = async (): Promise<void> => {
   }
 
   let annotations = [] as Annotation[];
+  let config: FluentBitSchema;
   const location = resolve(__dirname, PROBLEM_MATCHER_FILE_NAME);
   console.log(`::add-matcher::${location}`);
 
@@ -61,14 +61,14 @@ export const main = async (): Promise<void> => {
       };
 
       try {
-        const config = new FluentBitSchema(content, filePath);
+        config = new FluentBitSchema(content, filePath);
         const response = (await fetch(URL, {
           method: 'POST',
-          body: JSON.stringify(config.schema),
+          body: JSON.stringify({ config: config.schema }),
           headers,
         })) as Response;
 
-        const data = (await response.json()) as unknown as ValidationResponse;
+        const data = (await response.json()) as ValidatedConfigV2;
 
         if (response.status === 200) {
           debug(`[${filePath}]: ${JSON.stringify(data)}`);
@@ -85,7 +85,7 @@ export const main = async (): Promise<void> => {
       } catch (e) {
         if (e instanceof TokenError) {
           const { filePath: _filePath, line, col, message } = e as TokenError;
-          const errorReport = formatErrorsPerFile(relativeFilePath(_filePath), [['PARSE', [[line, col, message]]]]);
+          const errorReport = formatErrorsPerFile(getRelativeFilePath(_filePath), [[line, col, message]]);
           console.log(errorReport);
         } else {
           setFailed((e as Error).message);
@@ -96,13 +96,14 @@ export const main = async (): Promise<void> => {
   }
 
   if (annotations.length) {
-    const groupedByFile = annotations.reduce((memo, { filePath, errorGroups }) => {
-      memo[filePath] = memo[filePath] ? [...memo[filePath], ...errorGroups] : errorGroups;
+    const groupedByFile = annotations.reduce((memo, { filePath, errors }) => {
+      memo[filePath] = memo[filePath] ? [...memo[filePath], ...errors] : errors;
 
       return memo;
     }, {} as Record<string, unknown[]>);
     for (const file in groupedByFile) {
-      console.log(formatErrorsPerFile(file, groupedByFile[file] as Annotation['errorGroups']));
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      console.log(formatErrorsPerFile(file, groupedByFile[file] as Annotation['errors'], config!));
     }
     setFailed('We found errors in your configurations. Please check your logs');
   }

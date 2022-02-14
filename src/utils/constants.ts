@@ -1,6 +1,6 @@
 import { getBorderCharacters } from 'table';
 export const CALYPTIA_API_ENDPOINT = 'https://cloud-api.calyptia.com';
-export const CALYPTIA_API_VALIDATION_PATH = 'v1/config_validate/fluentbit';
+export const CALYPTIA_API_VALIDATION_PATH = 'v1/config_validate_v2';
 
 export const PROBLEM_MATCHER_FILE_NAME = 'problem-matcher.json';
 

@@ -46,7 +46,7 @@ describe('fluent-linter-action', () => {
           "::add-matcher::<PROJECT_ROOT>/src/problem-matcher.json",
         ],
         Array [
-          "<PROJECT_ROOT>/__fixtures__/scenarios/withInclude/wrongPathInclude.conf: 1:1 error PARSE Can not read file tail.conf 
+          "<PROJECT_ROOT>/__fixtures__/scenarios/withInclude/wrongPathInclude.conf: 1:1 error LINTER Can not find file tail.conf 
       ",
         ],
       ]
@@ -114,7 +114,6 @@ describe('fluent-linter-action', () => {
     mockedInput.CONFIG_LOCATION_GLOB = '__fixtures__/invalid.conf';
     const client = nock(CALYPTIA_API_ENDPOINT);
     client['post']('/' + CALYPTIA_API_VALIDATION_PATH).reply(200, failCase);
-
     await main();
     expect(setFailed.mock.calls).toMatchInlineSnapshot(`
       Array [
@@ -129,9 +128,9 @@ describe('fluent-linter-action', () => {
           "::add-matcher::<PROJECT_ROOT>/src/problem-matcher.json",
         ],
         Array [
-          "<PROJECT_ROOT>/__fixtures__/invalid.conf: 0:0 error john   cannot initialize input plugin: john 
-      <PROJECT_ROOT>/__fixtures__/invalid.conf: 0:0 error syslog Unknown syslog mode abc              
-      <PROJECT_ROOT>/__fixtures__/invalid.conf: 0:0 error parser missing 'key_name'                   
+          "<PROJECT_ROOT>/__fixtures__/invalid.conf: 0:0 error LINTER cannot initialize input plugin: john 
+      <PROJECT_ROOT>/__fixtures__/invalid.conf: 0:0 error LINTER Unknown syslog mode abc              
+      <PROJECT_ROOT>/__fixtures__/invalid.conf: 0:0 error LINTER missing 'key_name'                   
       ",
         ],
       ]
@@ -178,7 +177,7 @@ describe('fluent-linter-action', () => {
     expect(setFailed.mock.calls).toMatchInlineSnapshot(`
       Array [
         Array [
-          "request to https://cloud-api.calyptia.com/v1/config_validate/fluentbit failed, reason: Server Error",
+          "request to https://cloud-api.calyptia.com/v1/config_validate_v2 failed, reason: Server Error",
         ],
         Array [
           "We found an error, please check, please check your logs",

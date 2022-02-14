@@ -1,9 +1,11 @@
 import { join } from 'path';
+import type { ValidatedConfigV2 } from '../../generated/calyptia';
 
-export type FieldErrors = Record<string, Record<string, string[]>>;
-type Reasons = string[] | [line: number, col: number, reason: string][];
-type ErrorGroup = [group: string, reasons: Reasons];
-export type Annotation = { filePath: string; errorGroups: ErrorGroup[]; section: string };
+type IdError = [id: string, message: string];
+
+export type FullError = [line: number, col: number, reason: string];
+type ErrorGroup = IdError | FullError;
+export type Annotation = { filePath: string; errors: ErrorGroup[] };
 
 declare let process: {
   env: {
@@ -11,19 +13,34 @@ declare let process: {
   };
 };
 
-export function relativeFilePath(filePath: string): string {
+export function getRelativeFilePath(filePath: string): string {
   return filePath.replace(join(process.env.GITHUB_WORKSPACE, '/'), '');
 }
-export function normalizeErrors(filePath: string, { runtime, ...errors }: FieldErrors): Annotation[] {
-  const annotations = Object.entries(errors).reduce((memo, [command, issues]) => {
-    if (Object.keys(issues).length) {
-      const errorGroups = Object.entries(issues);
+export function normalizeErrors(filePath: string, errors: ValidatedConfigV2['errors']): Annotation[] {
+  const annotations = [] as Annotation[];
 
-      return [...memo, { filePath: relativeFilePath(filePath), section: command, errorGroups }];
+  const relativeFilePath = getRelativeFilePath(filePath);
+
+  const { runtime, ...rest } = errors;
+
+  if (runtime.length) {
+    for (const error of runtime) {
+      if ('id' in error && 'errors' in error) {
+        annotations.push({ filePath: relativeFilePath, errors: error.errors.map((err: string) => [error.id, err]) });
+      }
     }
+  }
+  for (const command in rest) {
+    const issues = rest[command as keyof typeof rest];
 
-    return memo;
-  }, [] as Annotation[]);
+    if (Object.keys(issues).length) {
+      const errors = Object.entries(issues).reduce((memo, [, errs]) => {
+        return [...memo, ...errs.map(({ id, errors }) => [id, errors.join('\n')] as ErrorGroup)];
+      }, [] as ErrorGroup[]);
+
+      annotations.push({ filePath: relativeFilePath, errors });
+    }
+  }
 
   return annotations;
 }
