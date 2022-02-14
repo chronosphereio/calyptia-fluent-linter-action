@@ -8,8 +8,12 @@ inputs:
     description: 'Head over to [Calyptia Cloud](https://cloud.calyptia.com/) and login (you can use your GitHub account). On the left panel, find _Account > settings > Generate API key_. make sure to store the token as a secret in your repository. the secret should be called `CALYPTIA_API_KEY`'
     required: true
   CONFIG_LOCATION_GLOB:
-    description: Make sure to change `CONFIG_LOCATION_GLOB` to a [glob](https://en.wikipedia.org/wiki/Glob_(programming)) that points to your `fluentd` and `Fluent Bit` configuration within the repository. you can use [this page](https://globster.xyz/) to make sure your glob will match the necessary files. ( example `*.conf` )'
+    description: Make sure to change `CONFIG_LOCATION_GLOB` to a [glob](https://en.wikipedia.org/wiki/Glob_(programming)) that points to your `fluentd` and `Fluent Bit` configuration within the repository. you can use [this page](https://globster.xyz/) to make sure your glob will match the necessary files. (example `*.conf`)'
     required: true
+  FOLLOW_SYMBOLIC_LINKS:
+    description: 'Indicates whether to follow symbolic links'
+    default: 'true'
+    required: false
 runs:
   using: 'node16'
   main: 'dist/index.js'

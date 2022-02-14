@@ -3,13 +3,19 @@ import * as glob from '@actions/glob';
 import { readContent } from './utils/readContent';
 import { FluentBitSchema, TokenError } from '@calyptia/fluent-bit-config-parser';
 import fetch from 'node-fetch';
-import { CALYPTIA_API_ENDPOINT, CALYPTIA_API_VALIDATION_PATH, PROBLEM_MATCHER_FILE_NAME } from './utils/constants';
+import {
+  CALYPTIA_API_ENDPOINT,
+  CALYPTIA_API_VALIDATION_PATH,
+  FALSE_VALUE,
+  PROBLEM_MATCHER_FILE_NAME,
+} from './utils/constants';
 import { Annotation, FieldErrors, normalizeErrors, relativeFilePath } from './utils/normalizeErrors';
 import { formatErrorsPerFile } from './formatErrorsPerFile';
 import { resolve } from 'path';
 export enum InputValues {
   CONFIG_LOCATION_GLOB = 'CONFIG_LOCATION_GLOB',
   CALYPTIA_API_KEY = 'CALYPTIA_API_KEY',
+  FOLLOW_SYMBOLIC_LINKS = 'FOLLOW_SYMBOLIC_LINKS',
 }
 
 type ValidationResponse = { errors?: FieldErrors };
@@ -22,15 +28,24 @@ const getActionInput = () => {
 };
 
 export const main = async (): Promise<void> => {
-  const input = getActionInput();
+  const { FOLLOW_SYMBOLIC_LINKS = 'false', CONFIG_LOCATION_GLOB, CALYPTIA_API_KEY } = getActionInput();
 
-  const globber = await glob.create(input.CONFIG_LOCATION_GLOB, { matchDirectories: false });
+  const globber = await glob.create(CONFIG_LOCATION_GLOB, {
+    matchDirectories: false,
+    followSymbolicLinks: FOLLOW_SYMBOLIC_LINKS.toLowerCase() !== FALSE_VALUE,
+  });
+
+  const files = await globber.glob();
+
+  if (!files.length) {
+    setFailed(`We could not find any files from using the provided GLOB (${CONFIG_LOCATION_GLOB})`);
+  }
 
   let annotations = [] as Annotation[];
   const location = resolve(__dirname, PROBLEM_MATCHER_FILE_NAME);
   console.log(`::add-matcher::${location}`);
 
-  for await (const filePath of globber.globGenerator()) {
+  for await (const filePath of files) {
     debug(`evaluating file ${filePath}`);
 
     const content = await readContent(filePath);
@@ -42,7 +57,7 @@ export const main = async (): Promise<void> => {
 
       const headers = {
         'Content-Type': 'application/json',
-        'x-project-token': input.CALYPTIA_API_KEY,
+        'x-project-token': CALYPTIA_API_KEY,
       };
 
       try {
@@ -67,7 +82,6 @@ export const main = async (): Promise<void> => {
         } else {
           setFailed(`The request failed:  status: ${response.status}, data: ${JSON.stringify(data)}`);
         }
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (e) {
         if (e instanceof TokenError) {
           const { filePath: _filePath, line, col, message } = e as TokenError;
