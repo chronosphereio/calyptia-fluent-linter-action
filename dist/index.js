@@ -28211,9 +28211,13 @@ var getActionInput = () => {
 };
 var main = async () => {
   const { FOLLOW_SYMBOLIC_LINKS = 'false', CONFIG_LOCATION_GLOB, CALYPTIA_API_KEY } = getActionInput();
+  let followSymbolicLinks = false;
+  if (!FOLLOW_SYMBOLIC_LINKS) {
+    followSymbolicLinks = (FOLLOW_SYMBOLIC_LINKS && FOLLOW_SYMBOLIC_LINKS.toLowerCase() !== FALSE_VALUE) || false;
+  }
   const globber = await glob.create(CONFIG_LOCATION_GLOB, {
     matchDirectories: false,
-    followSymbolicLinks: FOLLOW_SYMBOLIC_LINKS.toLowerCase() !== FALSE_VALUE,
+    followSymbolicLinks,
   });
   const files = await globber.glob();
   if (!files.length) {
