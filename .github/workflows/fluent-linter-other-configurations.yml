@@ -1,0 +1,12 @@
+on: pull_request
+name: Fluent-linter
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - id: running_linter
+        uses: calyptia/fluent-linter-action@gg/new-calyptia-api
+        with:
+          CALYPTIA_API_KEY: ${{ secrets.CALYPTIA_API_KEY }}
+          CONFIG_LOCATION_GLOB: '__fixtures__/conf/*.conf'
