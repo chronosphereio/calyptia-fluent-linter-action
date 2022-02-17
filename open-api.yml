@@ -16,7 +16,7 @@ servers:
         default: '5000'
   - url: 'https://cloud-api-dev.calyptia.com'
     description: dev
-  - url: 'https://cloud-api-prod.calyptia.com'
+  - url: 'https://cloud-api.calyptia.com'
     description: prod
 tags:
   - name: user
@@ -1431,6 +1431,7 @@ components:
         text:
           description: property name, value
           type: string
+          nullable: true
         errors:
           type: array
           items:
@@ -1465,7 +1466,7 @@ components:
           properties:
             runtime:
               type: array
-              additionalProperties:
+              items:
                 $ref: '#/components/schemas/ConfigValidityV2Runtime'
             input:
               type: object

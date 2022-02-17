@@ -17,6 +17,6 @@ export type ConfigValidityV2Property = {
   /**
    * property name, value
    */
-  text: string;
+  text: string | null;
   errors: Array<string>;
 };

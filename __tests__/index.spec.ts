@@ -245,4 +245,13 @@ describe('fluent-linter-action', () => {
     expect(setFailed).not.toHaveBeenCalled();
     expect(consoleLogMock).toHaveBeenCalledTimes(1);
   });
+
+  it('does not report if configuration schema is empty (parse is not lint-able)', async () => {
+    mockedInput.CONFIG_LOCATION_GLOB = '__fixtures__/multiline_parse.conf';
+
+    await main();
+
+    expect(setFailed).not.toHaveBeenCalled();
+    expect(consoleLogMock).toHaveBeenCalledTimes(1);
+  });
 });

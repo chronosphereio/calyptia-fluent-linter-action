@@ -10547,8 +10547,12 @@ var require_dist = __commonJS({
       COMMANDS2['INPUT'] = 'INPUT';
       COMMANDS2['FILTER'] = 'FILTER';
       COMMANDS2['SERVICE'] = 'SERVICE';
-      COMMANDS2['PARSER'] = 'PARSER';
       COMMANDS2['CUSTOM'] = 'CUSTOM';
+      COMMANDS2['PARSER'] = 'PARSER';
+      COMMANDS2['MULTILINE_PARSER'] = 'MULTILINE_PARSER';
+      COMMANDS2['PLUGINS'] = 'PLUGINS';
+      COMMANDS2['UPSTREAM'] = 'UPSTREAM';
+      COMMANDS2['NODE'] = 'NODE';
       return COMMANDS2;
     })(COMMANDS || {});
     var TOKEN_TYPES_DIRECTIVES = /* @__PURE__ */ ((TOKEN_TYPES_DIRECTIVES2) => {
@@ -10566,9 +10570,18 @@ var require_dist = __commonJS({
       TOKEN_TYPES2['DIRECTIVES'] = 'DIRECTIVES';
       return TOKEN_TYPES2;
     })(TOKEN_TYPES || {});
-    var FLUENTBIT_REGEX = /(?<![#][ ]*)\[[A-Z]{1,}\]/g;
+    var FLUENTBIT_REGEX = /(?<![#][ ]*)\[[A-Z_]{1,}\]/g;
     var FLUENTBIT_INCLUDE_REGEX = /(@include+\s.*){1,}/g;
-    var EXCLUDED_TAGS = /* @__PURE__ */ new Set(['service', 'parser', 'node', 'upstream']);
+    var EXCLUDED_TAGS = /* @__PURE__ */ new Set([
+      'SERVICE'.toLowerCase(),
+      'PARSER'.toLowerCase(),
+      'PLUGINS'.toLowerCase(),
+      'MULTILINE_PARSER'.toLowerCase(),
+      'MULTILINE_PARSER'.toLowerCase(),
+      'MULTILINE_PARSER'.toLowerCase(),
+      'NODE'.toLowerCase(),
+      'UPSTREAM'.toUpperCase(),
+    ]);
     var NO_STYLES_IN_TABLE2 = {
       border: (0, import_table3.getBorderCharacters)('void'),
       columnDefault: {
@@ -28239,6 +28252,10 @@ var main = async () => {
       };
       try {
         config = new import_fluent_bit_config_parser.FluentBitSchema(content, filePath);
+        if (!config.schema.length) {
+          (0, import_core.debug)(`${filePath}: empty schema, moving on...`);
+          continue;
+        }
         const response = await (0, import_node_fetch.default)(URL2, {
           method: 'POST',
           body: JSON.stringify({ config: config.schema }),

@@ -66,6 +66,12 @@ export const main = async (): Promise<void> => {
 
       try {
         config = new FluentBitSchema(content, filePath);
+
+        if (!config.schema.length) {
+          debug(`${filePath}: empty schema, moving on...`);
+          continue;
+        }
+
         const response = (await fetch(URL, {
           method: 'POST',
           body: JSON.stringify({ config: config.schema }),
