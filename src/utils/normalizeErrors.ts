@@ -25,9 +25,7 @@ export function normalizeErrors(filePath: string, errors: ValidatedConfigV2['err
 
   if (runtime.length) {
     for (const error of runtime) {
-      if ('id' in error && 'errors' in error) {
-        annotations.push({ filePath: relativeFilePath, errors: error.errors.map((err: string) => [error.id, err]) });
-      }
+      annotations.push({ filePath: relativeFilePath, errors: error.errors.map((err: string) => [error.id, err]) });
     }
   }
   for (const command in rest) {

@@ -28162,9 +28162,7 @@ function normalizeErrors(filePath, errors) {
     rest = __objRest(_a, ['runtime']);
   if (runtime.length) {
     for (const error of runtime) {
-      if ('id' in error && 'errors' in error) {
-        annotations.push({ filePath: relativeFilePath, errors: error.errors.map((err) => [error.id, err]) });
-      }
+      annotations.push({ filePath: relativeFilePath, errors: error.errors.map((err) => [error.id, err]) });
     }
   }
   for (const command in rest) {
@@ -28224,13 +28222,9 @@ var getActionInput = () => {
 };
 var main = async () => {
   const { FOLLOW_SYMBOLIC_LINKS = 'false', CONFIG_LOCATION_GLOB, CALYPTIA_API_KEY } = getActionInput();
-  let followSymbolicLinks = false;
-  if (!FOLLOW_SYMBOLIC_LINKS) {
-    followSymbolicLinks = (FOLLOW_SYMBOLIC_LINKS && FOLLOW_SYMBOLIC_LINKS.toLowerCase() !== FALSE_VALUE) || false;
-  }
   const globber = await glob.create(CONFIG_LOCATION_GLOB, {
     matchDirectories: false,
-    followSymbolicLinks,
+    followSymbolicLinks: FOLLOW_SYMBOLIC_LINKS !== FALSE_VALUE,
   });
   const files = await globber.glob();
   if (!files.length) {
