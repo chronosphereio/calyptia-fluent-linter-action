@@ -19,7 +19,8 @@ export function formatErrorsPerFile(
       const [line, col, message] = error;
       content = [`${filePath}:`, `${line}:${col}`, ISSUE_LEVEL, 'LINTER', message];
     } else {
-      const tokens = schema?.getTokensBySectionId(error[0]);
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      const tokens = schema!.getTokensBySectionId(error[0]);
 
       if (tokens) {
         content = [`${filePath}:`, `${tokens[0].line}:${tokens[0].col}`, ISSUE_LEVEL, 'LINTER', error[1]];

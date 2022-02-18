@@ -6,6 +6,15 @@ import { CALYPTIA_API_ENDPOINT, CALYPTIA_API_VALIDATION_PATH } from '../src/util
 import { mockConsole, unMockConsole } from './helpers';
 import { problemMatcher } from '../problem-matcher.json';
 import { join } from 'path';
+import { FluentBitSchema } from '@calyptia/fluent-bit-config-parser';
+const getTokensBySectionIdMock = jest.fn(() => [
+  {
+    col: 5,
+    line: 2,
+  },
+]);
+
+jest.spyOn(FluentBitSchema.prototype, 'getTokensBySectionId').mockImplementationOnce(getTokensBySectionIdMock);
 describe('fluent-linter-action', () => {
   let consoleLogMock: jest.Mock;
   const mockedInput = {
@@ -25,6 +34,7 @@ describe('fluent-linter-action', () => {
 
   afterAll(() => {
     unMockConsole('log');
+    jest.restoreAllMocks();
   });
 
   afterEach(() => {
@@ -115,6 +125,7 @@ describe('fluent-linter-action', () => {
     const client = nock(CALYPTIA_API_ENDPOINT);
     client['post']('/' + CALYPTIA_API_VALIDATION_PATH).reply(200, failCase);
     await main();
+
     expect(setFailed.mock.calls).toMatchInlineSnapshot(`
       Array [
         Array [
@@ -128,7 +139,7 @@ describe('fluent-linter-action', () => {
           "::add-matcher::<PROJECT_ROOT>/src/problem-matcher.json",
         ],
         Array [
-          "<PROJECT_ROOT>/__fixtures__/invalid.conf: 0:0 error LINTER cannot initialize input plugin: john 
+          "<PROJECT_ROOT>/__fixtures__/invalid.conf: 2:5 error LINTER cannot initialize input plugin: john 
       <PROJECT_ROOT>/__fixtures__/invalid.conf: 0:0 error LINTER Unknown syslog mode abc              
       <PROJECT_ROOT>/__fixtures__/invalid.conf: 0:0 error LINTER missing 'key_name'                   
       ",
@@ -163,6 +174,7 @@ describe('fluent-linter-action', () => {
       }
     }
 
+    expect(getTokensBySectionIdMock).toHaveBeenCalled();
     expect(client.isDone()).toBe(true);
   });
 
