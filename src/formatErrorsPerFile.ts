@@ -1,23 +1,34 @@
 import type { Annotation } from './utils/normalizeErrors';
 import { table } from 'table';
 import { NO_STYLES_IN_TABLE } from './utils/constants';
-import { isString } from './utils/guards';
+import { isFullError } from './utils/guards';
+import type { FluentBitSchema } from '@calyptia/fluent-bit-config-parser';
 
 const DEFAULT_LINE_AND_COLUMN = '0:0';
 const ISSUE_LEVEL = 'error';
-export function formatErrorsPerFile(filePath: string, errorGroups: Annotation['errorGroups']): string {
+export function formatErrorsPerFile(
+  filePath: string,
+  errorGroups: Annotation['errors'],
+  schema?: FluentBitSchema
+): string {
   const data = [] as string[][];
 
-  for (const [group, errors] of errorGroups) {
-    for (const reason of errors) {
-      if (isString(reason)) {
-        data.push([`${filePath}:`, DEFAULT_LINE_AND_COLUMN, ISSUE_LEVEL, group, reason]);
+  for (const error of errorGroups) {
+    let content = [];
+    if (isFullError(error)) {
+      const [line, col, message] = error;
+      content = [`${filePath}:`, `${line}:${col}`, ISSUE_LEVEL, 'LINTER', message];
+    } else {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      const tokens = schema!.getTokensBySectionId(error[0]);
+
+      if (tokens) {
+        content = [`${filePath}:`, `${tokens[0].line}:${tokens[0].col}`, ISSUE_LEVEL, 'LINTER', error[1]];
       } else {
-        const [line, col, message] = reason;
-        data.push([`${filePath}:`, `${line}:${col}`, ISSUE_LEVEL, group, message]);
+        content = [`${filePath}:`, DEFAULT_LINE_AND_COLUMN, ISSUE_LEVEL, 'LINTER', error[1]];
       }
     }
+    data.push(content);
   }
-
   return table(data, NO_STYLES_IN_TABLE);
 }

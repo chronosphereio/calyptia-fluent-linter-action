@@ -46,6 +46,9 @@
     "printWidth": 120
   },
   "eslintConfig": {
+    "ignorePatterns": [
+      "generated/"
+    ],
     "extends": [
       "plugin:@typescript-eslint/recommended",
       "plugin:prettier/recommended"

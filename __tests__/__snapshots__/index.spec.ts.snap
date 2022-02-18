@@ -2,9 +2,9 @@
 
 exports[`fluent-linter-action Reports errors correctly matching problemMatcher: __fixtures__/invalid.conf 1`] = `
 Object {
-  "column": "0",
+  "column": "5",
   "file": "<PROJECT_ROOT>/__fixtures__/invalid.conf",
-  "line": "0",
+  "line": "2",
   "message": "cannot initialize input plugin: john ",
   "severity": "error",
 }

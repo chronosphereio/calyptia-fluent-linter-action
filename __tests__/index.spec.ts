@@ -6,6 +6,15 @@ import { CALYPTIA_API_ENDPOINT, CALYPTIA_API_VALIDATION_PATH } from '../src/util
 import { mockConsole, unMockConsole } from './helpers';
 import { problemMatcher } from '../problem-matcher.json';
 import { join } from 'path';
+import { FluentBitSchema } from '@calyptia/fluent-bit-config-parser';
+const getTokensBySectionIdMock = jest.fn(() => [
+  {
+    col: 5,
+    line: 2,
+  },
+]);
+
+jest.spyOn(FluentBitSchema.prototype, 'getTokensBySectionId').mockImplementationOnce(getTokensBySectionIdMock);
 describe('fluent-linter-action', () => {
   let consoleLogMock: jest.Mock;
   const mockedInput = {
@@ -25,6 +34,7 @@ describe('fluent-linter-action', () => {
 
   afterAll(() => {
     unMockConsole('log');
+    jest.restoreAllMocks();
   });
 
   afterEach(() => {
@@ -46,7 +56,7 @@ describe('fluent-linter-action', () => {
           "::add-matcher::<PROJECT_ROOT>/src/problem-matcher.json",
         ],
         Array [
-          "<PROJECT_ROOT>/__fixtures__/scenarios/withInclude/wrongPathInclude.conf: 1:1 error PARSE Can not read file tail.conf 
+          "<PROJECT_ROOT>/__fixtures__/scenarios/withInclude/wrongPathInclude.conf: 1:1 error LINTER Can not find file tail.conf 
       ",
         ],
       ]
@@ -114,8 +124,8 @@ describe('fluent-linter-action', () => {
     mockedInput.CONFIG_LOCATION_GLOB = '__fixtures__/invalid.conf';
     const client = nock(CALYPTIA_API_ENDPOINT);
     client['post']('/' + CALYPTIA_API_VALIDATION_PATH).reply(200, failCase);
-
     await main();
+
     expect(setFailed.mock.calls).toMatchInlineSnapshot(`
       Array [
         Array [
@@ -129,9 +139,9 @@ describe('fluent-linter-action', () => {
           "::add-matcher::<PROJECT_ROOT>/src/problem-matcher.json",
         ],
         Array [
-          "<PROJECT_ROOT>/__fixtures__/invalid.conf: 0:0 error john   cannot initialize input plugin: john 
-      <PROJECT_ROOT>/__fixtures__/invalid.conf: 0:0 error syslog Unknown syslog mode abc              
-      <PROJECT_ROOT>/__fixtures__/invalid.conf: 0:0 error parser missing 'key_name'                   
+          "<PROJECT_ROOT>/__fixtures__/invalid.conf: 2:5 error LINTER cannot initialize input plugin: john 
+      <PROJECT_ROOT>/__fixtures__/invalid.conf: 0:0 error LINTER Unknown syslog mode abc              
+      <PROJECT_ROOT>/__fixtures__/invalid.conf: 0:0 error LINTER missing 'key_name'                   
       ",
         ],
       ]
@@ -164,6 +174,7 @@ describe('fluent-linter-action', () => {
       }
     }
 
+    expect(getTokensBySectionIdMock).toHaveBeenCalled();
     expect(client.isDone()).toBe(true);
   });
 
@@ -178,7 +189,7 @@ describe('fluent-linter-action', () => {
     expect(setFailed.mock.calls).toMatchInlineSnapshot(`
       Array [
         Array [
-          "request to https://cloud-api.calyptia.com/v1/config_validate/fluentbit failed, reason: Server Error",
+          "request to https://cloud-api.calyptia.com/v1/config_validate_v2 failed, reason: Server Error",
         ],
         Array [
           "We found an error, please check, please check your logs",
@@ -240,6 +251,15 @@ describe('fluent-linter-action', () => {
 
   it('does not report if configuration is not Fluent Bit/Fluentd', async () => {
     mockedInput.CONFIG_LOCATION_GLOB = '__fixtures__/nginx.conf';
+
+    await main();
+
+    expect(setFailed).not.toHaveBeenCalled();
+    expect(consoleLogMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not report if configuration schema is empty (parse is not lint-able)', async () => {
+    mockedInput.CONFIG_LOCATION_GLOB = '__fixtures__/multiline_parse.conf';
 
     await main();
 

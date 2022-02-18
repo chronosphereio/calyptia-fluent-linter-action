@@ -10547,8 +10547,12 @@ var require_dist = __commonJS({
       COMMANDS2['INPUT'] = 'INPUT';
       COMMANDS2['FILTER'] = 'FILTER';
       COMMANDS2['SERVICE'] = 'SERVICE';
-      COMMANDS2['PARSER'] = 'PARSER';
       COMMANDS2['CUSTOM'] = 'CUSTOM';
+      COMMANDS2['PARSER'] = 'PARSER';
+      COMMANDS2['MULTILINE_PARSER'] = 'MULTILINE_PARSER';
+      COMMANDS2['PLUGINS'] = 'PLUGINS';
+      COMMANDS2['UPSTREAM'] = 'UPSTREAM';
+      COMMANDS2['NODE'] = 'NODE';
       return COMMANDS2;
     })(COMMANDS || {});
     var TOKEN_TYPES_DIRECTIVES = /* @__PURE__ */ ((TOKEN_TYPES_DIRECTIVES2) => {
@@ -10566,9 +10570,18 @@ var require_dist = __commonJS({
       TOKEN_TYPES2['DIRECTIVES'] = 'DIRECTIVES';
       return TOKEN_TYPES2;
     })(TOKEN_TYPES || {});
-    var FLUENTBIT_REGEX = /(?<![#][ ]*)\[[A-Z]{1,}\]/g;
+    var FLUENTBIT_REGEX = /(?<![#][ ]*)\[[A-Z_]{1,}\]/g;
     var FLUENTBIT_INCLUDE_REGEX = /(@include+\s.*){1,}/g;
-    var EXCLUDED_TAGS = /* @__PURE__ */ new Set(['service', 'parser', 'node', 'upstream']);
+    var EXCLUDED_TAGS = /* @__PURE__ */ new Set([
+      'SERVICE'.toLowerCase(),
+      'PARSER'.toLowerCase(),
+      'PLUGINS'.toLowerCase(),
+      'MULTILINE_PARSER'.toLowerCase(),
+      'MULTILINE_PARSER'.toLowerCase(),
+      'MULTILINE_PARSER'.toLowerCase(),
+      'NODE'.toLowerCase(),
+      'UPSTREAM'.toUpperCase(),
+    ]);
     var NO_STYLES_IN_TABLE2 = {
       border: (0, import_table3.getBorderCharacters)('void'),
       columnDefault: {
@@ -10584,10 +10597,10 @@ var require_dist = __commonJS({
     })(CUSTOM_SECTIONS_NAMES || {});
     var isFluentBit = (config) => !!(config.match(FLUENTBIT_REGEX) || config.match(FLUENTBIT_INCLUDE_REGEX));
     var isValidFluentBitSection = (schema) => !!schema && !EXCLUDED_TAGS.has(schema.command.toLowerCase());
-    var isString2 = (value) => typeof value === 'string';
-    var isCommandType = (type) => isString2(type) && Object.keys(COMMANDS).includes(type);
+    var isString = (value) => typeof value === 'string';
+    var isCommandType = (type) => isString(type) && Object.keys(COMMANDS).includes(type);
     var isCustomSectionName = (block) =>
-      !!isString2(block.name) &&
+      !!isString(block.name) &&
       (block.name.includes(CUSTOM_SECTIONS_NAMES.FLUENTBIT_METRICS) ||
         block.name.includes(CUSTOM_SECTIONS_NAMES.CALYPTIA));
     var import_moo = __toModule(require_moo());
@@ -10661,10 +10674,11 @@ ${value}`);
       const normalizedField = field.toLowerCase();
       return normalizedField === 'match_regex' ? 'match' : normalizedField;
     }
+    var DIRECTIVE_EXTRACTION_REGEX = /@(\w+)\s+[a-zA-Z.\/].*/;
     var caseInsensitiveKeywords = (defs) => {
       const keys = (0, import_moo.keywords)(defs);
       return (value) => {
-        const matches = value.match(/@(\w+)\s+\w+/) || [];
+        const matches = value.match(DIRECTIVE_EXTRACTION_REGEX) || [];
         try {
           return keys(matches[1].toUpperCase());
         } catch (e) {
@@ -10679,8 +10693,8 @@ ${value}`);
           {
             match: /@\w+\s+.*/,
             type: caseInsensitiveKeywords(TOKEN_TYPES_DIRECTIVES),
-            value: (value) => {
-              const [, directive, ...rest] = value.trim().split(/(@\w+)/i);
+            value: (text) => {
+              const [, directive, ...rest] = text.trim().split(/(@\w+)/i);
               return `${directive.toUpperCase()} ${rest.join('').trim()}`;
             },
           },
@@ -10704,7 +10718,13 @@ ${value}`);
         [TOKEN_TYPES.CLOSE_BLOCK]: { match: ']', push: 'main' },
       },
     };
-    function tokenize(config, filePath, directives, pathMemo = /* @__PURE__ */ new Set()) {
+    function tokenize({
+      config,
+      filePath,
+      directives,
+      pathMemo = /* @__PURE__ */ new Set(),
+      options = { ignoreFullPaths: false },
+    }) {
       if (!config.replace(/\s/g, '')) {
         throw new TokenError2('File is empty', filePath, 0, 0);
       }
@@ -10737,6 +10757,9 @@ ${value}`);
               token.col
             );
           }
+          if ((0, import_posix.isAbsolute)(includeFilePath) && options.ignoreFullPaths) {
+            continue;
+          }
           let includeConfig = '';
           const fullPath = (0, import_path3.join)((0, import_posix.dirname)(filePath), includeFilePath);
           try {
@@ -10755,10 +10778,10 @@ ${value}`);
             if (e instanceof TokenError2) {
               throw e;
             }
-            throw new TokenError2(`Can not read file ${includeFilePath}`, filePath, token.line, token.col);
+            throw new TokenError2(`Can not find file ${includeFilePath}`, filePath, token.line, token.col);
           }
           directives.push(__spreadProps2(__spreadValues2({}, token), { filePath: fullPath }));
-          const includeTokens = tokenize(includeConfig, fullPath, directives, pathMemo);
+          const includeTokens = tokenize({ config: includeConfig, filePath: fullPath, directives, pathMemo });
           tokens = [...tokens, ...includeTokens];
         } else {
           tokens.push(__spreadProps2(__spreadValues2({}, token), { filePath }));
@@ -10811,11 +10834,16 @@ ${value}`);
       return (0, import_posix.isAbsolute)(filePath) ? filePath : (0, import_fs2.realpathSync)(filePath);
     }
     var FluentBitSchema2 = class {
-      constructor(source, filePath) {
+      constructor(source, filePath, tokenizeOptions = { ignoreFullPaths: false }) {
         this._source = source;
         this._filePath = filePath;
         this._directives = [];
-        this._tokens = tokenize(source, getFullPath(filePath), this._directives);
+        this._tokens = tokenize({
+          config: source,
+          filePath: getFullPath(filePath),
+          directives: this._directives,
+          options: tokenizeOptions,
+        });
         this._tokenIndex = new TokenIndex();
       }
       static isFluentBitConfiguration(source) {
@@ -28109,7 +28137,7 @@ var import_node_fetch = __toESM(require_lib2());
 // src/utils/constants.ts
 var import_table = __toESM(require_src());
 var CALYPTIA_API_ENDPOINT = 'https://cloud-api.calyptia.com';
-var CALYPTIA_API_VALIDATION_PATH = 'v1/config_validate/fluentbit';
+var CALYPTIA_API_VALIDATION_PATH = 'v1/config_validate_v2';
 var PROBLEM_MATCHER_FILE_NAME = 'problem-matcher.json';
 var FALSE_VALUE = 'false';
 var NO_STYLES_IN_TABLE = {
@@ -28123,20 +28151,29 @@ var NO_STYLES_IN_TABLE = {
 
 // src/utils/normalizeErrors.ts
 var import_path = require('path');
-function relativeFilePath(filePath) {
+function getRelativeFilePath(filePath) {
   return filePath.replace((0, import_path.join)(process.env.GITHUB_WORKSPACE, '/'), '');
 }
-function normalizeErrors(filePath, _a) {
-  var _b = _a,
-    { runtime } = _b,
-    errors = __objRest(_b, ['runtime']);
-  const annotations = Object.entries(errors).reduce((memo, [command, issues]) => {
-    if (Object.keys(issues).length) {
-      const errorGroups = Object.entries(issues);
-      return [...memo, { filePath: relativeFilePath(filePath), section: command, errorGroups }];
+function normalizeErrors(filePath, errors) {
+  const annotations = [];
+  const relativeFilePath = getRelativeFilePath(filePath);
+  const _a = errors,
+    { runtime } = _a,
+    rest = __objRest(_a, ['runtime']);
+  if (runtime.length) {
+    for (const error of runtime) {
+      annotations.push({ filePath: relativeFilePath, errors: error.errors.map((err) => [error.id, err]) });
     }
-    return memo;
-  }, []);
+  }
+  for (const command in rest) {
+    const issues = rest[command];
+    if (Object.keys(issues).length) {
+      const errors2 = Object.entries(issues).reduce((memo, [, errs]) => {
+        return [...memo, ...errs.map(({ id, errors: errors3 }) => [id, errors3.join('\n')])];
+      }, []);
+      annotations.push({ filePath: relativeFilePath, errors: errors2 });
+    }
+  }
   return annotations;
 }
 
@@ -28144,22 +28181,27 @@ function normalizeErrors(filePath, _a) {
 var import_table2 = __toESM(require_src());
 
 // src/utils/guards.ts
-var isString = (value) => typeof value === 'string';
+var isFullError = (content) => Array.isArray(content) && content.length === 3;
 
 // src/formatErrorsPerFile.ts
 var DEFAULT_LINE_AND_COLUMN = '0:0';
 var ISSUE_LEVEL = 'error';
-function formatErrorsPerFile(filePath, errorGroups) {
+function formatErrorsPerFile(filePath, errorGroups, schema) {
   const data = [];
-  for (const [group, errors] of errorGroups) {
-    for (const reason of errors) {
-      if (isString(reason)) {
-        data.push([`${filePath}:`, DEFAULT_LINE_AND_COLUMN, ISSUE_LEVEL, group, reason]);
+  for (const error of errorGroups) {
+    let content = [];
+    if (isFullError(error)) {
+      const [line, col, message] = error;
+      content = [`${filePath}:`, `${line}:${col}`, ISSUE_LEVEL, 'LINTER', message];
+    } else {
+      const tokens = schema.getTokensBySectionId(error[0]);
+      if (tokens) {
+        content = [`${filePath}:`, `${tokens[0].line}:${tokens[0].col}`, ISSUE_LEVEL, 'LINTER', error[1]];
       } else {
-        const [line, col, message] = reason;
-        data.push([`${filePath}:`, `${line}:${col}`, ISSUE_LEVEL, group, message]);
+        content = [`${filePath}:`, DEFAULT_LINE_AND_COLUMN, ISSUE_LEVEL, 'LINTER', error[1]];
       }
     }
+    data.push(content);
   }
   return (0, import_table2.table)(data, NO_STYLES_IN_TABLE);
 }
@@ -28182,13 +28224,14 @@ var main = async () => {
   const { FOLLOW_SYMBOLIC_LINKS = 'false', CONFIG_LOCATION_GLOB, CALYPTIA_API_KEY } = getActionInput();
   const globber = await glob.create(CONFIG_LOCATION_GLOB, {
     matchDirectories: false,
-    followSymbolicLinks: FOLLOW_SYMBOLIC_LINKS.toLowerCase() !== FALSE_VALUE,
+    followSymbolicLinks: FOLLOW_SYMBOLIC_LINKS !== FALSE_VALUE,
   });
   const files = await globber.glob();
   if (!files.length) {
     (0, import_core.setFailed)(`We could not find any files from using the provided GLOB (${CONFIG_LOCATION_GLOB})`);
   }
   let annotations = [];
+  let config;
   const location = (0, import_path2.resolve)(__dirname, PROBLEM_MATCHER_FILE_NAME);
   console.log(`::add-matcher::${location}`);
   for await (const filePath of files) {
@@ -28202,10 +28245,14 @@ var main = async () => {
         'x-project-token': CALYPTIA_API_KEY,
       };
       try {
-        const config = new import_fluent_bit_config_parser.FluentBitSchema(content, filePath);
+        config = new import_fluent_bit_config_parser.FluentBitSchema(content, filePath);
+        if (!config.schema.length) {
+          (0, import_core.debug)(`${filePath}: empty schema, moving on...`);
+          continue;
+        }
         const response = await (0, import_node_fetch.default)(URL2, {
           method: 'POST',
-          body: JSON.stringify(config.schema),
+          body: JSON.stringify({ config: config.schema }),
           headers,
         });
         const data = await response.json();
@@ -28222,7 +28269,7 @@ var main = async () => {
       } catch (e) {
         if (e instanceof import_fluent_bit_config_parser.TokenError) {
           const { filePath: _filePath, line, col, message } = e;
-          const errorReport = formatErrorsPerFile(relativeFilePath(_filePath), [['PARSE', [[line, col, message]]]]);
+          const errorReport = formatErrorsPerFile(getRelativeFilePath(_filePath), [[line, col, message]]);
           console.log(errorReport);
         } else {
           (0, import_core.setFailed)(e.message);
@@ -28232,12 +28279,12 @@ var main = async () => {
     }
   }
   if (annotations.length) {
-    const groupedByFile = annotations.reduce((memo, { filePath, errorGroups }) => {
-      memo[filePath] = memo[filePath] ? [...memo[filePath], ...errorGroups] : errorGroups;
+    const groupedByFile = annotations.reduce((memo, { filePath, errors }) => {
+      memo[filePath] = memo[filePath] ? [...memo[filePath], ...errors] : errors;
       return memo;
     }, {});
     for (const file in groupedByFile) {
-      console.log(formatErrorsPerFile(file, groupedByFile[file]));
+      console.log(formatErrorsPerFile(file, groupedByFile[file], config));
     }
     (0, import_core.setFailed)('We found errors in your configurations. Please check your logs');
   }
