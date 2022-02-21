@@ -28193,6 +28193,7 @@ function formatErrorsPerFile(filePath, errorGroups, schema) {
   const data = [];
   for (const error of errorGroups) {
     let content = [];
+    console.log('error:', error);
     if (isFullError(error)) {
       const [line, col, message] = error;
       content = [`${filePath}:`, `${line}:${col}`, ISSUE_LEVEL, 'LINTER', message];
@@ -28724,6 +28725,7 @@ var main = async () => {
     }
   }
   if (annotations.length) {
+    console.log(JSON.stringify(annotations, null, 2));
     const groupedByFile = annotations.reduce((memo, { filePath, errors }) => {
       memo[filePath] = memo[filePath] ? [...memo[filePath], ...errors] : errors;
       return memo;

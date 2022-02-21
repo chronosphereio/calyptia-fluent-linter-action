@@ -107,6 +107,7 @@ export const main = async (): Promise<void> => {
   }
 
   if (annotations.length) {
+    console.log(JSON.stringify(annotations, null, 2));
     const groupedByFile = annotations.reduce((memo, { filePath, errors }) => {
       memo[filePath] = memo[filePath] ? [...memo[filePath], ...errors] : errors;
 

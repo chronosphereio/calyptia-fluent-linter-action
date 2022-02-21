@@ -15,6 +15,7 @@ export function formatErrorsPerFile(
 
   for (const error of errorGroups) {
     let content = [];
+    console.log('error:', error);
     if (isFullError(error)) {
       const [line, col, message] = error;
       content = [`${filePath}:`, `${line}:${col}`, ISSUE_LEVEL, 'LINTER', message];
