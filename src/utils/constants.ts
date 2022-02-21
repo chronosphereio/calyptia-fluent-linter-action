@@ -13,3 +13,8 @@ export const NO_STYLES_IN_TABLE = {
   },
   drawHorizontalLine: (): boolean => false,
 };
+
+export const ACTION_MESSAGES = {
+  CONFIG_ERRORS: 'We found errors in your configurations. Please check your logs',
+  FATAL_ERROR: 'We found an error. Please check your logs',
+};
