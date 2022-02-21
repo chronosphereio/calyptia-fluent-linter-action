@@ -28649,8 +28649,8 @@ var ConfigValidatorV2Service = class {
 
 // src/index.ts
 var INPUT = /* @__PURE__ */ ((INPUT2) => {
-  INPUT2['CONFIG_LOCATION_GLOB'] = 'calyptia-api-key';
-  INPUT2['CALYPTIA_API_KEY'] = 'config-location-glob';
+  INPUT2['CALYPTIA_API_KEY'] = 'calyptia-api-key';
+  INPUT2['CONFIG_LOCATION_GLOB'] = 'config-location-glob';
   INPUT2['FOLLOW_SYMBOLIC_LINKS'] = 'follow-symbolic-links';
   return INPUT2;
 })(INPUT || {});
@@ -28665,14 +28665,14 @@ global.fetch = import_node_fetch.default;
 OpenAPI.BASE = CALYPTIA_API_ENDPOINT;
 var main = async () => {
   const input = getActionInput();
-  const globber = await glob.create(input['calyptia-api-key' /* CONFIG_LOCATION_GLOB */], {
+  const globber = await glob.create(input['config-location-glob' /* CONFIG_LOCATION_GLOB */], {
     matchDirectories: false,
     followSymbolicLinks: input['follow-symbolic-links' /* FOLLOW_SYMBOLIC_LINKS */] !== FALSE_VALUE,
   });
   const files = await globber.glob();
   if (!files.length) {
     (0, import_core.setFailed)(
-      `We could not find any files from using the provided GLOB (${input['calyptia-api-key' /* CONFIG_LOCATION_GLOB */]})`
+      `We could not find any files from using the provided GLOB (${input['config-location-glob' /* CONFIG_LOCATION_GLOB */]})`
     );
   }
   let annotations = [];
@@ -28686,7 +28686,7 @@ var main = async () => {
       (0, import_core.debug)(`File ${filePath} seems to be Fluent Bit config, validating...`);
       const headers = {
         'Content-Type': 'application/json',
-        'x-project-token': input['config-location-glob' /* CALYPTIA_API_KEY */],
+        'x-project-token': input['calyptia-api-key' /* CALYPTIA_API_KEY */],
       };
       try {
         config = new import_fluent_bit_config_parser.FluentBitSchema(content, filePath);

@@ -15,8 +15,8 @@ import { formatErrorsPerFile } from './formatErrorsPerFile';
 import { resolve } from 'path';
 import { ConfigValidatorV2Service, OpenAPI, ValidatingConfig } from '../generated/calyptia';
 export enum INPUT {
-  CONFIG_LOCATION_GLOB = 'calyptia-api-key',
-  CALYPTIA_API_KEY = 'config-location-glob',
+  CALYPTIA_API_KEY = 'calyptia-api-key',
+  CONFIG_LOCATION_GLOB = 'config-location-glob',
   FOLLOW_SYMBOLIC_LINKS = 'follow-symbolic-links',
 }
 
