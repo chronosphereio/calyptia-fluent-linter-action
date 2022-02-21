@@ -109,6 +109,7 @@ describe('fluent-linter-action', () => {
 
     expect(client.isDone()).toBe(true);
   });
+
   it('Reports no issues when configuration has no errors', async () => {
     mockedInput.CONFIG_LOCATION_GLOB = '__fixtures__/basic.conf';
     const client = nock(CALYPTIA_API_ENDPOINT);
@@ -120,6 +121,7 @@ describe('fluent-linter-action', () => {
     expect(consoleLogMock).toHaveBeenCalledTimes(1);
     expect(client.isDone()).toBe(true);
   });
+
   it('Reports errors correctly matching problemMatcher', async () => {
     mockedInput.CONFIG_LOCATION_GLOB = '__fixtures__/invalid.conf';
     const client = nock(CALYPTIA_API_ENDPOINT);
@@ -192,7 +194,7 @@ describe('fluent-linter-action', () => {
           "request to https://cloud-api.calyptia.com/v1/config_validate_v2 failed, reason: Server Error",
         ],
         Array [
-          "We found an error, please check, please check your logs",
+          "We found an error. Please check your logs",
         ],
       ]
     `);
@@ -240,13 +242,42 @@ describe('fluent-linter-action', () => {
     expect(setFailed.mock.calls).toMatchInlineSnapshot(`
       Array [
         Array [
-          "The request failed:  status: 401, data: {}",
+          "Unauthorized",
+        ],
+        Array [
+          "We found an error. Please check your logs",
         ],
       ]
     `);
     expect(consoleLogMock).toHaveBeenCalledTimes(1);
 
     expect(client.isDone()).toBe(true);
+  });
+
+  it('Reports errors when section does not have name', async () => {
+    mockedInput.CONFIG_LOCATION_GLOB = '__fixtures__/basic_without_name.conf';
+    await main();
+
+    expect(setFailed.mock.calls).toMatchInlineSnapshot(`
+      Array [
+        Array [
+          "We found errors in your configurations. Please check your logs",
+        ],
+      ]
+    `);
+    expect(consoleLogMock.mock.calls).toMatchInlineSnapshot(`
+      Array [
+        Array [
+          "::add-matcher::<PROJECT_ROOT>/src/problem-matcher.json",
+        ],
+        Array [
+          "<PROJECT_ROOT>/__fixtures__/basic_without_name.conf: 4:1 error LINTER Attribute \\"name\\" missing 
+      ",
+        ],
+      ]
+    `);
+
+    expect(getTokensBySectionIdMock).toHaveBeenCalled();
   });
 
   it('does not report if configuration is not Fluent Bit/Fluentd', async () => {

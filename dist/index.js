@@ -582,11 +582,11 @@ var require_http_client = __commonJS({
       HttpCodes2[(HttpCodes2['ServiceUnavailable'] = 503)] = 'ServiceUnavailable';
       HttpCodes2[(HttpCodes2['GatewayTimeout'] = 504)] = 'GatewayTimeout';
     })((HttpCodes = exports.HttpCodes || (exports.HttpCodes = {})));
-    var Headers;
-    (function (Headers2) {
-      Headers2['Accept'] = 'accept';
-      Headers2['ContentType'] = 'content-type';
-    })((Headers = exports.Headers || (exports.Headers = {})));
+    var Headers3;
+    (function (Headers4) {
+      Headers4['Accept'] = 'accept';
+      Headers4['ContentType'] = 'content-type';
+    })((Headers3 = exports.Headers || (exports.Headers = {})));
     var MediaTypes;
     (function (MediaTypes2) {
       MediaTypes2['ApplicationJson'] = 'application/json';
@@ -621,13 +621,13 @@ var require_http_client = __commonJS({
         this.message = message;
       }
       readBody() {
-        return new Promise(async (resolve2, reject) => {
+        return new Promise(async (resolve3, reject) => {
           let output = Buffer.alloc(0);
           this.message.on('data', (chunk) => {
             output = Buffer.concat([output, chunk]);
           });
           this.message.on('end', () => {
-            resolve2(output.toString());
+            resolve3(output.toString());
           });
         });
       }
@@ -701,9 +701,9 @@ var require_http_client = __commonJS({
         return this.request(verb, requestUrl, stream, additionalHeaders);
       }
       async getJson(requestUrl, additionalHeaders = {}) {
-        additionalHeaders[Headers.Accept] = this._getExistingOrDefaultHeader(
+        additionalHeaders[Headers3.Accept] = this._getExistingOrDefaultHeader(
           additionalHeaders,
-          Headers.Accept,
+          Headers3.Accept,
           MediaTypes.ApplicationJson
         );
         let res = await this.get(requestUrl, additionalHeaders);
@@ -711,14 +711,14 @@ var require_http_client = __commonJS({
       }
       async postJson(requestUrl, obj, additionalHeaders = {}) {
         let data = JSON.stringify(obj, null, 2);
-        additionalHeaders[Headers.Accept] = this._getExistingOrDefaultHeader(
+        additionalHeaders[Headers3.Accept] = this._getExistingOrDefaultHeader(
           additionalHeaders,
-          Headers.Accept,
+          Headers3.Accept,
           MediaTypes.ApplicationJson
         );
-        additionalHeaders[Headers.ContentType] = this._getExistingOrDefaultHeader(
+        additionalHeaders[Headers3.ContentType] = this._getExistingOrDefaultHeader(
           additionalHeaders,
-          Headers.ContentType,
+          Headers3.ContentType,
           MediaTypes.ApplicationJson
         );
         let res = await this.post(requestUrl, data, additionalHeaders);
@@ -726,14 +726,14 @@ var require_http_client = __commonJS({
       }
       async putJson(requestUrl, obj, additionalHeaders = {}) {
         let data = JSON.stringify(obj, null, 2);
-        additionalHeaders[Headers.Accept] = this._getExistingOrDefaultHeader(
+        additionalHeaders[Headers3.Accept] = this._getExistingOrDefaultHeader(
           additionalHeaders,
-          Headers.Accept,
+          Headers3.Accept,
           MediaTypes.ApplicationJson
         );
-        additionalHeaders[Headers.ContentType] = this._getExistingOrDefaultHeader(
+        additionalHeaders[Headers3.ContentType] = this._getExistingOrDefaultHeader(
           additionalHeaders,
-          Headers.ContentType,
+          Headers3.ContentType,
           MediaTypes.ApplicationJson
         );
         let res = await this.put(requestUrl, data, additionalHeaders);
@@ -741,14 +741,14 @@ var require_http_client = __commonJS({
       }
       async patchJson(requestUrl, obj, additionalHeaders = {}) {
         let data = JSON.stringify(obj, null, 2);
-        additionalHeaders[Headers.Accept] = this._getExistingOrDefaultHeader(
+        additionalHeaders[Headers3.Accept] = this._getExistingOrDefaultHeader(
           additionalHeaders,
-          Headers.Accept,
+          Headers3.Accept,
           MediaTypes.ApplicationJson
         );
-        additionalHeaders[Headers.ContentType] = this._getExistingOrDefaultHeader(
+        additionalHeaders[Headers3.ContentType] = this._getExistingOrDefaultHeader(
           additionalHeaders,
-          Headers.ContentType,
+          Headers3.ContentType,
           MediaTypes.ApplicationJson
         );
         let res = await this.patch(requestUrl, data, additionalHeaders);
@@ -829,12 +829,12 @@ var require_http_client = __commonJS({
         this._disposed = true;
       }
       requestRaw(info, data) {
-        return new Promise((resolve2, reject) => {
+        return new Promise((resolve3, reject) => {
           let callbackForResult = function (err, res) {
             if (err) {
               reject(err);
             }
-            resolve2(res);
+            resolve3(res);
           };
           this.requestRawWithCallback(info, data, callbackForResult);
         });
@@ -987,7 +987,7 @@ var require_http_client = __commonJS({
       _performExponentialBackoff(retryNumber) {
         retryNumber = Math.min(ExponentialBackoffCeiling, retryNumber);
         const ms = ExponentialBackoffTimeSlice * Math.pow(2, retryNumber);
-        return new Promise((resolve2) => setTimeout(() => resolve2(), ms));
+        return new Promise((resolve3) => setTimeout(() => resolve3(), ms));
       }
       static dateTimeDeserializer(key, value) {
         if (typeof value === 'string') {
@@ -999,7 +999,7 @@ var require_http_client = __commonJS({
         return value;
       }
       async _processResponse(res, options) {
-        return new Promise(async (resolve2, reject) => {
+        return new Promise(async (resolve3, reject) => {
           const statusCode = res.message.statusCode;
           const response = {
             statusCode,
@@ -1007,7 +1007,7 @@ var require_http_client = __commonJS({
             headers: {},
           };
           if (statusCode == HttpCodes.NotFound) {
-            resolve2(response);
+            resolve3(response);
           }
           let obj;
           let contents;
@@ -1036,7 +1036,7 @@ var require_http_client = __commonJS({
             err.result = response.result;
             reject(err);
           } else {
-            resolve2(response);
+            resolve3(response);
           }
         });
       }
@@ -1110,11 +1110,11 @@ var require_oidc_utils = __commonJS({
         function adopt(value) {
           return value instanceof P
             ? value
-            : new P(function (resolve2) {
-                resolve2(value);
+            : new P(function (resolve3) {
+                resolve3(value);
               });
         }
-        return new (P || (P = Promise))(function (resolve2, reject) {
+        return new (P || (P = Promise))(function (resolve3, reject) {
           function fulfilled(value) {
             try {
               step(generator.next(value));
@@ -1130,7 +1130,7 @@ var require_oidc_utils = __commonJS({
             }
           }
           function step(result) {
-            result.done ? resolve2(result.value) : adopt(result.value).then(fulfilled, rejected);
+            result.done ? resolve3(result.value) : adopt(result.value).then(fulfilled, rejected);
           }
           step((generator = generator.apply(thisArg, _arguments || [])).next());
         });
@@ -1252,11 +1252,11 @@ var require_core = __commonJS({
         function adopt(value) {
           return value instanceof P
             ? value
-            : new P(function (resolve2) {
-                resolve2(value);
+            : new P(function (resolve3) {
+                resolve3(value);
               });
         }
-        return new (P || (P = Promise))(function (resolve2, reject) {
+        return new (P || (P = Promise))(function (resolve3, reject) {
           function fulfilled(value) {
             try {
               step(generator.next(value));
@@ -1272,7 +1272,7 @@ var require_core = __commonJS({
             }
           }
           function step(result) {
-            result.done ? resolve2(result.value) : adopt(result.value).then(fulfilled, rejected);
+            result.done ? resolve3(result.value) : adopt(result.value).then(fulfilled, rejected);
           }
           step((generator = generator.apply(thisArg, _arguments || [])).next());
         });
@@ -2963,11 +2963,11 @@ var require_internal_globber = __commonJS({
         function adopt(value) {
           return value instanceof P
             ? value
-            : new P(function (resolve2) {
-                resolve2(value);
+            : new P(function (resolve3) {
+                resolve3(value);
               });
         }
-        return new (P || (P = Promise))(function (resolve2, reject) {
+        return new (P || (P = Promise))(function (resolve3, reject) {
           function fulfilled(value) {
             try {
               step(generator.next(value));
@@ -2983,7 +2983,7 @@ var require_internal_globber = __commonJS({
             }
           }
           function step(result) {
-            result.done ? resolve2(result.value) : adopt(result.value).then(fulfilled, rejected);
+            result.done ? resolve3(result.value) : adopt(result.value).then(fulfilled, rejected);
           }
           step((generator = generator.apply(thisArg, _arguments || [])).next());
         });
@@ -3009,14 +3009,14 @@ var require_internal_globber = __commonJS({
           i[n] =
             o[n] &&
             function (v) {
-              return new Promise(function (resolve2, reject) {
-                (v = o[n](v)), settle(resolve2, reject, v.done, v.value);
+              return new Promise(function (resolve3, reject) {
+                (v = o[n](v)), settle(resolve3, reject, v.done, v.value);
               });
             };
         }
-        function settle(resolve2, reject, d, v) {
+        function settle(resolve3, reject, d, v) {
           Promise.resolve(v).then(function (v2) {
-            resolve2({ value: v2, done: d });
+            resolve3({ value: v2, done: d });
           }, reject);
         }
       };
@@ -3271,11 +3271,11 @@ var require_internal_hash_files = __commonJS({
         function adopt(value) {
           return value instanceof P
             ? value
-            : new P(function (resolve2) {
-                resolve2(value);
+            : new P(function (resolve3) {
+                resolve3(value);
               });
         }
-        return new (P || (P = Promise))(function (resolve2, reject) {
+        return new (P || (P = Promise))(function (resolve3, reject) {
           function fulfilled(value) {
             try {
               step(generator.next(value));
@@ -3291,7 +3291,7 @@ var require_internal_hash_files = __commonJS({
             }
           }
           function step(result) {
-            result.done ? resolve2(result.value) : adopt(result.value).then(fulfilled, rejected);
+            result.done ? resolve3(result.value) : adopt(result.value).then(fulfilled, rejected);
           }
           step((generator = generator.apply(thisArg, _arguments || [])).next());
         });
@@ -3317,14 +3317,14 @@ var require_internal_hash_files = __commonJS({
           i[n] =
             o[n] &&
             function (v) {
-              return new Promise(function (resolve2, reject) {
-                (v = o[n](v)), settle(resolve2, reject, v.done, v.value);
+              return new Promise(function (resolve3, reject) {
+                (v = o[n](v)), settle(resolve3, reject, v.done, v.value);
               });
             };
         }
-        function settle(resolve2, reject, d, v) {
+        function settle(resolve3, reject, d, v) {
           Promise.resolve(v).then(function (v2) {
-            resolve2({ value: v2, done: d });
+            resolve3({ value: v2, done: d });
           }, reject);
         }
       };
@@ -3398,11 +3398,11 @@ var require_glob = __commonJS({
         function adopt(value) {
           return value instanceof P
             ? value
-            : new P(function (resolve2) {
-                resolve2(value);
+            : new P(function (resolve3) {
+                resolve3(value);
               });
         }
-        return new (P || (P = Promise))(function (resolve2, reject) {
+        return new (P || (P = Promise))(function (resolve3, reject) {
           function fulfilled(value) {
             try {
               step(generator.next(value));
@@ -3418,7 +3418,7 @@ var require_glob = __commonJS({
             }
           }
           function step(result) {
-            result.done ? resolve2(result.value) : adopt(result.value).then(fulfilled, rejected);
+            result.done ? resolve3(result.value) : adopt(result.value).then(fulfilled, rejected);
           }
           step((generator = generator.apply(thisArg, _arguments || [])).next());
         });
@@ -10597,10 +10597,10 @@ var require_dist = __commonJS({
     })(CUSTOM_SECTIONS_NAMES || {});
     var isFluentBit = (config) => !!(config.match(FLUENTBIT_REGEX) || config.match(FLUENTBIT_INCLUDE_REGEX));
     var isValidFluentBitSection = (schema) => !!schema && !EXCLUDED_TAGS.has(schema.command.toLowerCase());
-    var isString = (value) => typeof value === 'string';
-    var isCommandType = (type) => isString(type) && Object.keys(COMMANDS).includes(type);
+    var isString2 = (value) => typeof value === 'string';
+    var isCommandType = (type) => isString2(type) && Object.keys(COMMANDS).includes(type);
     var isCustomSectionName = (block) =>
-      !!isString(block.name) &&
+      !!isString2(block.name) &&
       (block.name.includes(CUSTOM_SECTIONS_NAMES.FLUENTBIT_METRICS) ||
         block.name.includes(CUSTOM_SECTIONS_NAMES.CALYPTIA));
     var import_moo = __toModule(require_moo());
@@ -21039,7 +21039,7 @@ var require_lib2 = __commonJS({
         body = null;
       } else if (isURLSearchParams(body)) {
         body = Buffer.from(body.toString());
-      } else if (isBlob(body));
+      } else if (isBlob2(body));
       else if (Buffer.isBuffer(body));
       else if (Object.prototype.toString.call(body) === '[object ArrayBuffer]') {
         body = Buffer.from(body);
@@ -21151,7 +21151,7 @@ var require_lib2 = __commonJS({
       if (body === null) {
         return Body.Promise.resolve(Buffer.alloc(0));
       }
-      if (isBlob(body)) {
+      if (isBlob2(body)) {
         body = body.stream();
       }
       if (Buffer.isBuffer(body)) {
@@ -21163,7 +21163,7 @@ var require_lib2 = __commonJS({
       let accum = [];
       let accumBytes = 0;
       let abort = false;
-      return new Body.Promise(function (resolve2, reject) {
+      return new Body.Promise(function (resolve3, reject) {
         let resTimeout;
         if (_this4.timeout) {
           resTimeout = setTimeout(function () {
@@ -21204,7 +21204,7 @@ var require_lib2 = __commonJS({
           }
           clearTimeout(resTimeout);
           try {
-            resolve2(Buffer.concat(accum, accumBytes));
+            resolve3(Buffer.concat(accum, accumBytes));
           } catch (err) {
             reject(
               new FetchError(
@@ -21272,7 +21272,7 @@ var require_lib2 = __commonJS({
         typeof obj.sort === 'function'
       );
     }
-    function isBlob(obj) {
+    function isBlob2(obj) {
       return (
         typeof obj === 'object' &&
         typeof obj.arrayBuffer === 'function' &&
@@ -21307,7 +21307,7 @@ var require_lib2 = __commonJS({
         return 'text/plain;charset=UTF-8';
       } else if (isURLSearchParams(body)) {
         return 'application/x-www-form-urlencoded;charset=UTF-8';
-      } else if (isBlob(body)) {
+      } else if (isBlob2(body)) {
         return body.type || null;
       } else if (Buffer.isBuffer(body)) {
         return null;
@@ -21327,7 +21327,7 @@ var require_lib2 = __commonJS({
       const body = instance.body;
       if (body === null) {
         return 0;
-      } else if (isBlob(body)) {
+      } else if (isBlob2(body)) {
         return body.size;
       } else if (Buffer.isBuffer(body)) {
         return body.length;
@@ -21347,7 +21347,7 @@ var require_lib2 = __commonJS({
       const body = instance.body;
       if (body === null) {
         dest.end();
-      } else if (isBlob(body)) {
+      } else if (isBlob2(body)) {
         body.stream().pipe(dest);
       } else if (Buffer.isBuffer(body)) {
         dest.write(body);
@@ -21381,11 +21381,11 @@ var require_lib2 = __commonJS({
       return void 0;
     }
     var MAP = Symbol('map');
-    var Headers = class {
+    var Headers3 = class {
       constructor() {
         let init = arguments.length > 0 && arguments[0] !== void 0 ? arguments[0] : void 0;
         this[MAP] = /* @__PURE__ */ Object.create(null);
-        if (init instanceof Headers) {
+        if (init instanceof Headers3) {
           const rawHeaders = init.raw();
           const headerNames = Object.keys(rawHeaders);
           for (const headerName of headerNames) {
@@ -21436,14 +21436,14 @@ var require_lib2 = __commonJS({
       }
       forEach(callback) {
         let thisArg = arguments.length > 1 && arguments[1] !== void 0 ? arguments[1] : void 0;
-        let pairs = getHeaders(this);
+        let pairs = getHeaders2(this);
         let i = 0;
         while (i < pairs.length) {
           var _pairs$i = pairs[i];
           const name = _pairs$i[0],
             value = _pairs$i[1];
           callback.call(thisArg, value, name, this);
-          pairs = getHeaders(this);
+          pairs = getHeaders2(this);
           i++;
         }
       }
@@ -21493,14 +21493,14 @@ var require_lib2 = __commonJS({
         return createHeadersIterator(this, 'key+value');
       }
     };
-    Headers.prototype.entries = Headers.prototype[Symbol.iterator];
-    Object.defineProperty(Headers.prototype, Symbol.toStringTag, {
+    Headers3.prototype.entries = Headers3.prototype[Symbol.iterator];
+    Object.defineProperty(Headers3.prototype, Symbol.toStringTag, {
       value: 'Headers',
       writable: false,
       enumerable: false,
       configurable: true,
     });
-    Object.defineProperties(Headers.prototype, {
+    Object.defineProperties(Headers3.prototype, {
       get: { enumerable: true },
       forEach: { enumerable: true },
       set: { enumerable: true },
@@ -21511,7 +21511,7 @@ var require_lib2 = __commonJS({
       values: { enumerable: true },
       entries: { enumerable: true },
     });
-    function getHeaders(headers) {
+    function getHeaders2(headers) {
       let kind = arguments.length > 1 && arguments[1] !== void 0 ? arguments[1] : 'key+value';
       const keys = Object.keys(headers[MAP]).sort();
       return keys.map(
@@ -21548,7 +21548,7 @@ var require_lib2 = __commonJS({
           const target = _INTERNAL.target,
             kind = _INTERNAL.kind,
             index = _INTERNAL.index;
-          const values = getHeaders(target, kind);
+          const values = getHeaders2(target, kind);
           const len = values.length;
           if (index >= len) {
             return {
@@ -21580,7 +21580,7 @@ var require_lib2 = __commonJS({
       return obj;
     }
     function createHeadersLenient(obj) {
-      const headers = new Headers();
+      const headers = new Headers3();
       for (const name of Object.keys(obj)) {
         if (invalidTokenRegex.test(name)) {
           continue;
@@ -21610,7 +21610,7 @@ var require_lib2 = __commonJS({
         let opts = arguments.length > 1 && arguments[1] !== void 0 ? arguments[1] : {};
         Body.call(this, body, opts);
         const status = opts.status || 200;
-        const headers = new Headers(opts.headers);
+        const headers = new Headers3(opts.headers);
         if (body != null && !headers.has('Content-Type')) {
           const contentType = extractContentType(body);
           if (contentType) {
@@ -21715,7 +21715,7 @@ var require_lib2 = __commonJS({
           timeout: init.timeout || input.timeout || 0,
           size: init.size || input.size || 0,
         });
-        const headers = new Headers(init.headers || input.headers || {});
+        const headers = new Headers3(init.headers || input.headers || {});
         if (inputBody != null && !headers.has('Content-Type')) {
           const contentType = extractContentType(inputBody);
           if (contentType) {
@@ -21773,9 +21773,9 @@ var require_lib2 = __commonJS({
       clone: { enumerable: true },
       signal: { enumerable: true },
     });
-    function getNodeRequestOptions(request) {
-      const parsedURL = request[INTERNALS$2].parsedURL;
-      const headers = new Headers(request[INTERNALS$2].headers);
+    function getNodeRequestOptions(request2) {
+      const parsedURL = request2[INTERNALS$2].parsedURL;
+      const headers = new Headers3(request2[INTERNALS$2].headers);
       if (!headers.has('Accept')) {
         headers.set('Accept', '*/*');
       }
@@ -21785,15 +21785,15 @@ var require_lib2 = __commonJS({
       if (!/^https?:$/.test(parsedURL.protocol)) {
         throw new TypeError('Only HTTP(S) protocols are supported');
       }
-      if (request.signal && request.body instanceof Stream.Readable && !streamDestructionSupported) {
+      if (request2.signal && request2.body instanceof Stream.Readable && !streamDestructionSupported) {
         throw new Error('Cancellation of streamed requests with AbortSignal is not supported in node < 8');
       }
       let contentLengthValue = null;
-      if (request.body == null && /^(POST|PUT)$/i.test(request.method)) {
+      if (request2.body == null && /^(POST|PUT)$/i.test(request2.method)) {
         contentLengthValue = '0';
       }
-      if (request.body != null) {
-        const totalBytes = getTotalBytes(request);
+      if (request2.body != null) {
+        const totalBytes = getTotalBytes(request2);
         if (typeof totalBytes === 'number') {
           contentLengthValue = String(totalBytes);
         }
@@ -21804,10 +21804,10 @@ var require_lib2 = __commonJS({
       if (!headers.has('User-Agent')) {
         headers.set('User-Agent', 'node-fetch/1.0 (+https://github.com/bitinn/node-fetch)');
       }
-      if (request.compress && !headers.has('Accept-Encoding')) {
+      if (request2.compress && !headers.has('Accept-Encoding')) {
         headers.set('Accept-Encoding', 'gzip,deflate');
       }
-      let agent = request.agent;
+      let agent = request2.agent;
       if (typeof agent === 'function') {
         agent = agent(parsedURL);
       }
@@ -21815,7 +21815,7 @@ var require_lib2 = __commonJS({
         headers.set('Connection', 'close');
       }
       return Object.assign({}, parsedURL, {
-        method: request.method,
+        method: request2.method,
         headers: exportNodeCompatibleHeaders(headers),
         agent,
       });
@@ -21836,22 +21836,22 @@ var require_lib2 = __commonJS({
       const dest = new URL$1(destination).hostname;
       return orig === dest || (orig[orig.length - dest.length - 1] === '.' && orig.endsWith(dest));
     };
-    function fetch2(url, opts) {
-      if (!fetch2.Promise) {
+    function fetch3(url, opts) {
+      if (!fetch3.Promise) {
         throw new Error('native promise missing, set fetch.Promise to your favorite alternative');
       }
-      Body.Promise = fetch2.Promise;
-      return new fetch2.Promise(function (resolve2, reject) {
-        const request = new Request(url, opts);
-        const options = getNodeRequestOptions(request);
+      Body.Promise = fetch3.Promise;
+      return new fetch3.Promise(function (resolve3, reject) {
+        const request2 = new Request(url, opts);
+        const options = getNodeRequestOptions(request2);
         const send = (options.protocol === 'https:' ? https : http).request;
-        const signal = request.signal;
+        const signal = request2.signal;
         let response = null;
         const abort = function abort2() {
           let error = new AbortError('The user aborted a request.');
           reject(error);
-          if (request.body && request.body instanceof Stream.Readable) {
-            request.body.destroy(error);
+          if (request2.body && request2.body instanceof Stream.Readable) {
+            request2.body.destroy(error);
           }
           if (!response || !response.body) return;
           response.body.emit('error', error);
@@ -21874,28 +21874,28 @@ var require_lib2 = __commonJS({
           if (signal) signal.removeEventListener('abort', abortAndFinalize);
           clearTimeout(reqTimeout);
         }
-        if (request.timeout) {
+        if (request2.timeout) {
           req.once('socket', function (socket) {
             reqTimeout = setTimeout(function () {
-              reject(new FetchError(`network timeout at: ${request.url}`, 'request-timeout'));
+              reject(new FetchError(`network timeout at: ${request2.url}`, 'request-timeout'));
               finalize();
-            }, request.timeout);
+            }, request2.timeout);
           });
         }
         req.on('error', function (err) {
-          reject(new FetchError(`request to ${request.url} failed, reason: ${err.message}`, 'system', err));
+          reject(new FetchError(`request to ${request2.url} failed, reason: ${err.message}`, 'system', err));
           finalize();
         });
         req.on('response', function (res) {
           clearTimeout(reqTimeout);
           const headers = createHeadersLenient(res.headers);
-          if (fetch2.isRedirect(res.statusCode)) {
+          if (fetch3.isRedirect(res.statusCode)) {
             const location = headers.get('Location');
             let locationURL = null;
             try {
-              locationURL = location === null ? null : new URL$1(location, request.url).toString();
+              locationURL = location === null ? null : new URL$1(location, request2.url).toString();
             } catch (err) {
-              if (request.redirect !== 'manual') {
+              if (request2.redirect !== 'manual') {
                 reject(
                   new FetchError(`uri requested responds with an invalid redirect URL: ${location}`, 'invalid-redirect')
                 );
@@ -21903,11 +21903,11 @@ var require_lib2 = __commonJS({
                 return;
               }
             }
-            switch (request.redirect) {
+            switch (request2.redirect) {
               case 'error':
                 reject(
                   new FetchError(
-                    `uri requested responds with a redirect, redirect mode is set to error: ${request.url}`,
+                    `uri requested responds with a redirect, redirect mode is set to error: ${request2.url}`,
                     'no-redirect'
                   )
                 );
@@ -21926,29 +21926,29 @@ var require_lib2 = __commonJS({
                 if (locationURL === null) {
                   break;
                 }
-                if (request.counter >= request.follow) {
-                  reject(new FetchError(`maximum redirect reached at: ${request.url}`, 'max-redirect'));
+                if (request2.counter >= request2.follow) {
+                  reject(new FetchError(`maximum redirect reached at: ${request2.url}`, 'max-redirect'));
                   finalize();
                   return;
                 }
                 const requestOpts = {
-                  headers: new Headers(request.headers),
-                  follow: request.follow,
-                  counter: request.counter + 1,
-                  agent: request.agent,
-                  compress: request.compress,
-                  method: request.method,
-                  body: request.body,
-                  signal: request.signal,
-                  timeout: request.timeout,
-                  size: request.size,
+                  headers: new Headers3(request2.headers),
+                  follow: request2.follow,
+                  counter: request2.counter + 1,
+                  agent: request2.agent,
+                  compress: request2.compress,
+                  method: request2.method,
+                  body: request2.body,
+                  signal: request2.signal,
+                  timeout: request2.timeout,
+                  size: request2.size,
                 };
-                if (!isDomainOrSubdomain(request.url, locationURL)) {
+                if (!isDomainOrSubdomain(request2.url, locationURL)) {
                   for (const name of ['authorization', 'www-authenticate', 'cookie', 'cookie2']) {
                     requestOpts.headers.delete(name);
                   }
                 }
-                if (res.statusCode !== 303 && request.body && getTotalBytes(request) === null) {
+                if (res.statusCode !== 303 && request2.body && getTotalBytes(request2) === null) {
                   reject(
                     new FetchError('Cannot follow redirect with body being a readable stream', 'unsupported-redirect')
                   );
@@ -21957,13 +21957,13 @@ var require_lib2 = __commonJS({
                 }
                 if (
                   res.statusCode === 303 ||
-                  ((res.statusCode === 301 || res.statusCode === 302) && request.method === 'POST')
+                  ((res.statusCode === 301 || res.statusCode === 302) && request2.method === 'POST')
                 ) {
                   requestOpts.method = 'GET';
                   requestOpts.body = void 0;
                   requestOpts.headers.delete('content-length');
                 }
-                resolve2(fetch2(new Request(locationURL, requestOpts)));
+                resolve3(fetch3(new Request(locationURL, requestOpts)));
                 finalize();
                 return;
             }
@@ -21973,24 +21973,24 @@ var require_lib2 = __commonJS({
           });
           let body = res.pipe(new PassThrough$1());
           const response_options = {
-            url: request.url,
+            url: request2.url,
             status: res.statusCode,
             statusText: res.statusMessage,
             headers,
-            size: request.size,
-            timeout: request.timeout,
-            counter: request.counter,
+            size: request2.size,
+            timeout: request2.timeout,
+            counter: request2.counter,
           };
           const codings = headers.get('Content-Encoding');
           if (
-            !request.compress ||
-            request.method === 'HEAD' ||
+            !request2.compress ||
+            request2.method === 'HEAD' ||
             codings === null ||
             res.statusCode === 204 ||
             res.statusCode === 304
           ) {
             response = new Response(body, response_options);
-            resolve2(response);
+            resolve3(response);
             return;
           }
           const zlibOptions = {
@@ -22000,7 +22000,7 @@ var require_lib2 = __commonJS({
           if (codings == 'gzip' || codings == 'x-gzip') {
             body = body.pipe(zlib.createGunzip(zlibOptions));
             response = new Response(body, response_options);
-            resolve2(response);
+            resolve3(response);
             return;
           }
           if (codings == 'deflate' || codings == 'x-deflate') {
@@ -22012,30 +22012,30 @@ var require_lib2 = __commonJS({
                 body = body.pipe(zlib.createInflateRaw());
               }
               response = new Response(body, response_options);
-              resolve2(response);
+              resolve3(response);
             });
             return;
           }
           if (codings == 'br' && typeof zlib.createBrotliDecompress === 'function') {
             body = body.pipe(zlib.createBrotliDecompress());
             response = new Response(body, response_options);
-            resolve2(response);
+            resolve3(response);
             return;
           }
           response = new Response(body, response_options);
-          resolve2(response);
+          resolve3(response);
         });
-        writeToStream(req, request);
+        writeToStream(req, request2);
       });
     }
-    fetch2.isRedirect = function (code) {
+    fetch3.isRedirect = function (code) {
       return code === 301 || code === 302 || code === 303 || code === 307 || code === 308;
     };
-    fetch2.Promise = global.Promise;
-    module2.exports = exports = fetch2;
+    fetch3.Promise = global.Promise;
+    module2.exports = exports = fetch3;
     Object.defineProperty(exports, '__esModule', { value: true });
     exports.default = exports;
-    exports.Headers = Headers;
+    exports.Headers = Headers3;
     exports.Request = Request;
     exports.Response = Response;
     exports.FetchError = FetchError;
@@ -28137,7 +28137,6 @@ var import_node_fetch = __toESM(require_lib2());
 // src/utils/constants.ts
 var import_table = __toESM(require_src());
 var CALYPTIA_API_ENDPOINT = 'https://cloud-api.calyptia.com';
-var CALYPTIA_API_VALIDATION_PATH = 'v1/config_validate_v2';
 var PROBLEM_MATCHER_FILE_NAME = 'problem-matcher.json';
 var FALSE_VALUE = 'false';
 var NO_STYLES_IN_TABLE = {
@@ -28148,6 +28147,11 @@ var NO_STYLES_IN_TABLE = {
   },
   drawHorizontalLine: () => false,
 };
+var ACTION_MESSAGES = {
+  CONFIG_ERRORS: 'We found errors in your configurations. Please check your logs',
+  FATAL_ERROR: 'We found an error. Please check your logs',
+};
+var ATTRIBUTE_NAME_MISSING = 'Attribute "name" missing';
 
 // src/utils/normalizeErrors.ts
 var import_path = require('path');
@@ -28208,6 +28212,442 @@ function formatErrorsPerFile(filePath, errorGroups, schema) {
 
 // src/index.ts
 var import_path2 = require('path');
+
+// generated/calyptia/core/ApiError.ts
+var ApiError = class extends Error {
+  constructor(response, message) {
+    super(message);
+    this.name = 'ApiError';
+    this.url = response.url;
+    this.status = response.status;
+    this.statusText = response.statusText;
+    this.body = response.body;
+  }
+};
+
+// generated/calyptia/core/CancelablePromise.ts
+var CancelError = class extends Error {
+  constructor(message) {
+    super(message);
+    this.name = 'CancelError';
+  }
+  get isCancelled() {
+    return true;
+  }
+};
+var CancelablePromise = class {
+  #isResolved;
+  #isRejected;
+  #isCancelled;
+  #cancelHandlers;
+  #promise;
+  #resolve;
+  #reject;
+  constructor(executor) {
+    this.#isResolved = false;
+    this.#isRejected = false;
+    this.#isCancelled = false;
+    this.#cancelHandlers = [];
+    this.#promise = new Promise((resolve3, reject) => {
+      this.#resolve = resolve3;
+      this.#reject = reject;
+      const onResolve = (value) => {
+        var _a;
+        if (this.#isResolved || this.#isRejected || this.#isCancelled) {
+          return;
+        }
+        this.#isResolved = true;
+        (_a = this.#resolve) == null ? void 0 : _a.call(this, value);
+      };
+      const onReject = (reason) => {
+        var _a;
+        if (this.#isResolved || this.#isRejected || this.#isCancelled) {
+          return;
+        }
+        this.#isRejected = true;
+        (_a = this.#reject) == null ? void 0 : _a.call(this, reason);
+      };
+      const onCancel = (cancelHandler) => {
+        if (this.#isResolved || this.#isRejected || this.#isCancelled) {
+          return;
+        }
+        this.#cancelHandlers.push(cancelHandler);
+      };
+      Object.defineProperty(onCancel, 'isResolved', {
+        get: () => this.#isResolved,
+      });
+      Object.defineProperty(onCancel, 'isRejected', {
+        get: () => this.#isRejected,
+      });
+      Object.defineProperty(onCancel, 'isCancelled', {
+        get: () => this.#isCancelled,
+      });
+      return executor(onResolve, onReject, onCancel);
+    });
+  }
+  then(onFulfilled, onRejected) {
+    return this.#promise.then(onFulfilled, onRejected);
+  }
+  catch(onRejected) {
+    return this.#promise.catch(onRejected);
+  }
+  finally(onFinally) {
+    return this.#promise.finally(onFinally);
+  }
+  cancel() {
+    var _a;
+    if (this.#isResolved || this.#isRejected || this.#isCancelled) {
+      return;
+    }
+    this.#isCancelled = true;
+    if (this.#cancelHandlers.length) {
+      try {
+        for (const cancelHandler of this.#cancelHandlers) {
+          cancelHandler();
+        }
+      } catch (error) {
+        console.warn('Cancellation threw an error', error);
+        return;
+      }
+    }
+    this.#cancelHandlers.length = 0;
+    (_a = this.#reject) == null ? void 0 : _a.call(this, new CancelError('Request aborted'));
+  }
+  get isCancelled() {
+    return this.#isCancelled;
+  }
+};
+Symbol.toStringTag;
+
+// generated/calyptia/core/OpenAPI.ts
+var OpenAPI = {
+  BASE: 'http://localhost:5000',
+  VERSION: '1.0',
+  WITH_CREDENTIALS: false,
+  CREDENTIALS: 'include',
+  TOKEN: void 0,
+  USERNAME: void 0,
+  PASSWORD: void 0,
+  HEADERS: void 0,
+  ENCODE_PATH: void 0,
+};
+
+// generated/calyptia/models/Agent.ts
+var Agent;
+((Agent2) => {
+  let type;
+  ((type2) => {
+    type2['FLUENTBIT'] = 'fluentbit';
+    type2['FLUENTD'] = 'fluentd';
+  })((type = Agent2.type || (Agent2.type = {})));
+  let edition;
+  ((edition2) => {
+    edition2['COMMUNITY'] = 'community';
+    edition2['ENTERPRISE'] = 'enterprise';
+  })((edition = Agent2.edition || (Agent2.edition = {})));
+})(Agent || (Agent = {}));
+
+// generated/calyptia/models/PipelineStatus.ts
+var PipelineStatus;
+((PipelineStatus2) => {
+  let status;
+  ((status2) => {
+    status2['NEW'] = 'NEW';
+    status2['FAILED'] = 'FAILED';
+    status2['STARTING'] = 'STARTING';
+    status2['STARTED'] = 'STARTED';
+    status2['DELETED'] = 'DELETED';
+  })((status = PipelineStatus2.status || (PipelineStatus2.status = {})));
+})(PipelineStatus || (PipelineStatus = {}));
+
+// generated/calyptia/models/RegisterAgent.ts
+var RegisterAgent;
+((RegisterAgent2) => {
+  let type;
+  ((type2) => {
+    type2['FLUENTBIT'] = 'fluentbit';
+    type2['FLUENTD'] = 'fluentd';
+  })((type = RegisterAgent2.type || (RegisterAgent2.type = {})));
+  let edition;
+  ((edition2) => {
+    edition2['COMMUNITY'] = 'community';
+    edition2['ENTERPRISE'] = 'enterprise';
+  })((edition = RegisterAgent2.edition || (RegisterAgent2.edition = {})));
+})(RegisterAgent || (RegisterAgent = {}));
+
+// generated/calyptia/models/UpdateAgent.ts
+var UpdateAgent;
+((UpdateAgent2) => {
+  let edition;
+  ((edition2) => {
+    edition2['COMMUNITY'] = 'community';
+    edition2['ENTERPRISE'] = 'enterprise';
+  })((edition = UpdateAgent2.edition || (UpdateAgent2.edition = {})));
+})(UpdateAgent || (UpdateAgent = {}));
+
+// generated/calyptia/core/request.ts
+var isDefined = (value) => {
+  return value !== void 0 && value !== null;
+};
+var isString = (value) => {
+  return typeof value === 'string';
+};
+var isStringWithValue = (value) => {
+  return isString(value) && value !== '';
+};
+var isBlob = (value) => {
+  return (
+    typeof value === 'object' &&
+    typeof value.type === 'string' &&
+    typeof value.stream === 'function' &&
+    typeof value.arrayBuffer === 'function' &&
+    typeof value.constructor === 'function' &&
+    typeof value.constructor.name === 'string' &&
+    /^(Blob|File)$/.test(value.constructor.name) &&
+    /^(Blob|File)$/.test(value[Symbol.toStringTag])
+  );
+};
+var isFormData = (value) => {
+  return value instanceof FormData;
+};
+var base64 = (str) => {
+  try {
+    return btoa(str);
+  } catch (err) {
+    return Buffer.from(str).toString('base64');
+  }
+};
+var getQueryString = (params) => {
+  const qs = [];
+  const append = (key, value) => {
+    qs.push(`${encodeURIComponent(key)}=${encodeURIComponent(String(value))}`);
+  };
+  const process2 = (key, value) => {
+    if (isDefined(value)) {
+      if (Array.isArray(value)) {
+        value.forEach((v) => {
+          process2(key, v);
+        });
+      } else if (typeof value === 'object') {
+        Object.entries(value).forEach(([k, v]) => {
+          process2(`${key}[${k}]`, v);
+        });
+      } else {
+        append(key, value);
+      }
+    }
+  };
+  Object.entries(params).forEach(([key, value]) => {
+    process2(key, value);
+  });
+  if (qs.length > 0) {
+    return `?${qs.join('&')}`;
+  }
+  return '';
+};
+var getUrl = (config, options) => {
+  const encoder = config.ENCODE_PATH || encodeURI;
+  const path = options.url.replace('{api-version}', config.VERSION).replace(/{(.*?)}/g, (substring, group) => {
+    var _a;
+    if ((_a = options.path) == null ? void 0 : _a.hasOwnProperty(group)) {
+      return encoder(String(options.path[group]));
+    }
+    return substring;
+  });
+  const url = `${config.BASE}${path}`;
+  if (options.query) {
+    return `${url}${getQueryString(options.query)}`;
+  }
+  return url;
+};
+var getFormData = (options) => {
+  if (options.formData) {
+    const formData = new FormData();
+    const process2 = (key, value) => {
+      if (isString(value) || isBlob(value)) {
+        formData.append(key, value);
+      } else {
+        formData.append(key, JSON.stringify(value));
+      }
+    };
+    Object.entries(options.formData)
+      .filter(([_, value]) => isDefined(value))
+      .forEach(([key, value]) => {
+        if (Array.isArray(value)) {
+          value.forEach((v) => process2(key, v));
+        } else {
+          process2(key, value);
+        }
+      });
+    return formData;
+  }
+  return;
+};
+var resolve = async (options, resolver) => {
+  if (typeof resolver === 'function') {
+    return resolver(options);
+  }
+  return resolver;
+};
+var getHeaders = async (config, options) => {
+  const token = await resolve(options, config.TOKEN);
+  const username = await resolve(options, config.USERNAME);
+  const password = await resolve(options, config.PASSWORD);
+  const additionalHeaders = await resolve(options, config.HEADERS);
+  const headers = Object.entries(
+    __spreadValues(
+      __spreadValues(
+        {
+          Accept: 'application/json',
+        },
+        additionalHeaders
+      ),
+      options.headers
+    )
+  )
+    .filter(([_, value]) => isDefined(value))
+    .reduce(
+      (headers2, [key, value]) =>
+        __spreadProps(__spreadValues({}, headers2), {
+          [key]: String(value),
+        }),
+      {}
+    );
+  if (isStringWithValue(token)) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+  if (isStringWithValue(username) && isStringWithValue(password)) {
+    const credentials = base64(`${username}:${password}`);
+    headers['Authorization'] = `Basic ${credentials}`;
+  }
+  if (options.body) {
+    if (options.mediaType) {
+      headers['Content-Type'] = options.mediaType;
+    } else if (isBlob(options.body)) {
+      headers['Content-Type'] = options.body.type || 'application/octet-stream';
+    } else if (isString(options.body)) {
+      headers['Content-Type'] = 'text/plain';
+    } else if (!isFormData(options.body)) {
+      headers['Content-Type'] = 'application/json';
+    }
+  }
+  return new Headers(headers);
+};
+var getRequestBody = (options) => {
+  var _a;
+  if (options.body) {
+    if ((_a = options.mediaType) == null ? void 0 : _a.includes('/json')) {
+      return JSON.stringify(options.body);
+    } else if (isString(options.body) || isBlob(options.body) || isFormData(options.body)) {
+      return options.body;
+    } else {
+      return JSON.stringify(options.body);
+    }
+  }
+  return;
+};
+var sendRequest = async (config, options, url, body, formData, headers, onCancel) => {
+  const controller = new AbortController();
+  const request2 = {
+    headers,
+    body: body ?? formData,
+    method: options.method,
+    signal: controller.signal,
+  };
+  if (config.WITH_CREDENTIALS) {
+    request2.credentials = config.CREDENTIALS;
+  }
+  onCancel(() => controller.abort());
+  return await fetch(url, request2);
+};
+var getResponseHeader = (response, responseHeader) => {
+  if (responseHeader) {
+    const content = response.headers.get(responseHeader);
+    if (isString(content)) {
+      return content;
+    }
+  }
+  return;
+};
+var getResponseBody = async (response) => {
+  if (response.status !== 204) {
+    try {
+      const contentType = response.headers.get('Content-Type');
+      if (contentType) {
+        const isJSON = contentType.toLowerCase().startsWith('application/json');
+        if (isJSON) {
+          return await response.json();
+        } else {
+          return await response.text();
+        }
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }
+  return;
+};
+var catchErrorCodes = (options, result) => {
+  const errors = __spreadValues(
+    {
+      400: 'Bad Request',
+      401: 'Unauthorized',
+      403: 'Forbidden',
+      404: 'Not Found',
+      500: 'Internal Server Error',
+      502: 'Bad Gateway',
+      503: 'Service Unavailable',
+    },
+    options.errors
+  );
+  const error = errors[result.status];
+  if (error) {
+    throw new ApiError(result, error);
+  }
+  if (!result.ok) {
+    throw new ApiError(result, 'Generic Error');
+  }
+};
+var request = (config, options) => {
+  return new CancelablePromise(async (resolve3, reject, onCancel) => {
+    try {
+      const url = getUrl(config, options);
+      const formData = getFormData(options);
+      const body = getRequestBody(options);
+      const headers = await getHeaders(config, options);
+      if (!onCancel.isCancelled) {
+        const response = await sendRequest(config, options, url, body, formData, headers, onCancel);
+        const responseBody = await getResponseBody(response);
+        const responseHeader = getResponseHeader(response, options.responseHeader);
+        const result = {
+          url,
+          ok: response.ok,
+          status: response.status,
+          statusText: response.statusText,
+          body: responseHeader ?? responseBody,
+        };
+        catchErrorCodes(options, result);
+        resolve3(result.body);
+      }
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
+// generated/calyptia/services/ConfigValidatorV2Service.ts
+var ConfigValidatorV2Service = class {
+  static validateConfigV2(requestBody) {
+    return request(OpenAPI, {
+      method: 'POST',
+      url: '/v1/config_validate_v2',
+      body: requestBody,
+      mediaType: 'application/json',
+    });
+  }
+};
+
+// src/index.ts
 var InputValues = /* @__PURE__ */ ((InputValues2) => {
   InputValues2['CONFIG_LOCATION_GLOB'] = 'CONFIG_LOCATION_GLOB';
   InputValues2['CALYPTIA_API_KEY'] = 'CALYPTIA_API_KEY';
@@ -28220,8 +28660,11 @@ var getActionInput = () => {
     return __spreadProps(__spreadValues({}, memo), { [prop]: value });
   }, {});
 };
+global.Headers = import_node_fetch.Headers;
+global.fetch = import_node_fetch.default;
+OpenAPI.BASE = CALYPTIA_API_ENDPOINT;
 var main = async () => {
-  const { FOLLOW_SYMBOLIC_LINKS = 'false', CONFIG_LOCATION_GLOB, CALYPTIA_API_KEY } = getActionInput();
+  const { FOLLOW_SYMBOLIC_LINKS = FALSE_VALUE, CONFIG_LOCATION_GLOB, CALYPTIA_API_KEY } = getActionInput();
   const globber = await glob.create(CONFIG_LOCATION_GLOB, {
     matchDirectories: false,
     followSymbolicLinks: FOLLOW_SYMBOLIC_LINKS !== FALSE_VALUE,
@@ -28239,7 +28682,6 @@ var main = async () => {
     const content = await readContent(filePath);
     if (import_fluent_bit_config_parser.FluentBitSchema.isFluentBitConfiguration(content)) {
       (0, import_core.debug)(`File ${filePath} seems to be Fluent Bit config, validating...`);
-      const URL2 = `${CALYPTIA_API_ENDPOINT}/${CALYPTIA_API_VALIDATION_PATH}`;
       const headers = {
         'Content-Type': 'application/json',
         'x-project-token': CALYPTIA_API_KEY,
@@ -28247,24 +28689,34 @@ var main = async () => {
       try {
         config = new import_fluent_bit_config_parser.FluentBitSchema(content, filePath);
         if (!config.schema.length) {
-          (0, import_core.debug)(`${filePath}: empty schema, moving on...`);
+          (0, import_core.debug)(`${filePath}: Empty schema, moving on...`);
           continue;
         }
-        const response = await (0, import_node_fetch.default)(URL2, {
-          method: 'POST',
-          body: JSON.stringify({ config: config.schema }),
-          headers,
-        });
-        const data = await response.json();
-        if (response.status === 200) {
-          (0, import_core.debug)(`[${filePath}]: ${JSON.stringify(data)}`);
-          if (data.errors) {
-            const errors = normalizeErrors(filePath, data.errors);
-            (0, import_core.debug)(`${filePath}, Found errors: ${JSON.stringify(errors, null, 2)}`);
-            annotations = [...annotations, ...errors];
+        OpenAPI.HEADERS = headers;
+        const sectionsWithoutNames = config.schema.filter(({ name }) => !name);
+        if (sectionsWithoutNames.length) {
+          const sectionsWithoutNamesErrors = [];
+          for (const section of sectionsWithoutNames) {
+            const tokens = config.getTokensBySectionId(section.id);
+            if (tokens) {
+              sectionsWithoutNamesErrors.push([tokens[0].line, tokens[0].col, ATTRIBUTE_NAME_MISSING]);
+            }
           }
-        } else {
-          (0, import_core.setFailed)(`The request failed:  status: ${response.status}, data: ${JSON.stringify(data)}`);
+          annotations.push({ filePath: getRelativeFilePath(filePath), errors: sectionsWithoutNamesErrors });
+          (0, import_core.debug)(
+            `We have skipped ${getRelativeFilePath(
+              filePath
+            )}. It seems to be missing the name attribute, in some sections. These errors will be annotated.`
+          );
+          continue;
+        }
+        const response = await ConfigValidatorV2Service.validateConfigV2({
+          config: config.schema,
+        });
+        if (response.errors) {
+          const errors = normalizeErrors(filePath, response.errors);
+          (0, import_core.debug)(`${filePath}, Found errors: ${JSON.stringify(errors, null, 2)}`);
+          annotations = [...annotations, ...errors];
         }
       } catch (e) {
         if (e instanceof import_fluent_bit_config_parser.TokenError) {
@@ -28274,7 +28726,7 @@ var main = async () => {
         } else {
           (0, import_core.setFailed)(e.message);
         }
-        (0, import_core.setFailed)('We found an error, please check, please check your logs');
+        (0, import_core.setFailed)(ACTION_MESSAGES.FATAL_ERROR);
       }
     }
   }
@@ -28286,7 +28738,7 @@ var main = async () => {
     for (const file in groupedByFile) {
       console.log(formatErrorsPerFile(file, groupedByFile[file], config));
     }
-    (0, import_core.setFailed)('We found errors in your configurations. Please check your logs');
+    (0, import_core.setFailed)(ACTION_MESSAGES.CONFIG_ERRORS);
   }
 };
 

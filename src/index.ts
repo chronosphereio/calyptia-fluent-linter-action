@@ -2,17 +2,18 @@ import { getInput, setFailed, debug } from '@actions/core';
 import * as glob from '@actions/glob';
 import { readContent } from './utils/readContent';
 import { FluentBitSchema, TokenError } from '@calyptia/fluent-bit-config-parser';
-import fetch from 'node-fetch';
+import fetch, { Headers } from 'node-fetch';
 import {
+  ACTION_MESSAGES,
+  ATTRIBUTE_NAME_MISSING,
   CALYPTIA_API_ENDPOINT,
-  CALYPTIA_API_VALIDATION_PATH,
   FALSE_VALUE,
   PROBLEM_MATCHER_FILE_NAME,
 } from './utils/constants';
-import { Annotation, normalizeErrors, getRelativeFilePath } from './utils/normalizeErrors';
+import { Annotation, normalizeErrors, getRelativeFilePath, FullError } from './utils/normalizeErrors';
 import { formatErrorsPerFile } from './formatErrorsPerFile';
 import { resolve } from 'path';
-import type { ValidatedConfigV2 } from '../generated/calyptia';
+import { ConfigValidatorV2Service, OpenAPI, ValidatingConfig } from '../generated/calyptia';
 export enum InputValues {
   CONFIG_LOCATION_GLOB = 'CONFIG_LOCATION_GLOB',
   CALYPTIA_API_KEY = 'CALYPTIA_API_KEY',
@@ -26,8 +27,13 @@ const getActionInput = () => {
   }, {} as Record<keyof typeof InputValues, string>);
 };
 
+global.Headers = Headers;
+global.fetch = fetch;
+
+OpenAPI.BASE = CALYPTIA_API_ENDPOINT;
+
 export const main = async (): Promise<void> => {
-  const { FOLLOW_SYMBOLIC_LINKS = 'false', CONFIG_LOCATION_GLOB, CALYPTIA_API_KEY } = getActionInput();
+  const { FOLLOW_SYMBOLIC_LINKS = FALSE_VALUE, CONFIG_LOCATION_GLOB, CALYPTIA_API_KEY } = getActionInput();
 
   const globber = await glob.create(CONFIG_LOCATION_GLOB, {
     matchDirectories: false,
@@ -53,8 +59,6 @@ export const main = async (): Promise<void> => {
     if (FluentBitSchema.isFluentBitConfiguration(content)) {
       debug(`File ${filePath} seems to be Fluent Bit config, validating...`);
 
-      const URL = `${CALYPTIA_API_ENDPOINT}/${CALYPTIA_API_VALIDATION_PATH}`;
-
       const headers = {
         'Content-Type': 'application/json',
         'x-project-token': CALYPTIA_API_KEY,
@@ -64,29 +68,41 @@ export const main = async (): Promise<void> => {
         config = new FluentBitSchema(content, filePath);
 
         if (!config.schema.length) {
-          debug(`${filePath}: empty schema, moving on...`);
+          debug(`${filePath}: Empty schema, moving on...`);
           continue;
         }
 
-        const response = (await fetch(URL, {
-          method: 'POST',
-          body: JSON.stringify({ config: config.schema }),
-          headers,
-        })) as Response;
+        OpenAPI.HEADERS = headers;
+        const sectionsWithoutNames = config.schema.filter(({ name }) => !name);
 
-        const data = (await response.json()) as ValidatedConfigV2;
-
-        if (response.status === 200) {
-          debug(`[${filePath}]: ${JSON.stringify(data)}`);
-
-          if (data.errors) {
-            const errors = normalizeErrors(filePath, data.errors);
-
-            debug(`${filePath}, Found errors: ${JSON.stringify(errors, null, 2)}`);
-            annotations = [...annotations, ...errors];
+        if (sectionsWithoutNames.length) {
+          const sectionsWithoutNamesErrors = [];
+          // We will log the errors found and skip the file giving that we can not really validate without a name in the section.
+          for (const section of sectionsWithoutNames) {
+            const tokens = config.getTokensBySectionId(section.id);
+            if (tokens) {
+              sectionsWithoutNamesErrors.push([tokens[0].line, tokens[0].col, ATTRIBUTE_NAME_MISSING] as FullError);
+            }
           }
-        } else {
-          setFailed(`The request failed:  status: ${response.status}, data: ${JSON.stringify(data)}`);
+          annotations.push({ filePath: getRelativeFilePath(filePath), errors: sectionsWithoutNamesErrors });
+          debug(
+            `We have skipped ${getRelativeFilePath(
+              filePath
+            )}. It seems to be missing the name attribute, in some sections. These errors will be annotated.`
+          );
+
+          continue;
+        }
+
+        const response = await ConfigValidatorV2Service.validateConfigV2({
+          config: config.schema as ValidatingConfig['config'],
+        });
+
+        if (response.errors) {
+          const errors = normalizeErrors(filePath, response.errors);
+
+          debug(`${filePath}, Found errors: ${JSON.stringify(errors, null, 2)}`);
+          annotations = [...annotations, ...errors];
         }
       } catch (e) {
         if (e instanceof TokenError) {
@@ -96,7 +112,7 @@ export const main = async (): Promise<void> => {
         } else {
           setFailed((e as Error).message);
         }
-        setFailed('We found an error, please check, please check your logs');
+        setFailed(ACTION_MESSAGES.FATAL_ERROR);
       }
     }
   }
@@ -111,6 +127,6 @@ export const main = async (): Promise<void> => {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       console.log(formatErrorsPerFile(file, groupedByFile[file] as Annotation['errors'], config!));
     }
-    setFailed('We found errors in your configurations. Please check your logs');
+    setFailed(ACTION_MESSAGES.CONFIG_ERRORS);
   }
 };

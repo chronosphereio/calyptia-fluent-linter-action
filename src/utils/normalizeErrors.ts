@@ -1,7 +1,7 @@
 import { join } from 'path';
 import type { ValidatedConfigV2 } from '../../generated/calyptia';
 
-type IdError = [id: string, message: string];
+export type IdError = [id: string, message: string];
 
 export type FullError = [line: number, col: number, reason: string];
 type ErrorGroup = IdError | FullError;
@@ -12,7 +12,6 @@ declare let process: {
     GITHUB_WORKSPACE: string;
   };
 };
-
 export function getRelativeFilePath(filePath: string): string {
   return filePath.replace(join(process.env.GITHUB_WORKSPACE, '/'), '');
 }
