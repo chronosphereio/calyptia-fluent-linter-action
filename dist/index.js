@@ -28199,6 +28199,7 @@ function formatErrorsPerFile(filePath, errorGroups, schema) {
       content = [`${filePath}:`, `${line}:${col}`, ISSUE_LEVEL, 'LINTER', message];
     } else {
       const tokens = schema.getTokensBySectionId(error[0]);
+      console.log('tokens:', tokens);
       if (tokens) {
         content = [`${filePath}:`, `${tokens[0].line}:${tokens[0].col}`, ISSUE_LEVEL, 'LINTER', error[1]];
       } else {
