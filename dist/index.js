@@ -10603,6 +10603,11 @@ var require_dist = __commonJS({
       !!isString2(block.name) &&
       (block.name.includes(CUSTOM_SECTIONS_NAMES.FLUENTBIT_METRICS) ||
         block.name.includes(CUSTOM_SECTIONS_NAMES.CALYPTIA));
+    var isValidSchema = (node) => {
+      const isValidBlock = isValidFluentBitSection(node);
+      const isNotCustomSectionName = !isCustomSectionName(node);
+      return isValidBlock && isNotCustomSectionName;
+    };
     var import_moo = __toModule(require_moo());
     var import_table22 = __toModule(require_src2());
     var PROP_DEFAULT_INDENT = 3;
@@ -10818,7 +10823,7 @@ ${value}`);
             const attrName = normalizeField(key);
             const attrValue = value.join(' ');
             if (attrName === 'name') {
-              block = __spreadProps2(__spreadValues2({}, block), { [attrName]: attrValue });
+              block = __spreadProps2(__spreadValues2({}, block), { name: attrValue });
             } else {
               block = __spreadProps2(__spreadValues2({}, block), {
                 optional: __spreadProps2(__spreadValues2({}, block.optional), { [attrName]: attrValue }),
@@ -10863,12 +10868,7 @@ ${value}`);
         return this._directives;
       }
       get schema() {
-        const test = (node) => {
-          const isValidBlock = isValidFluentBitSection(node);
-          const isNotCustomSectionName = !isCustomSectionName(node);
-          return isValidBlock && isNotCustomSectionName;
-        };
-        return this.AST.filter(test).map((_a) => {
+        return this.AST.filter(isValidSchema).map((_a) => {
           var _b = _a,
             { __filePath } = _b,
             rest = __objRest2(_b, ['__filePath']);
@@ -28648,14 +28648,14 @@ var ConfigValidatorV2Service = class {
 };
 
 // src/index.ts
-var InputValues = /* @__PURE__ */ ((InputValues2) => {
-  InputValues2['CONFIG_LOCATION_GLOB'] = 'CONFIG_LOCATION_GLOB';
-  InputValues2['CALYPTIA_API_KEY'] = 'CALYPTIA_API_KEY';
-  InputValues2['FOLLOW_SYMBOLIC_LINKS'] = 'FOLLOW_SYMBOLIC_LINKS';
-  return InputValues2;
-})(InputValues || {});
+var INPUT = /* @__PURE__ */ ((INPUT2) => {
+  INPUT2['CONFIG_LOCATION_GLOB'] = 'calyptia-api-key';
+  INPUT2['CALYPTIA_API_KEY'] = 'config-location-glob';
+  INPUT2['FOLLOW_SYMBOLIC_LINKS'] = 'follow-symbolic-links';
+  return INPUT2;
+})(INPUT || {});
 var getActionInput = () => {
-  return Object.keys(InputValues).reduce((memo, prop) => {
+  return Object.values(INPUT).reduce((memo, prop) => {
     const value = (0, import_core.getInput)(prop);
     return __spreadProps(__spreadValues({}, memo), { [prop]: value });
   }, {});
@@ -28664,14 +28664,16 @@ global.Headers = import_node_fetch.Headers;
 global.fetch = import_node_fetch.default;
 OpenAPI.BASE = CALYPTIA_API_ENDPOINT;
 var main = async () => {
-  const { FOLLOW_SYMBOLIC_LINKS = FALSE_VALUE, CONFIG_LOCATION_GLOB, CALYPTIA_API_KEY } = getActionInput();
-  const globber = await glob.create(CONFIG_LOCATION_GLOB, {
+  const input = getActionInput();
+  const globber = await glob.create(input['calyptia-api-key' /* CONFIG_LOCATION_GLOB */], {
     matchDirectories: false,
-    followSymbolicLinks: FOLLOW_SYMBOLIC_LINKS !== FALSE_VALUE,
+    followSymbolicLinks: input['follow-symbolic-links' /* FOLLOW_SYMBOLIC_LINKS */] !== FALSE_VALUE,
   });
   const files = await globber.glob();
   if (!files.length) {
-    (0, import_core.setFailed)(`We could not find any files from using the provided GLOB (${CONFIG_LOCATION_GLOB})`);
+    (0, import_core.setFailed)(
+      `We could not find any files from using the provided GLOB (${input['calyptia-api-key' /* CONFIG_LOCATION_GLOB */]})`
+    );
   }
   let annotations = [];
   let config;
@@ -28684,7 +28686,7 @@ var main = async () => {
       (0, import_core.debug)(`File ${filePath} seems to be Fluent Bit config, validating...`);
       const headers = {
         'Content-Type': 'application/json',
-        'x-project-token': CALYPTIA_API_KEY,
+        'x-project-token': input['config-location-glob' /* CALYPTIA_API_KEY */],
       };
       try {
         config = new import_fluent_bit_config_parser.FluentBitSchema(content, filePath);

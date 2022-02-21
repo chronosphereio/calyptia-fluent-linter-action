@@ -14,17 +14,17 @@ import { Annotation, normalizeErrors, getRelativeFilePath, FullError } from './u
 import { formatErrorsPerFile } from './formatErrorsPerFile';
 import { resolve } from 'path';
 import { ConfigValidatorV2Service, OpenAPI, ValidatingConfig } from '../generated/calyptia';
-export enum InputValues {
-  CONFIG_LOCATION_GLOB = 'CONFIG_LOCATION_GLOB',
-  CALYPTIA_API_KEY = 'CALYPTIA_API_KEY',
-  FOLLOW_SYMBOLIC_LINKS = 'FOLLOW_SYMBOLIC_LINKS',
+export enum INPUT {
+  CONFIG_LOCATION_GLOB = 'calyptia-api-key',
+  CALYPTIA_API_KEY = 'config-location-glob',
+  FOLLOW_SYMBOLIC_LINKS = 'follow-symbolic-links',
 }
 
 const getActionInput = () => {
-  return Object.keys(InputValues).reduce((memo, prop) => {
+  return Object.values(INPUT).reduce((memo, prop) => {
     const value = getInput(prop);
     return { ...memo, [prop]: value };
-  }, {} as Record<keyof typeof InputValues, string>);
+  }, {} as Record<`${INPUT}`, string>);
 };
 
 global.Headers = Headers;
@@ -33,17 +33,17 @@ global.fetch = fetch;
 OpenAPI.BASE = CALYPTIA_API_ENDPOINT;
 
 export const main = async (): Promise<void> => {
-  const { FOLLOW_SYMBOLIC_LINKS = FALSE_VALUE, CONFIG_LOCATION_GLOB, CALYPTIA_API_KEY } = getActionInput();
+  const input = getActionInput();
 
-  const globber = await glob.create(CONFIG_LOCATION_GLOB, {
+  const globber = await glob.create(input[INPUT.CONFIG_LOCATION_GLOB], {
     matchDirectories: false,
-    followSymbolicLinks: FOLLOW_SYMBOLIC_LINKS !== FALSE_VALUE,
+    followSymbolicLinks: input[INPUT.FOLLOW_SYMBOLIC_LINKS] !== FALSE_VALUE,
   });
 
   const files = await globber.glob();
 
   if (!files.length) {
-    setFailed(`We could not find any files from using the provided GLOB (${CONFIG_LOCATION_GLOB})`);
+    setFailed(`We could not find any files from using the provided GLOB (${input[INPUT.CONFIG_LOCATION_GLOB]})`);
   }
 
   let annotations = [] as Annotation[];
@@ -61,7 +61,7 @@ export const main = async (): Promise<void> => {
 
       const headers = {
         'Content-Type': 'application/json',
-        'x-project-token': CALYPTIA_API_KEY,
+        'x-project-token': input[INPUT.CALYPTIA_API_KEY],
       };
 
       try {

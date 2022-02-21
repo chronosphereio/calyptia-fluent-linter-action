@@ -64,12 +64,12 @@ The first step is to create the workflow in your repository. We describe two way
          - id: fluent_linter_action
            uses: calyptia/fluent-linter-action@main
            with:
-             CALYPTIA_API_KEY: ${{ secrets.CALYPTIA_API_KEY }}
-             FOLLOW_SYMBOLIC_LINKS: 'true' # this is optional. It defaults to false.
-             CONFIG_LOCATION_GLOB: '*.conf'
+             calyptia-api-key: ${{ secrets.CALYPTIA_API_KEY }}
+             follow-symbolic-links: 'true' # this is optional. It defaults to false.
+             config-location-glob: '*.conf'
    ```
 
-1. Make sure to change `CONFIG_LOCATION_GLOB` to a [glob](<https://en.wikipedia.org/wiki/Glob_(programming)>) that points to your `Fluentd` and `Fluent Bit` configuration within the repository. You can use [this page](https://globster.xyz/) to make sure your glob will match the necessary files.
+1. Make sure to change `config-location-glob` to a [glob](<https://en.wikipedia.org/wiki/Glob_(programming)>) that points to your `Fluentd` and `Fluent Bit` configuration within the repository. You can use [this page](https://globster.xyz/) to make sure your glob will match the necessary files.
 
 _If you want to see it in action, take a look at the [example here](https://github.com/calyptia/fluent-linter-action/pull/9)_
 
@@ -79,7 +79,7 @@ _If you want to see it in action, take a look at the [example here](https://gith
 1. Under the tab _Actions_ look for a button called _New workflow_.
 1. Under _Choose workflow_, you will find a text box. Please type "fluent-linter"
 1. You will find Fluent-linter-action by Calyptia. Look for a button called "Configure"
-1. Make sure to change `CONFIG_LOCATION_GLOB` to a [glob](<https://en.wikipedia.org/wiki/Glob_(programming)>) that points to your fluentd and fluent-bit configuration within the repository.
+1. Make sure to change `config-location-glob` to a [glob](<https://en.wikipedia.org/wiki/Glob_(programming)>) that points to your fluentd and fluent-bit configuration within the repository.
 
 If everything goes well, you will see an editor that will let you change anything on the workflow before committing. You can change the version from `main` to a specific one.
 
@@ -97,7 +97,7 @@ In order to get the full linting capabilities from this action, you will need to
 
 The last step will be to use the API Key we generated in Calyptia Cloud.
 
-Add a new secret to your repository find _Settings > Secrets > New repository secret_. The name for this secret should be `CALYPTIA_API_KEY`. Paste the secret you obtained in the step before.
+Add a new secret to your repository find _Settings > Secrets > New repository secret_. The name for this secret should be `calyptia-api-key`. Paste the secret you obtained in the step before.
 
 > note: Settings is often next to the insights tab. If you can't see the option, you are missing permissions.
 
