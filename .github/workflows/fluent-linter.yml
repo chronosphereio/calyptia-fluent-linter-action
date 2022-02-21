@@ -6,7 +6,7 @@ jobs:
     steps:
       - uses: actions/checkout@master
       - id: running_linter
-        uses: calyptia/fluent-linter-action@gg/using-new-sdk
+        uses: calyptia/fluent-linter-action@gg/making-options-kebab-case
         with:
-          CALYPTIA_API_KEY: ${{ secrets.CALYPTIA_API_KEY }}
-          CONFIG_LOCATION_GLOB: '__fixtures__/configurations/*.conf'
+          calyptia-api-key: ${{ secrets.CALYPTIA_API_KEY }}
+          config-location-glob: '__fixtures__/configurations/*.conf'
