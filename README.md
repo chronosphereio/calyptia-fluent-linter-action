@@ -20,7 +20,7 @@
 
   </p>
 
-## Table of Contents
+## Table of Contents 🦉
 
 - [Getting Started](#getting-started)
 - [Installation](#installation)
