@@ -1,4 +1,4 @@
-import { main, InputValues } from '../src';
+import { main, INPUT } from '../src';
 import { setFailed, getInput, setOutput } from '../__mocks__/@actions/core';
 import nock from 'nock';
 import failCase from '../__fixtures__/scenarios/failed_case.json';
@@ -18,14 +18,14 @@ jest.spyOn(FluentBitSchema.prototype, 'getTokensBySectionId').mockImplementation
 describe('fluent-linter-action', () => {
   let consoleLogMock: jest.Mock;
   const mockedInput = {
-    [InputValues.CALYPTIA_API_KEY]: 'API_TOKEN',
-    [InputValues.CONFIG_LOCATION_GLOB]: '__fixtures__/*.conf',
-    [InputValues.FOLLOW_SYMBOLIC_LINKS]: 'false',
+    [INPUT.CALYPTIA_API_KEY]: 'API_TOKEN',
+    [INPUT.CONFIG_LOCATION_GLOB]: '__fixtures__/*.conf',
+    [INPUT.FOLLOW_SYMBOLIC_LINKS]: 'false',
   };
 
   process.env.GITHUB_WORKSPACE = '<PROJECT_ROOT>';
   beforeAll(() => {
-    getInput.mockImplementation((key: Partial<InputValues>) => {
+    getInput.mockImplementation((key: Partial<INPUT>) => {
       return mockedInput[key];
     });
 
@@ -45,8 +45,8 @@ describe('fluent-linter-action', () => {
   });
 
   it('Reports missing file with @INCLUDE', async () => {
-    mockedInput.CONFIG_LOCATION_GLOB = '__fixtures__/scenarios/withInclude/wrongPathInclude.conf';
-    mockedInput.FOLLOW_SYMBOLIC_LINKS = 'true';
+    mockedInput[INPUT.CONFIG_LOCATION_GLOB] = '__fixtures__/scenarios/withInclude/wrongPathInclude.conf';
+    mockedInput[INPUT.FOLLOW_SYMBOLIC_LINKS] = 'true';
 
     await main();
 
@@ -94,9 +94,9 @@ describe('fluent-linter-action', () => {
     }
   });
   it('Reports no issues with @INCLUDE', async () => {
-    mockedInput.CONFIG_LOCATION_GLOB = '__fixtures__/scenarios/withInclude/include.conf';
-    getInput.mockImplementation((key: Partial<Exclude<InputValues, 'FOLLOW_SYMBOLIC_LINKS'>>) => {
-      const { FOLLOW_SYMBOLIC_LINKS, ...rest } = mockedInput;
+    mockedInput[INPUT.CONFIG_LOCATION_GLOB] = '__fixtures__/scenarios/withInclude/include.conf';
+    getInput.mockImplementation((key: Exclude<`${INPUT}`, `${INPUT.FOLLOW_SYMBOLIC_LINKS}`>) => {
+      const { [INPUT.FOLLOW_SYMBOLIC_LINKS]: FOLLOW_SYMBOLIC_LINKS, ...rest } = mockedInput;
       return rest[key];
     });
     const client = nock(CALYPTIA_API_ENDPOINT);
@@ -111,7 +111,7 @@ describe('fluent-linter-action', () => {
   });
 
   it('Reports no issues when configuration has no errors', async () => {
-    mockedInput.CONFIG_LOCATION_GLOB = '__fixtures__/basic.conf';
+    mockedInput[INPUT.CONFIG_LOCATION_GLOB] = '__fixtures__/basic.conf';
     const client = nock(CALYPTIA_API_ENDPOINT);
     client['post']('/' + CALYPTIA_API_VALIDATION_PATH).reply(200, { config: {} });
 
@@ -123,7 +123,7 @@ describe('fluent-linter-action', () => {
   });
 
   it('Reports errors correctly matching problemMatcher', async () => {
-    mockedInput.CONFIG_LOCATION_GLOB = '__fixtures__/invalid.conf';
+    mockedInput[INPUT.CONFIG_LOCATION_GLOB] = '__fixtures__/invalid.conf';
     const client = nock(CALYPTIA_API_ENDPOINT);
     client['post']('/' + CALYPTIA_API_VALIDATION_PATH).reply(200, failCase);
     await main();
@@ -181,7 +181,7 @@ describe('fluent-linter-action', () => {
   });
 
   it('Reports errors when request fails', async () => {
-    mockedInput.CONFIG_LOCATION_GLOB = '__fixtures__/basic.conf';
+    mockedInput[INPUT.CONFIG_LOCATION_GLOB] = '__fixtures__/basic.conf';
     const client = nock(CALYPTIA_API_ENDPOINT);
 
     client['post']('/' + CALYPTIA_API_VALIDATION_PATH).replyWithError(new Error('Server Error'));
@@ -219,7 +219,7 @@ describe('fluent-linter-action', () => {
   });
 
   it('Reports failure when the CONFIG_LOCATION_GLOB does not provide any results', async () => {
-    mockedInput.CONFIG_LOCATION_GLOB = '__fixtures__/*.nonexistent';
+    mockedInput[INPUT.CONFIG_LOCATION_GLOB] = '__fixtures__/*.nonexistent';
 
     await main();
 
@@ -233,7 +233,7 @@ describe('fluent-linter-action', () => {
     `);
   });
   it('Reports errors when request fails with other than 500', async () => {
-    mockedInput.CONFIG_LOCATION_GLOB = '__fixtures__/basic.conf';
+    mockedInput[INPUT.CONFIG_LOCATION_GLOB] = '__fixtures__/basic.conf';
     const client = nock(CALYPTIA_API_ENDPOINT);
     client['post']('/' + CALYPTIA_API_VALIDATION_PATH).reply(401, new Error('Auth Error'));
 
@@ -255,7 +255,7 @@ describe('fluent-linter-action', () => {
   });
 
   it('Reports errors when section does not have name', async () => {
-    mockedInput.CONFIG_LOCATION_GLOB = '__fixtures__/basic_without_name.conf';
+    mockedInput[INPUT.CONFIG_LOCATION_GLOB] = '__fixtures__/basic_without_name.conf';
     await main();
 
     expect(setFailed.mock.calls).toMatchInlineSnapshot(`
@@ -281,7 +281,7 @@ describe('fluent-linter-action', () => {
   });
 
   it('does not report if configuration is not Fluent Bit/Fluentd', async () => {
-    mockedInput.CONFIG_LOCATION_GLOB = '__fixtures__/nginx.conf';
+    mockedInput[INPUT.CONFIG_LOCATION_GLOB] = '__fixtures__/nginx.conf';
 
     await main();
 
@@ -290,7 +290,7 @@ describe('fluent-linter-action', () => {
   });
 
   it('does not report if configuration schema is empty (parse is not lint-able)', async () => {
-    mockedInput.CONFIG_LOCATION_GLOB = '__fixtures__/multiline_parse.conf';
+    mockedInput[INPUT.CONFIG_LOCATION_GLOB] = '__fixtures__/multiline_parse.conf';
 
     await main();
 
