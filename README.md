@@ -8,7 +8,10 @@
     <a href="https://codecov.io/gh/calyptia/fluent-linter-action">
       <img src="https://codecov.io/gh/calyptia/fluent-linter-action/branch/main/graph/badge.svg?token=48gHuQl8zV" alt="codecov" />
     </a>
-  <a href="https://github.com/calyptia/fluent-linter-action/blob/main/LICENSE">
+    <a href="http://slack.fluentd.org/">
+      <img src="https://img.shields.io/badge/slack-@slack.fluentd.org-green.svg?logo=slack" alt="Slack" />
+    </a>
+    <a href="https://github.com/calyptia/fluent-linter-action/blob/main/LICENSE">
       <img src="https://img.shields.io/github/license/calyptia/fluent-linter-action" alt="APACHE 2.0 license" />
     </a>
 </p>
