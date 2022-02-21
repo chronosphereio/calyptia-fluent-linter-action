@@ -28194,13 +28194,11 @@ function formatErrorsPerFile(filePath, errorGroups, schema) {
   const data = [];
   for (const error of errorGroups) {
     let content = [];
-    console.log('error:', error);
     if (isFullError(error)) {
       const [line, col, message] = error;
       content = [`${filePath}:`, `${line}:${col}`, ISSUE_LEVEL, 'LINTER', message];
     } else {
       const tokens = schema.getTokensBySectionId(error[0]);
-      console.log('tokens:', tokens);
       if (tokens) {
         content = [`${filePath}:`, `${tokens[0].line}:${tokens[0].col}`, ISSUE_LEVEL, 'LINTER', error[1]];
       } else {
@@ -28696,16 +28694,15 @@ var main = async () => {
         OpenAPI.BASE = CALYPTIA_API_ENDPOINT;
         OpenAPI.HEADERS = headers;
         const sectionsWithoutNames = config.schema.filter(({ name }) => !name);
+        const sectionsWithoutNamesErrors = [];
         if (sectionsWithoutNames.length) {
-          const errors = sectionsWithoutNames.map((section) => {
+          for (const section of sectionsWithoutNames) {
             const tokens = config.getTokensBySectionId(section.id);
             if (tokens) {
-              return [tokens[0].line, tokens[0].col, ATTRIBUTE_NAME_MISSING];
-            } else {
-              return [section.id, ATTRIBUTE_NAME_MISSING];
+              sectionsWithoutNamesErrors.push([tokens[0].line, tokens[0].col, ATTRIBUTE_NAME_MISSING]);
             }
-          });
-          annotations.push({ filePath: getRelativeFilePath(filePath), errors });
+          }
+          annotations.push({ filePath: getRelativeFilePath(filePath), errors: sectionsWithoutNamesErrors });
           (0, import_core.debug)(
             `We have skipped ${getRelativeFilePath(
               filePath
@@ -28734,7 +28731,6 @@ var main = async () => {
     }
   }
   if (annotations.length) {
-    console.log(JSON.stringify(annotations, null, 2));
     const groupedByFile = annotations.reduce((memo, { filePath, errors }) => {
       memo[filePath] = memo[filePath] ? [...memo[filePath], ...errors] : errors;
       return memo;

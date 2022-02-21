@@ -271,7 +271,7 @@ describe('fluent-linter-action', () => {
           "::add-matcher::<PROJECT_ROOT>/src/problem-matcher.json",
         ],
         Array [
-          "<PROJECT_ROOT>/__fixtures__/basic_without_name.conf: 4:1 error LINTER attribute \\"name\\" missing 
+          "<PROJECT_ROOT>/__fixtures__/basic_without_name.conf: 4:1 error LINTER Attribute \\"name\\" missing 
       ",
         ],
       ]

@@ -15,14 +15,12 @@ export function formatErrorsPerFile(
 
   for (const error of errorGroups) {
     let content = [];
-    console.log('error:', error);
     if (isFullError(error)) {
       const [line, col, message] = error;
       content = [`${filePath}:`, `${line}:${col}`, ISSUE_LEVEL, 'LINTER', message];
     } else {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const tokens = schema!.getTokensBySectionId(error[0]);
-      console.log('tokens:', tokens);
       if (tokens) {
         content = [`${filePath}:`, `${tokens[0].line}:${tokens[0].col}`, ISSUE_LEVEL, 'LINTER', error[1]];
       } else {

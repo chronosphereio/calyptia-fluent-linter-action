@@ -10,7 +10,7 @@ import {
   FALSE_VALUE,
   PROBLEM_MATCHER_FILE_NAME,
 } from './utils/constants';
-import { Annotation, normalizeErrors, getRelativeFilePath, FullError, IdError } from './utils/normalizeErrors';
+import { Annotation, normalizeErrors, getRelativeFilePath, FullError } from './utils/normalizeErrors';
 import { formatErrorsPerFile } from './formatErrorsPerFile';
 import { resolve } from 'path';
 import { ConfigValidatorV2Service, OpenAPI, ValidatingConfig } from '../generated/calyptia';
@@ -75,17 +75,16 @@ export const main = async (): Promise<void> => {
 
         const sectionsWithoutNames = config.schema.filter(({ name }) => !name);
 
+        const sectionsWithoutNamesErrors = [];
         if (sectionsWithoutNames.length) {
           // We will log the errors found and skip the file giving that we can not really validate without a name in the section.
-          const errors = sectionsWithoutNames.map((section) => {
+          for (const section of sectionsWithoutNames) {
             const tokens = config.getTokensBySectionId(section.id);
             if (tokens) {
-              return [tokens[0].line, tokens[0].col, ATTRIBUTE_NAME_MISSING] as FullError;
-            } else {
-              return [section.id, ATTRIBUTE_NAME_MISSING] as IdError;
+              sectionsWithoutNamesErrors.push([tokens[0].line, tokens[0].col, ATTRIBUTE_NAME_MISSING] as FullError);
             }
-          });
-          annotations.push({ filePath: getRelativeFilePath(filePath), errors });
+          }
+          annotations.push({ filePath: getRelativeFilePath(filePath), errors: sectionsWithoutNamesErrors });
 
           debug(
             `We have skipped ${getRelativeFilePath(
@@ -120,7 +119,6 @@ export const main = async (): Promise<void> => {
   }
 
   if (annotations.length) {
-    console.log(JSON.stringify(annotations, null, 2));
     const groupedByFile = annotations.reduce((memo, { filePath, errors }) => {
       memo[filePath] = memo[filePath] ? [...memo[filePath], ...errors] : errors;
 
