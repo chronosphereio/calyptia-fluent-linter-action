@@ -12,7 +12,6 @@ declare let process: {
     GITHUB_WORKSPACE: string;
   };
 };
-
 export function getRelativeFilePath(filePath: string): string {
   return filePath.replace(join(process.env.GITHUB_WORKSPACE, '/'), '');
 }

@@ -28695,9 +28695,11 @@ var main = async () => {
         const sectionsWithoutNames = config.schema.filter(({ name }) => !name);
         if (sectionsWithoutNames.length) {
           const errors = sectionsWithoutNames.map((section) => [section.id, 'attribute "name" missing']);
-          annotations.push({ filePath, errors });
+          annotations.push({ filePath: getRelativeFilePath(filePath), errors });
           (0, import_core.debug)(
-            `We have skipped ${filePath}. It seems to be missing in some sections the name attribute.`
+            `We have skipped ${getRelativeFilePath(
+              filePath
+            )}. It seems to be missing in some sections the name attribute.`
           );
           continue;
         }

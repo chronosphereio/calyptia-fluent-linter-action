@@ -72,9 +72,13 @@ export const main = async (): Promise<void> => {
         if (sectionsWithoutNames.length) {
           // We will log the errors found and skip the file giving that we can not really validate without a name in the section.
           const errors = sectionsWithoutNames.map((section) => [section.id, 'attribute "name" missing'] as IdError);
-          annotations.push({ filePath, errors });
+          annotations.push({ filePath: getRelativeFilePath(filePath), errors });
 
-          debug(`We have skipped ${filePath}. It seems to be missing in some sections the name attribute.`);
+          debug(
+            `We have skipped ${getRelativeFilePath(
+              filePath
+            )}. It seems to be missing in some sections the name attribute.`
+          );
 
           continue;
         }
