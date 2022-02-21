@@ -1,6 +1,6 @@
 <p align="center">
     <a href="https://github.com/marketplace/actions/fluent-linter-action">
-      <img src="https://img.shields.io/badge/Marketplace-v2-undefined.svg?logo=github&logoColor=white&style=flat" alt="GitHub Marketplace" />
+      <img src="https://img.shields.io/badge/Marketplace-v0.2.0-undefined.svg?logo=github&logoColor=white&style=flat" alt="GitHub Marketplace" />
     </a>
     <a href="https://github.com/calyptia/fluent-lint-action/actions/workflows/unit-tests.yml">
       <img src="https://github.com/calyptia/fluent-linter-action/actions/workflows/unit-tests.yml/badge.svg" alt="unit-tests" />
@@ -8,7 +8,10 @@
     <a href="https://codecov.io/gh/calyptia/fluent-linter-action">
       <img src="https://codecov.io/gh/calyptia/fluent-linter-action/branch/main/graph/badge.svg?token=48gHuQl8zV" alt="codecov" />
     </a>
-  <a href="https://github.com/calyptia/fluent-linter-action/blob/main/LICENSE">
+    <a href="http://slack.fluentd.org/">
+      <img src="https://img.shields.io/badge/slack-@slack.fluentd.org-green.svg?logo=slack" alt="Slack" />
+    </a>
+    <a href="https://github.com/calyptia/fluent-linter-action/blob/main/LICENSE">
       <img src="https://img.shields.io/github/license/calyptia/fluent-linter-action" alt="APACHE 2.0 license" />
     </a>
 </p>
