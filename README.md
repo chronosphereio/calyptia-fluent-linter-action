@@ -1,6 +1,6 @@
 <p align="center">
     <a href="https://github.com/marketplace/actions/fluent-linter-action">
-      <img src="https://img.shields.io/badge/Marketplace-v2-undefined.svg?logo=github&logoColor=white&style=flat" alt="GitHub Marketplace" />
+      <img src="https://img.shields.io/badge/Marketplace-v0.2.0-undefined.svg?logo=github&logoColor=white&style=flat" alt="GitHub Marketplace" />
     </a>
     <a href="https://github.com/calyptia/fluent-lint-action/actions/workflows/unit-tests.yml">
       <img src="https://github.com/calyptia/fluent-linter-action/actions/workflows/unit-tests.yml/badge.svg" alt="unit-tests" />
