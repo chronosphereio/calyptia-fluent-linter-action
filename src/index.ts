@@ -30,6 +30,8 @@ const getActionInput = () => {
 global.Headers = Headers;
 global.fetch = fetch;
 
+OpenAPI.BASE = CALYPTIA_API_ENDPOINT;
+
 export const main = async (): Promise<void> => {
   const { FOLLOW_SYMBOLIC_LINKS = FALSE_VALUE, CONFIG_LOCATION_GLOB, CALYPTIA_API_KEY } = getActionInput();
 
@@ -70,13 +72,11 @@ export const main = async (): Promise<void> => {
           continue;
         }
 
-        OpenAPI.BASE = CALYPTIA_API_ENDPOINT;
         OpenAPI.HEADERS = headers;
-
         const sectionsWithoutNames = config.schema.filter(({ name }) => !name);
 
-        const sectionsWithoutNamesErrors = [];
         if (sectionsWithoutNames.length) {
+          const sectionsWithoutNamesErrors = [];
           // We will log the errors found and skip the file giving that we can not really validate without a name in the section.
           for (const section of sectionsWithoutNames) {
             const tokens = config.getTokensBySectionId(section.id);
@@ -85,11 +85,10 @@ export const main = async (): Promise<void> => {
             }
           }
           annotations.push({ filePath: getRelativeFilePath(filePath), errors: sectionsWithoutNamesErrors });
-
           debug(
             `We have skipped ${getRelativeFilePath(
               filePath
-            )}. It seems to be missing in some sections the name attribute.`
+            )}. It seems to be missing the name attribute, in some sections. These errors will be annotated.`
           );
 
           continue;

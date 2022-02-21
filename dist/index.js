@@ -28662,6 +28662,7 @@ var getActionInput = () => {
 };
 global.Headers = import_node_fetch.Headers;
 global.fetch = import_node_fetch.default;
+OpenAPI.BASE = CALYPTIA_API_ENDPOINT;
 var main = async () => {
   const { FOLLOW_SYMBOLIC_LINKS = FALSE_VALUE, CONFIG_LOCATION_GLOB, CALYPTIA_API_KEY } = getActionInput();
   const globber = await glob.create(CONFIG_LOCATION_GLOB, {
@@ -28691,11 +28692,10 @@ var main = async () => {
           (0, import_core.debug)(`${filePath}: Empty schema, moving on...`);
           continue;
         }
-        OpenAPI.BASE = CALYPTIA_API_ENDPOINT;
         OpenAPI.HEADERS = headers;
         const sectionsWithoutNames = config.schema.filter(({ name }) => !name);
-        const sectionsWithoutNamesErrors = [];
         if (sectionsWithoutNames.length) {
+          const sectionsWithoutNamesErrors = [];
           for (const section of sectionsWithoutNames) {
             const tokens = config.getTokensBySectionId(section.id);
             if (tokens) {
@@ -28706,7 +28706,7 @@ var main = async () => {
           (0, import_core.debug)(
             `We have skipped ${getRelativeFilePath(
               filePath
-            )}. It seems to be missing in some sections the name attribute.`
+            )}. It seems to be missing the name attribute, in some sections. These errors will be annotated.`
           );
           continue;
         }
