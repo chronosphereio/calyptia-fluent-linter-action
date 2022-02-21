@@ -3,8 +3,14 @@ import * as glob from '@actions/glob';
 import { readContent } from './utils/readContent';
 import { FluentBitSchema, TokenError } from '@calyptia/fluent-bit-config-parser';
 import fetch, { Headers } from 'node-fetch';
-import { ACTION_MESSAGES, CALYPTIA_API_ENDPOINT, FALSE_VALUE, PROBLEM_MATCHER_FILE_NAME } from './utils/constants';
-import { Annotation, normalizeErrors, getRelativeFilePath, IdError } from './utils/normalizeErrors';
+import {
+  ACTION_MESSAGES,
+  ATTRIBUTE_NAME_MISSING,
+  CALYPTIA_API_ENDPOINT,
+  FALSE_VALUE,
+  PROBLEM_MATCHER_FILE_NAME,
+} from './utils/constants';
+import { Annotation, normalizeErrors, getRelativeFilePath, FullError, IdError } from './utils/normalizeErrors';
 import { formatErrorsPerFile } from './formatErrorsPerFile';
 import { resolve } from 'path';
 import { ConfigValidatorV2Service, OpenAPI, ValidatingConfig } from '../generated/calyptia';
@@ -71,7 +77,14 @@ export const main = async (): Promise<void> => {
 
         if (sectionsWithoutNames.length) {
           // We will log the errors found and skip the file giving that we can not really validate without a name in the section.
-          const errors = sectionsWithoutNames.map((section) => [section.id, 'attribute "name" missing'] as IdError);
+          const errors = sectionsWithoutNames.map((section) => {
+            const tokens = config.getTokensBySectionId(section.id);
+            if (tokens) {
+              return [tokens[0].line, tokens[0].col, ATTRIBUTE_NAME_MISSING] as FullError;
+            } else {
+              return [section.id, ATTRIBUTE_NAME_MISSING] as IdError;
+            }
+          });
           annotations.push({ filePath: getRelativeFilePath(filePath), errors });
 
           debug(

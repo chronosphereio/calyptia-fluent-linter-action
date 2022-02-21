@@ -28151,6 +28151,7 @@ var ACTION_MESSAGES = {
   CONFIG_ERRORS: 'We found errors in your configurations. Please check your logs',
   FATAL_ERROR: 'We found an error. Please check your logs',
 };
+var ATTRIBUTE_NAME_MISSING = 'Attribute "name" missing';
 
 // src/utils/normalizeErrors.ts
 var import_path = require('path');
@@ -28696,7 +28697,14 @@ var main = async () => {
         OpenAPI.HEADERS = headers;
         const sectionsWithoutNames = config.schema.filter(({ name }) => !name);
         if (sectionsWithoutNames.length) {
-          const errors = sectionsWithoutNames.map((section) => [section.id, 'attribute "name" missing']);
+          const errors = sectionsWithoutNames.map((section) => {
+            const tokens = config.getTokensBySectionId(section.id);
+            if (tokens) {
+              return [tokens[0].line, tokens[0].col, ATTRIBUTE_NAME_MISSING];
+            } else {
+              return [section.id, ATTRIBUTE_NAME_MISSING];
+            }
+          });
           annotations.push({ filePath: getRelativeFilePath(filePath), errors });
           (0, import_core.debug)(
             `We have skipped ${getRelativeFilePath(
