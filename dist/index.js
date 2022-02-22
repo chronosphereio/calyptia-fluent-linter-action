@@ -28157,7 +28157,7 @@ var ATTRIBUTE_NAME_MISSING = 'Attribute "name" missing';
 var import_path = require('path');
 function getRelativeFilePath(filePath) {
   const relativePath = filePath.replace((0, import_path.join)(process.env.GITHUB_WORKSPACE, '/'), '');
-  return relativePath.startsWith('/') ? relativePath : `./${relativePath}`;
+  return `./${relativePath}`;
 }
 function normalizeErrors(filePath, errors) {
   const annotations = [];
