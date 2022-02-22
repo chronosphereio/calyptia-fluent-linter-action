@@ -1,29 +1,29 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`fluent-linter-action Reports errors correctly matching problemMatcher: __fixtures__/invalid.conf 1`] = `
+exports[`fluent-linter-action Reports errors correctly matching problemMatcher: ./__fixtures__/invalid.conf 1`] = `
 Object {
   "column": "5",
-  "file": "<PROJECT_ROOT>/__fixtures__/invalid.conf",
+  "file": "./__fixtures__/invalid.conf",
   "line": "2",
   "message": "cannot initialize input plugin: john ",
   "severity": "error",
 }
 `;
 
-exports[`fluent-linter-action Reports errors correctly matching problemMatcher: __fixtures__/invalid.conf 2`] = `
+exports[`fluent-linter-action Reports errors correctly matching problemMatcher: ./__fixtures__/invalid.conf 2`] = `
 Object {
   "column": "0",
-  "file": "<PROJECT_ROOT>/__fixtures__/invalid.conf",
+  "file": "./__fixtures__/invalid.conf",
   "line": "0",
   "message": "Unknown syslog mode abc              ",
   "severity": "error",
 }
 `;
 
-exports[`fluent-linter-action Reports errors correctly matching problemMatcher: __fixtures__/invalid.conf 3`] = `
+exports[`fluent-linter-action Reports errors correctly matching problemMatcher: ./__fixtures__/invalid.conf 3`] = `
 Object {
   "column": "0",
-  "file": "<PROJECT_ROOT>/__fixtures__/invalid.conf",
+  "file": "./__fixtures__/invalid.conf",
   "line": "0",
   "message": "missing 'key_name'                   ",
   "severity": "error",
