@@ -13,7 +13,10 @@ declare let process: {
   };
 };
 export function getRelativeFilePath(filePath: string): string {
-  return filePath.replace(join(process.env.GITHUB_WORKSPACE, '/'), '');
+  const relativePath = filePath.replace(join(process.env.GITHUB_WORKSPACE, '/'), '');
+
+  // We add the ./ to the relative path to match the problem matcher.
+  return filePath.startsWith('/') ? relativePath : join('./', relativePath);
 }
 export function normalizeErrors(filePath: string, errors: ValidatedConfigV2['errors']): Annotation[] {
   const annotations = [] as Annotation[];

@@ -297,4 +297,68 @@ describe('fluent-linter-action', () => {
     expect(setFailed).not.toHaveBeenCalled();
     expect(consoleLogMock).toHaveBeenCalledTimes(1);
   });
+
+  describe('problemMarcher', () => {
+    const [
+      {
+        pattern: [{ regexp }],
+      },
+    ] = problemMatcher;
+
+    it('Matches file on root', () => {
+      const output =
+        './some/nested/file/fluent-bit.conf: 10:1 warning PARSER some random error that the parser reported';
+
+      const issue = output.match(new RegExp(regexp));
+
+      if (issue) {
+        const [, file, line, column, severity, , message] = issue;
+
+        expect({
+          file,
+          line,
+          column,
+          severity,
+          message,
+        }).toMatchInlineSnapshot(`
+          Object {
+            "column": "1",
+            "file": "./some/nested/file/fluent-bit.conf",
+            "line": "10",
+            "message": "some random error that the parser reported",
+            "severity": "warning",
+          }
+        `);
+      }
+
+      expect.hasAssertions();
+    });
+    it('Matches file on root', () => {
+      const output = './fluent-bit.conf: 84:1 error LINTER cannot initialize input plugin: cpu123';
+
+      const issue = output.match(new RegExp(regexp));
+
+      if (issue) {
+        const [, file, line, column, severity, , message] = issue;
+
+        expect({
+          file,
+          line,
+          column,
+          severity,
+          message,
+        }).toMatchInlineSnapshot(`
+          Object {
+            "column": "1",
+            "file": "./fluent-bit.conf",
+            "line": "84",
+            "message": "cannot initialize input plugin: cpu123",
+            "severity": "error",
+          }
+        `);
+      }
+
+      expect.hasAssertions();
+    });
+  });
 });

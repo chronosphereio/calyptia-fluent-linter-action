@@ -32,6 +32,9 @@
     "*": [
       "pretty-quick --staged"
     ],
+    "problem-matcher.json": [
+      "bash -c \"npm run problem-matcher:build\""
+    ],
     "*.ts": [
       "eslint --fix",
       "bash -c \"npm run build\"",
