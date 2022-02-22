@@ -5,7 +5,7 @@ import failCase from '../__fixtures__/scenarios/failed_case.json';
 import { CALYPTIA_API_ENDPOINT, CALYPTIA_API_VALIDATION_PATH } from '../src/utils/constants';
 import { mockConsole, unMockConsole } from './helpers';
 import { problemMatcher } from '../problem-matcher.json';
-import { join } from 'path';
+import { join, resolve } from 'path';
 import { FluentBitSchema } from '@calyptia/fluent-bit-config-parser';
 const getTokensBySectionIdMock = jest.fn(() => [
   {
@@ -23,7 +23,7 @@ describe('fluent-linter-action', () => {
     [INPUT.FOLLOW_SYMBOLIC_LINKS]: 'false',
   };
 
-  process.env.GITHUB_WORKSPACE = '<PROJECT_ROOT>';
+  process.env.GITHUB_WORKSPACE = resolve(__dirname, '../');
   beforeAll(() => {
     getInput.mockImplementation((key: Partial<INPUT>) => {
       return mockedInput[key];
@@ -56,7 +56,7 @@ describe('fluent-linter-action', () => {
           "::add-matcher::<PROJECT_ROOT>/src/problem-matcher.json",
         ],
         Array [
-          "<PROJECT_ROOT>/__fixtures__/scenarios/withInclude/wrongPathInclude.conf: 1:1 error LINTER Can not find file tail.conf 
+          "./__fixtures__/scenarios/withInclude/wrongPathInclude.conf: 1:1 error LINTER Can not find file tail.conf 
       ",
         ],
       ]
@@ -141,9 +141,9 @@ describe('fluent-linter-action', () => {
           "::add-matcher::<PROJECT_ROOT>/src/problem-matcher.json",
         ],
         Array [
-          "<PROJECT_ROOT>/__fixtures__/invalid.conf: 2:5 error LINTER cannot initialize input plugin: john 
-      <PROJECT_ROOT>/__fixtures__/invalid.conf: 0:0 error LINTER Unknown syslog mode abc              
-      <PROJECT_ROOT>/__fixtures__/invalid.conf: 0:0 error LINTER missing 'key_name'                   
+          "./__fixtures__/invalid.conf: 2:5 error LINTER cannot initialize input plugin: john 
+      ./__fixtures__/invalid.conf: 0:0 error LINTER Unknown syslog mode abc              
+      ./__fixtures__/invalid.conf: 0:0 error LINTER missing 'key_name'                   
       ",
         ],
       ]
@@ -271,7 +271,7 @@ describe('fluent-linter-action', () => {
           "::add-matcher::<PROJECT_ROOT>/src/problem-matcher.json",
         ],
         Array [
-          "<PROJECT_ROOT>/__fixtures__/basic_without_name.conf: 4:1 error LINTER Attribute \\"name\\" missing 
+          "./__fixtures__/basic_without_name.conf: 4:1 error LINTER Attribute \\"name\\" missing 
       ",
         ],
       ]
@@ -296,5 +296,69 @@ describe('fluent-linter-action', () => {
 
     expect(setFailed).not.toHaveBeenCalled();
     expect(consoleLogMock).toHaveBeenCalledTimes(1);
+  });
+
+  describe('problemMarcher', () => {
+    const [
+      {
+        pattern: [{ regexp }],
+      },
+    ] = problemMatcher;
+
+    it('Matches file on root', () => {
+      const output =
+        './some/nested/file/fluent-bit.conf: 10:1 warning PARSER some random error that the parser reported';
+
+      const issue = output.match(new RegExp(regexp));
+
+      if (issue) {
+        const [, file, line, column, severity, , message] = issue;
+
+        expect({
+          file,
+          line,
+          column,
+          severity,
+          message,
+        }).toMatchInlineSnapshot(`
+          Object {
+            "column": "1",
+            "file": "./some/nested/file/fluent-bit.conf",
+            "line": "10",
+            "message": "some random error that the parser reported",
+            "severity": "warning",
+          }
+        `);
+      }
+
+      expect.hasAssertions();
+    });
+    it('Matches file on root', () => {
+      const output = './fluent-bit.conf: 84:1 error LINTER cannot initialize input plugin: cpu123';
+
+      const issue = output.match(new RegExp(regexp));
+
+      if (issue) {
+        const [, file, line, column, severity, , message] = issue;
+
+        expect({
+          file,
+          line,
+          column,
+          severity,
+          message,
+        }).toMatchInlineSnapshot(`
+          Object {
+            "column": "1",
+            "file": "./fluent-bit.conf",
+            "line": "84",
+            "message": "cannot initialize input plugin: cpu123",
+            "severity": "error",
+          }
+        `);
+      }
+
+      expect.hasAssertions();
+    });
   });
 });
