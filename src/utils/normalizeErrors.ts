@@ -12,6 +12,12 @@ declare let process: {
     GITHUB_WORKSPACE: string;
   };
 };
+
+/**
+ * There are errors we can not ignore in runtime, but we know are not relevant for linting purposes.
+ * This ignore list should help us filter these out
+ */
+const IGNORE_LIST = ['Error binding socket'];
 export function getRelativeFilePath(filePath: string): string {
   const relativePath = filePath.replace(join(process.env.GITHUB_WORKSPACE, '/'), '');
 
@@ -27,7 +33,13 @@ export function normalizeErrors(filePath: string, errors: ValidatedConfigV2['err
 
   if (runtime.length) {
     for (const error of runtime) {
-      annotations.push({ filePath: relativeFilePath, errors: error.errors.map((err: string) => [error.id, err]) });
+      const issues = error.errors.filter((err) => !IGNORE_LIST.includes(err));
+
+      // We skip the error report if we don't have issues left.
+      if (!issues.length) {
+        continue;
+      }
+      annotations.push({ filePath: relativeFilePath, errors: issues.map((err) => [error.id, err]) });
     }
   }
   for (const command in rest) {

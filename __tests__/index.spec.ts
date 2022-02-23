@@ -14,7 +14,7 @@ const getTokensBySectionIdMock = jest.fn(() => [
   },
 ]);
 
-jest.spyOn(FluentBitSchema.prototype, 'getTokensBySectionId').mockImplementationOnce(getTokensBySectionIdMock);
+jest.spyOn(FluentBitSchema.prototype, 'getTokensBySectionId');
 describe('fluent-linter-action', () => {
   let consoleLogMock: jest.Mock;
   const mockedInput = {
@@ -123,6 +123,7 @@ describe('fluent-linter-action', () => {
   });
 
   it('Reports errors correctly matching problemMatcher', async () => {
+    jest.spyOn(FluentBitSchema.prototype, 'getTokensBySectionId').mockImplementationOnce(getTokensBySectionIdMock);
     mockedInput[INPUT.CONFIG_LOCATION_GLOB] = '__fixtures__/invalid.conf';
     const client = nock(CALYPTIA_API_ENDPOINT);
     client['post']('/' + CALYPTIA_API_VALIDATION_PATH).reply(200, failCase);
@@ -177,6 +178,45 @@ describe('fluent-linter-action', () => {
     }
 
     expect(getTokensBySectionIdMock).toHaveBeenCalled();
+    expect(client.isDone()).toBe(true);
+  });
+  it('Reports errors correctly and excludes runtime errors', async () => {
+    jest.spyOn(FluentBitSchema.prototype, 'getTokensBySectionId').mockImplementationOnce(getTokensBySectionIdMock);
+    mockedInput[INPUT.CONFIG_LOCATION_GLOB] = '__fixtures__/invalid.conf';
+    const client = nock(CALYPTIA_API_ENDPOINT);
+    const failCaseWithListenError = {
+      errors: {
+        ...failCase.errors,
+        runtime: [
+          {
+            id: '47b5f893-b617-498f-a644-09bbdf88f014',
+            errors: ['Error binding socket'],
+          },
+        ],
+      },
+    };
+    client['post']('/' + CALYPTIA_API_VALIDATION_PATH).reply(200, failCaseWithListenError);
+    await main();
+
+    expect(setFailed.mock.calls).toMatchInlineSnapshot(`
+      Array [
+        Array [
+          "We found errors in your configurations. Please check your logs",
+        ],
+      ]
+    `);
+    expect(consoleLogMock.mock.calls).toMatchInlineSnapshot(`
+      Array [
+        Array [
+          "::add-matcher::<PROJECT_ROOT>/src/problem-matcher.json",
+        ],
+        Array [
+          "./__fixtures__/invalid.conf: 2:5 error LINTER Unknown syslog mode abc 
+      ./__fixtures__/invalid.conf: 0:0 error LINTER missing 'key_name'      
+      ",
+        ],
+      ]
+    `);
     expect(client.isDone()).toBe(true);
   });
 

@@ -1,6 +1,11 @@
 {
   "errors": {
-    "runtime": [{ "id": "47b5f893-b617-498f-a644-09bbdf88f014", "errors": ["cannot initialize input plugin: john"] }],
+    "runtime": [
+      {
+        "id": "47b5f893-b617-498f-a644-09bbdf88f014",
+        "errors": ["cannot initialize input plugin: john", "Error binding socket"]
+      }
+    ],
     "input": {
       "syslog": [
         {
