@@ -6,7 +6,7 @@ jobs:
     steps:
       - uses: actions/checkout@master
       - id: running_linter
-        uses: calyptia/fluent-linter-action@gg/making-problem-matcher-broeader
+        uses: calyptia/fluent-linter-action@gg/ignore-errors
         with:
           calyptia-api-key: ${{ secrets.CALYPTIA_API_KEY }}
           config-location-glob: '__fixtures__/configurations/*.conf'
