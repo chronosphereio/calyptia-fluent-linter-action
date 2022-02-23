@@ -28155,6 +28155,7 @@ var ATTRIBUTE_NAME_MISSING = 'Attribute "name" missing';
 
 // src/utils/normalizeErrors.ts
 var import_path = require('path');
+var IGNORE_LIST = ['Error binding socket'];
 function getRelativeFilePath(filePath) {
   const relativePath = filePath.replace((0, import_path.join)(process.env.GITHUB_WORKSPACE, '/'), '');
   return `./${relativePath}`;
@@ -28167,7 +28168,11 @@ function normalizeErrors(filePath, errors) {
     rest = __objRest(_a, ['runtime']);
   if (runtime.length) {
     for (const error of runtime) {
-      annotations.push({ filePath: relativeFilePath, errors: error.errors.map((err) => [error.id, err]) });
+      const issues = error.errors.filter((err) => !IGNORE_LIST.includes(err));
+      if (!issues.length) {
+        continue;
+      }
+      annotations.push({ filePath: relativeFilePath, errors: issues.map((err) => [error.id, err]) });
     }
   }
   for (const command in rest) {
