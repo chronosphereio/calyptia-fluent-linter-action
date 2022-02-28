@@ -121,7 +121,7 @@
     "eslint": "8.9.0",
     "eslint-config-prettier": "8.4.0",
     "eslint-plugin-prettier": "4.0.0",
-    "husky": "4.3.8",
+    "husky": "7.0.4",
     "jest": "^27.5.1",
     "jest-serializer-path": "^0.1.15",
     "lint-staged": "12.3.4",
