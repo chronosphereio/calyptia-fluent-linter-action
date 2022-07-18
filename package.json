@@ -107,7 +107,7 @@
     "@actions/core": "^1.6.0",
     "@actions/glob": "^0.2.0",
     "@calyptia/fluent-bit-config-parser": "^1.0.0",
-    "node-fetch": "^2.6.7",
+    "node-fetch": "^3.2.9",
     "table": "^6.8.0"
   },
   "devDependencies": {
